@@ -1,0 +1,9 @@
+# djouhri.de - security contact
+# Responsible disclosure is welcome. PGP-encrypted reports are preferred
+# (see Encryption). I read every report and respond in German or English.
+
+Contact: mailto:sami@djouhri.de
+Encryption: https://djouhri.de/pgp-key.asc
+Preferred-Languages: de, en
+Canonical: https://djouhri.de/.well-known/security.txt
+Expires: 2027-01-01T00:00:00.000Z

@@ -1,0 +1,35 @@
+{
+  "name": "sami-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Digitale Visitenkarte, kuratiertes Public-Subset der Eigen-Projekte.",
+  "scripts": {
+    "dev": "next dev -p 8210",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@react-pdf/renderer": "^4.5.1",
+    "@types/nodemailer": "^8.0.1",
+    "next": "^16.3.0",
+    "nodemailer": "^9.0.3",
+    "openpgp": "^6.3.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "autoprefixer": "^10.5.4",
+    "eslint": "^9.18.0",
+    "eslint-config-next": "^16.3.0",
+    "postcss": "^8.5.25",
+    "tailwindcss": "^3.4.16",
+    "typescript": "^5.7.2"
+  },
+  "overrides": {
+    "postcss": "^8.5.25"
+  }
+}

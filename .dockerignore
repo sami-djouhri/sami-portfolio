@@ -1,0 +1,17 @@
+# Build-Context schlank + frei von Dev-/Laufzeit-Daten halten.
+# WICHTIG: .data (CMS-Store) NIE ins Image, Laufzeit-Quelle ist das Docker-Volume
+# /data. Lag .data im Build-Context, backte `next build` veralteten Store-Text in
+# die SSG-Seiten (Incident 2026-06-28: ASCII-Umlaute trotz sauberem Volume).
+node_modules
+.next
+.git
+.data
+.env
+*.log
+npm-debug.log*
+Dockerfile
+.dockerignore
+README*.md
+DEPLOY*.md
+ZIELBILD.md
+CLAUDE.md

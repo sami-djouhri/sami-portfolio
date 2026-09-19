@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+.env
+.env.local
+*.log
+*.tsbuildinfo
+.DS_Store
+# Lokaler CMS-Store (Dev), im Container liegt er im Volume /data
+.data/

@@ -1,0 +1,49 @@
+/* captcha-guard widget, minimales, neutrales Styling. Über die Custom-Properties
+   an das App-Theme anpassbar. Passt zu claude-design (ruhige Rundungen, dezent). */
+captcha-guard {
+  display: inline-flex;
+  --cg-fg: #52525b;
+  --cg-accent: #c96442; /* claude-accent, dezent */
+  --cg-border: #e4e4e7;
+}
+captcha-guard .cg-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--cg-border);
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--cg-fg);
+  min-height: 2.25rem;
+  min-width: 12rem;
+}
+captcha-guard .cg-spinner {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid var(--cg-border);
+  border-top-color: var(--cg-accent);
+  animation: cg-spin 0.7s linear infinite;
+  flex: none;
+}
+captcha-guard[data-state="solved"] .cg-spinner {
+  border: 2px solid var(--cg-accent);
+  border-top-color: var(--cg-accent);
+  animation: none;
+}
+captcha-guard[data-state="error"] .cg-spinner {
+  border-color: #dc2626;
+  animation: none;
+}
+@keyframes cg-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  captcha-guard {
+    --cg-fg: #a1a1aa;
+    --cg-border: #3f3f46;
+  }
+}

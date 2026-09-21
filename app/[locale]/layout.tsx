@@ -168,7 +168,7 @@ export default async function LocaleLayout(
       'IT Security / Hardening',
     ],
     // ★ Das eigentliche Ziel der Seite, maschinenlesbar. Bis 2026-08-27 stand die
-    // gesuchte Position ausschliesslich als Fliesstext auf /cv — Recruiter-Werkzeuge
+    // gesuchte Position ausschliesslich als Fliesstext auf /cv: Recruiter-Werkzeuge
     // und Suchmaschinen lesen aber zuerst die strukturierten Felder. Wer nicht bis
     // Seite sechs klickt, erfuhr nicht, dass hier jemand Arbeit sucht.
     // Quelle ist lib/cv.ts, damit die Angabe nicht neben /cv und dem PDF driftet.

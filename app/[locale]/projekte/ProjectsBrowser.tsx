@@ -106,7 +106,7 @@ export function ProjectsBrowser({
    * vor: als Filter helfen sie kaum, als Wand aus gleich aussehenden Kacheln
    * erschlagen sie die Mehrfach-Treffer, nach denen man tatsächlich filtert.
    * Deshalb zeigt die Ansicht standardmäßig nur, was mindestens zwei Projekte
-   * verbindet — plus alles, was gerade aktiv ist, damit ein per URL gesetzter
+   * verbindet: plus alles, was gerade aktiv ist, damit ein per URL gesetzter
    * Filter nie unsichtbar wird. Der Rest bleibt einen Klick entfernt.
    */
   const SCHWELLE = 2;
@@ -118,7 +118,7 @@ export function ProjectsBrowser({
     );
     // Die Schwelle allein trägt nur über den ganzen Bestand. Sobald eine Domäne
     // gewählt ist, fallen die Zählstände zusammen (Infra: 3 von 35, Web: 1 von 12,
-    // Bots: gar keiner, weil sich die zwei Projekte keinen Stack teilen) — die
+    // Bots: gar keiner, weil sich die zwei Projekte keinen Stack teilen), die
     // Leiste sähe dann defekt aus. Deshalb eine Untergrenze: `allStacks` ist nach
     // Häufigkeit sortiert, die ersten zwölf sind genau die verbindendsten.
     const basis =

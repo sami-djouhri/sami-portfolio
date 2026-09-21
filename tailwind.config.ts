@@ -39,19 +39,19 @@ const config: Config = {
         text: '#ece9e0',
         // ★ LESBARKEIT BEI STREULICHT (2026-08-24, Owner-Befund „auf geblendeten
         // Bildschirmen schlecht lesbar"). `muted` trägt fast jeden Lead und Absatz
-        // dieser Seite, `muted-dim` jede Metazeile — beide lagen bei 5,7:1 bzw.
+        // dieser Seite, `muted-dim` jede Metazeile: beide lagen bei 5,7:1 bzw.
         // 5,2:1. Das ist auf einem Prüfer AA-konform und im Sonnenlicht trotzdem
         // weg: WCAG rechnet gegen den NOMINALEN Grund, während Streulicht den
         // realen Grund aufhellt und das Verhältnis zusammenfallen lässt. Ein
         // dunkles Design ist genau deshalb der ungünstigste Fall.
-        // Angehoben auf 7,7:1 / 6,2:1 — die tonale Leiter bleibt erhalten
+        // Angehoben auf 7,7:1 / 6,2:1, die tonale Leiter bleibt erhalten
         // (text 16,1 › muted 7,7 › muted-dim 6,2), sie steht nur höher.
         muted: '#a3a39e',
         'muted-dim': '#8f9199',
         // ── ZWEI FARBEN, ZWEI STIMMEN (seit 2026-08-24) ──────────────────────
         // Die frühere Doktrin („Amber = Marke, Grün = nur funktional") ist ersetzt.
         // Beide Farben sind jetzt gleichrangig, aber semantisch getrennt: die Farbe
-        // sagt, WER spricht. Das ist kein Geschmack, sondern Information — und der
+        // sagt, WER spricht. Das ist kein Geschmack, sondern Information, und der
         // Grund, warum die Seite nicht als „Terminal-Kostüm" liest.
         //
         //   AMBER = der Mensch  → CTA, Drop-Cap, Pull-Quote, Tagline, Hover, Fokus
@@ -111,7 +111,7 @@ const config: Config = {
         glow: '0 0 0 1px rgba(224,164,88,0.25), 0 0 24px -6px rgba(224,164,88,0.35)',
         'glow-term': '0 0 18px -4px rgba(90,197,111,0.45)',
         // Grüner Fassungs-Glow für TUI-Rahmen: der Rahmen ist Maschine, also leuchtet
-        // er grün nach. Bewusst schwächer als `glow` — ein Rahmen darf nie lauter
+        // er grün nach. Bewusst schwächer als `glow`, ein Rahmen darf nie lauter
         // sein als der Knopf, den er umschließt.
         'frame-term': '0 0 0 1px rgba(90,197,111,0.14), 0 0 28px -10px rgba(90,197,111,0.30)',
         // Neutrale, warm-schwarz getönte Ruhe-Elevation (fehlte bisher, Tiefe kam

@@ -9,14 +9,14 @@ import type { Domain, StackKey } from '@/lib/projects';
  * Der Zweck ist, Lesearbeit zu ERSETZEN, nicht sie zu schmücken: in einer Liste aus
  * zwei Dutzend Zeilen erkennt man „das sind die Infrastruktur-Sachen" am Umriss,
  * bevor man das erste Wort gelesen hat. Vorher stand an diesen Stellen für jede
- * Zeile dasselbe `›` — ein Zeichen ohne Information.
+ * Zeile dasselbe `›`, ein Zeichen ohne Information.
  *
  * Farbe folgt der Zwei-Stimmen-Doktrin: eine Einordnung kommt vom System, also
  * spricht sie GRÜN. Beim Hover der umgebenden Karte wechselt sie nach Amber, weil
  * dann der Mensch handelt.
  *
  * A11y: das Zeichen ist `aria-hidden`. Wo es in Links steht, führt deren
- * `aria-label` die Einordnung im Text mit — ein zusätzlicher sr-only-Text würde vom
+ * `aria-label` die Einordnung im Text mit, ein zusätzlicher sr-only-Text würde vom
  * `aria-label` des Links ohnehin verschluckt und wäre nur scheinbar zugänglich.
  */
 const BOX = {

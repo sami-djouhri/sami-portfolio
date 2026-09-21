@@ -54,7 +54,7 @@ const de: Dict = {
     'Alle drei laufen seit Jahren im Alltagsbetrieb. Wenn eins davon nachts ausfällt, repariere ich es. Drei als Anker, der Rest in der vollen Liste.',
   'home.proof.running': 'Im Dauerbetrieb',
   'home.proof.servicesLive': 'verwaltete Services',
-  // „10 Drift in der Service-Map" liest sich falsch, sobald die Zahl nicht 0 ist —
+  // „10 Drift in der Service-Map" liest sich falsch, sobald die Zahl nicht 0 ist,
   // und sie ist jetzt gemessen statt gesetzt, also ist sie oft nicht 0.
   'home.proof.driftSuffix': 'Abweichungen vom Soll',
   'home.proof.selfMeasured': 'selbst gemessen',

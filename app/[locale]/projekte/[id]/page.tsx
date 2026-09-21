@@ -668,7 +668,7 @@ function Decisions({
 /**
  * Zerlegt einen Kennzahl-Wert in eine führende Zahl und den Rest.
  *
- * ★ Der Grund: `value` ist ein freier String, und die Daten enthalten beides —
+ * ★ Der Grund: `value` ist ein freier String, und die Daten enthalten beides:
  * echte Zahlen („165 über die Flotte", „0 gegen die Quelle") und reine Prosa
  * („Shell · Mail · News · Kalender · Assets · Projekt-Deck", „erwartete Marge +
  * Downside (P05 · CVaR)"). Vorher bekam JEDER dieser Werte `.stat-major`, also

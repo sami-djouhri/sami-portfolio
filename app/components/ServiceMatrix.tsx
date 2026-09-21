@@ -3,7 +3,7 @@
  *
  * Warum das hier steht: die Kernaussage der Seite war eine ZAHL („162"), und eine
  * Zahl muss man lesen und dann in eine Vorstellung übersetzen. Die Matrix überspringt
- * beide Schritte — man sieht die Größenordnung und die Gesundheit im selben Blick,
+ * beide Schritte, man sieht die Größenordnung und die Gesundheit im selben Blick,
  * in dem man die Seite überhaupt erfasst. Die Zahl bleibt daneben stehen, sie ist
  * jetzt die Beschriftung des Bildes statt sein Ersatz.
  *
@@ -11,18 +11,18 @@
  * Sie erfindet nichts und rundet nicht. Wächst die Zahl in der `.env`, wächst das Bild.
  *
  * Privacy: reines Aggregat. Keine Namen, keine Reihenfolge, keine Gruppierung nach
- * Host — die Zellen sind bewusst ununterscheidbar, damit aus dem Bild nichts über
+ * Host, die Zellen sind bewusst ununterscheidbar, damit aus dem Bild nichts über
  * die interne Struktur ablesbar ist.
  *
  * Bewegung: EIN animiertes Element (ein Verlaufs-Rechteck, das durch eine Maske aus
- * den Zellen wandert), nicht 162 animierte Zellen — sonst wäre das auf schwacher
+ * den Zellen wandert), nicht 162 animierte Zellen, sonst wäre das auf schwacher
  * Hardware ein Ruckel-Generator. `prefers-reduced-motion` blendet es aus.
  */
 const CELL = 8;
 const GAP = 3;
 const PITCH = CELL + GAP;
 
-/** Grob 4,5:1 breit — passt in eine Panel-Spalte, ohne zur Briefmarke zu werden. */
+/** Grob 4,5:1 breit, passt in eine Panel-Spalte, ohne zur Briefmarke zu werden. */
 function gridShape(count: number): { cols: number; rows: number } {
   const cols = Math.max(1, Math.ceil(Math.sqrt(count * 4.5)));
   return { cols, rows: Math.max(1, Math.ceil(count / cols)) };
@@ -95,7 +95,7 @@ export function ServiceMatrix({
       </defs>
 
       {/* Ruhezustand: alle Dienste laufen (grün), Abweichungen in Amber. Die
-          leichte Helligkeitsstreuung ist rein optisch — sie nimmt dem Raster das
+          leichte Helligkeitsstreuung ist rein optisch, sie nimmt dem Raster das
           Tote, ohne eine Aussage über einzelne Zellen zu behaupten. */}
       {cells.map((c, i) => (
         <rect

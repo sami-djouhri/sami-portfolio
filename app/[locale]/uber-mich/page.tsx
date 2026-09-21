@@ -82,7 +82,7 @@ export default async function UeberMichPage(props: { params: Promise<{ locale: s
           >
             <ConvergeStrands className="ml-auto h-full w-full max-w-2xl" />
           </div>
-          {/* Der Lead trug bis 2026-08-27 `about.tagline` — also woertlich denselben
+          {/* Der Lead trug bis 2026-08-27 `about.tagline`, also woertlich denselben
               Satz, der schon auf der Startseite steht. Wer von dort hierher klickt,
               las als Erstes eine Wiederholung. Der Lead nennt jetzt, was DIESE Seite
               leistet: den Weg, nicht die These. */}
@@ -294,12 +294,12 @@ export default async function UeberMichPage(props: { params: Promise<{ locale: s
 
         {/* Bis 2026-08-27 stand hier eine Kopie des Startseiten-Abschlusses: dasselbe
             Terminal-Fenster `mail -s "Hallo" sami`, derselbe Einladungstext. Dieselbe
-            Fensterleiste trug auch /kontakt — bei einer Terminal-Oberflaeche heisst
+            Fensterleiste trug auch /kontakt, bei einer Terminal-Oberflaeche heisst
             das, dem Besucher denselben Befehl dreimal vorzutippen. Das Fenster gehoert
             jetzt /kontakt, wo die Konversion sitzt.
 
             Der Abschluss folgt stattdessen aus DIESER Seite: wer die vier Prinzipien
-            gelesen hat, will sie angewandt sehen — nicht als Erstes eine Mail
+            gelesen hat, will sie angewandt sehen, nicht als Erstes eine Mail
             schreiben. Also fuehrt der Hauptweg zu den Projekten, Kontakt bleibt als
             zweiter Weg daneben. Nebenbei behoben: der Eyebrow lautete `./say-hi.sh`
             auch auf der deutschen Fassung. */}

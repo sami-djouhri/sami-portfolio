@@ -10,7 +10,7 @@ import type { CSSProperties } from 'react';
  *   Hosttopologie (Privacy: keine Infra-Karte nachbauen).
  * - Das Netz ist ein SYSTEM-Diagramm, spricht also grün (Zwei-Stimmen-Doktrin,
  *   siehe tailwind.config.ts). Bis 2026-08-24 waren die Linien amber und nur der
- *   eine 'live'-Knoten grün — das las sich wie ein Fehler im eigenen Schema.
+ *   eine 'live'-Knoten grün, das las sich wie ein Fehler im eigenen Schema.
  *   Unterschieden wird jetzt über Helligkeit: der live-Knoten leuchtet heller
  *   als die übrigen, statt die Farbe zu wechseln.
  * - Animation rein transform/opacity/stroke-dashoffset; reduced-motion + print

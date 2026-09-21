@@ -58,7 +58,7 @@ export default async function CvPage(props: { params: Promise<{ locale: string }
           <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted">
             <span className="status-dot status-dot--live" aria-hidden />
             {/* Quelle: lib/cv.ts (CV_ZIEL). Derselbe Satz stand hier und im PDF
-                doppelt — bei einer Änderung des Ziels wäre eine der beiden
+                doppelt, bei einer Änderung des Ziels wäre eine der beiden
                 Fassungen stehen geblieben. */}
             <span className="text-term">{getZiel(locale).praefix}</span>
             <span className="text-muted-dim">{getZiel(locale).position}</span>

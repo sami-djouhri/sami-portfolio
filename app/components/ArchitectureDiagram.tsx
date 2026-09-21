@@ -145,7 +145,7 @@ export function ArchitectureDiagram({ architecture }: { architecture: Architectu
 
   return (
     // KEIN role="img" auf dem <figure>: ARIA erlaubt die Rolle dort nicht (Lighthouse
-    // aria-allowed-role, gefunden 2026-08-18). Gebraucht wurde sie auch nicht — die
+    // aria-allowed-role, gefunden 2026-08-18). Gebraucht wurde sie auch nicht, die
     // <figcaption> unten traegt denselben `summary` und beschreibt den Datenfluss
     // vollstaendig in Prosa. Das Diagramm selbst ist dessen visuelle Wiederholung und
     // deshalb aria-hidden; es enthaelt nichts Fokussierbares. Vorher wurde der Text

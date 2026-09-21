@@ -382,7 +382,7 @@ export default async function ToolboxPage(props: { params: Promise<{ locale: str
         {/* `opacity-50`: der Stapel ist Hintergrund-Signatur, kein Bedienelement.
             Die Maske des HeaderVisual blendet nach UNTEN aus, also blieb
             ausgerechnet die kräftigste Ebene (OPACITY.strong = 0,7) als einzige
-            voll stehen — direkt neben der Überschrift. Ihr 300 px breiter Rahmen
+            voll stehen: direkt neben der Überschrift. Ihr 300 px breiter Rahmen
             fiel auf, ihr 12-px-Label war auf die Entfernung nicht mehr zu lesen:
             sichtbar blieb ein leerer Kasten, der wie ein Rendering-Fehler aussah.
             Halbiert liest sich das Motiv als Textur, was es sein soll. */}
@@ -426,7 +426,7 @@ export default async function ToolboxPage(props: { params: Promise<{ locale: str
           </p>
           {/* Disziplinen als Karten mit Zeichen und Werkzeug-Chips.
               Vorher: vier Kacheln mit je einer senkrechten Aufzählung, zusammen 25
-              Zeilen, vor jeder derselbe `›`-Marker ohne Aussage — und man musste
+              Zeilen, vor jeder derselbe `›`-Marker ohne Aussage, und man musste
               lesen, um zu wissen, WAS eine Rubrik ist. Jetzt trägt das Icon die
               Erkennung, die Zahl rechts die Größenordnung, und die Werkzeuge stehen
               als umbrechende Chips statt untereinander. Gleiche Information, rund
@@ -474,7 +474,7 @@ export default async function ToolboxPage(props: { params: Promise<{ locale: str
                     key={r.label}
                     className="grid gap-8 border-b border-border/60 pb-10 last:border-0 md:grid-cols-12"
                   >
-                    {/* ★ Die Werkzeugliste stand hier ein ZWEITES Mal, vollständig —
+                    {/* ★ Die Werkzeugliste stand hier ein ZWEITES Mal, vollständig,
                         dieselben 25 Namen, die Sektion 01 direkt darüber schon zeigt.
                         Das war keine Vertiefung, sondern eine Wiederholung, die den
                         Blick zwingt zu prüfen, ob sich etwas geändert hat. Jetzt steht
@@ -585,7 +585,7 @@ export default async function ToolboxPage(props: { params: Promise<{ locale: str
                     <CountUp to={proof.services} />
                   </span>
                   {/* Wie auf der Startseite: der Drift steht nur da, wenn er gemessen
-                      wurde. `proof.drift` ist seit 2026-08-27 `number | null` — null
+                      wurde. `proof.drift` ist seit 2026-08-27 `number | null`: null
                       heisst „nicht verlaesslich ermittelt", nicht „null Abweichungen". */}
                   <span className="text-sm leading-snug text-muted">
                     {en ? 'services live' : 'Services live'}
@@ -621,7 +621,7 @@ export default async function ToolboxPage(props: { params: Promise<{ locale: str
           {/* Die Shell steht direkt unter den Zahlen, die sie abfragbar macht: eine
               Seite ueber gebaute Systeme, in der man erstmals selbst etwas tun kann,
               statt nur Beschreibungen zu lesen. Bewusst hier und nicht auf der
-              Startseite — die bleibt der ruhige Einstieg. */}
+              Startseite, die bleibt der ruhige Einstieg. */}
           <div className="pt-10">
             <p className="mb-3 font-mono text-xs uppercase tracking-widest text-muted-dim">
               {en ? 'or ask yourself' : 'oder selbst nachfragen'}
@@ -637,7 +637,7 @@ export default async function ToolboxPage(props: { params: Promise<{ locale: str
             />
             {/* Balken als .bar-row, identisch zum Stack-Diagramm weiter unten: eine
                 Bildsprache je Seite. Das frühere SVG skalierte über `w-full`
-                PROPORTIONAL zur Breite — bei 900 px Container wurden aus einer
+                PROPORTIONAL zur Breite, bei 900 px Container wurden aus einer
                 viewBox von 100×144 rund 1300 px Höhe für fünf Werte, mit 40 px
                 großen Labels. In HTML bleibt die Schrift in ihrer echten Größe,
                 nur der Balken folgt der Breite. */}

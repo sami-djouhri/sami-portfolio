@@ -104,7 +104,7 @@ export default async function JetztPage(props: { params: Promise<{ locale: strin
   const aktiv = focus.filter((f) => f.status === 'aktiv');
   // Nur Status zeigen, die es gerade WIRKLICH gibt. Eine Spalte, die „00“ ausweist,
   // belegt ein Drittel der Statuszeile, um mitzuteilen, dass es nichts mitzuteilen
-  // gibt. Faellt ein Status weg, schrumpft das Raster mit — die Klassennamen stehen
+  // gibt. Faellt ein Status weg, schrumpft das Raster mit, die Klassennamen stehen
   // literal da, weil Tailwind zusammengesetzte Namen nicht erzeugt.
   const counts = STATUS_ORDER.map((s) => ({
     status: s,
@@ -127,7 +127,7 @@ export default async function JetztPage(props: { params: Promise<{ locale: strin
           <PageHeader
             eyebrow="systemctl status sami"
             title={en ? 'Where things stand.' : 'Wo ich gerade stehe.'}
-            /* Der englische Lead nannte bis 2026-08-27 „some things in design“ —
+            /* Der englische Lead nannte bis 2026-08-27 „some things in design“,
                waehrend der Zaehler direkt darunter dafuer `00` auswies. Eine Seite,
                deren Anspruch „gemessen statt behauptet“ ist, darf sich nicht auf dem
                eigenen Bildschirm widersprechen. Beide Fassungen nennen jetzt nur,
@@ -221,12 +221,12 @@ export default async function JetztPage(props: { params: Promise<{ locale: strin
 
         {/* Prosaische Momentaufnahme: ORDNET die Liste darüber ein, wiederholt sie nicht.
             Vorher standen hier `description`-Felder WORTWÖRTLICH ein zweites Mal auf
-            derselben Seite (drei Absätze, je ~50 Wörter Dopplung) — auf einer Seite,
+            derselben Seite (drei Absätze, je ~50 Wörter Dopplung), auf einer Seite,
             deren Kritik „zu textlastig“ lautet, der teuerste Text überhaupt.
             Ebenfalls raus: `.toLowerCase()` auf den deutschen Zweigen. Im Englischen
             hält es den Satzfluss, im Deutschen zerstört es die Substantiv-
             Großschreibung („nachschlagewerk, karte, adress-suche“).
-            Die Satzschablone nennt den Titel jetzt als eigenständige Nennung — die
+            Die Satzschablone nennt den Titel jetzt als eigenständige Nennung, die
             Titel sind ganze Sätze („Dienste laufen lassen, wenn sie gebraucht
             werden“), die alte Fassung setzte sie in eine Schablone für Substantive
             und ergab „… gebraucht werden weiter ausbauen, Domäne für Domäne“. */}
@@ -240,7 +240,7 @@ export default async function JetztPage(props: { params: Promise<{ locale: strin
             </p>
             {/* Verweist auf Position statt auf Titel. Bis 2026-08-27 nannte dieser
                 Abschnitt `aktiv[0].title`, `aktiv[1].title` und `naechstes.title`
-                woertlich — dieselben Ueberschriften, die direkt darueber in der Liste
+                woertlich: dieselben Ueberschriften, die direkt darueber in der Liste
                 stehen, und der Status „als Naechstes“ zusaetzlich als Abzeichen. Die
                 Runde davor hatte die `description`-Dopplung entfernt und die
                 Titel-Dopplung stehen lassen. Eine Momentaufnahme soll die Liste

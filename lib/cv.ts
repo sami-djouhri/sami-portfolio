@@ -18,13 +18,13 @@ import { DIENSTE_PROSA } from '@/lib/proof';
 // um ein Boolean zu erfahren.
 
 /**
- * Die gesuchte Position — das eigentliche Ziel dieser Website.
+ * Die gesuchte Position, das eigentliche Ziel dieser Website.
  *
  * ★ Stand bis 2026-08-27 wortgleich an zwei Stellen (`/cv` und das generierte PDF).
  * Zwei Fassungen desselben Satzes driften auseinander, sobald sich das Ziel ändert,
  * und dann steht auf dem PDF etwas anderes als auf der Seite. Seit 2026-08-27 ist
  * das hier die einzige Quelle; sie speist zusätzlich das `seeks`-Feld der
- * strukturierten Daten (`app/[locale]/layout.tsx`) — Recruiter-Werkzeuge und
+ * strukturierten Daten (`app/[locale]/layout.tsx`): Recruiter-Werkzeuge und
  * Suchmaschinen lesen dieses Feld, bevor irgendjemand den Fließtext sieht.
  */
 export const CV_ZIEL = {

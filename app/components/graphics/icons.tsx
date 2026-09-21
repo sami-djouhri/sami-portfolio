@@ -158,7 +158,7 @@ export function IconTerminal({ className }: IconProps) {
 // Map: Domain-String auf passendes Icon.
 // ★ Muss ALLE Werte von `Domain` aus lib/projects.ts abdecken. Die Tabelle nannte
 // bis 2026-08-24 `Kunden` (die Domäne heisst seit dem Umbau `Web`) und hatte für
-// `Web` gar keinen Eintrag — drei Projekte hätten `undefined` bekommen. Der
+// `Web` gar keinen Eintrag: drei Projekte hätten `undefined` bekommen. Der
 // Record-Typ ist deshalb jetzt an `Domain` gebunden statt an `string`: ein neuer
 // Domänen-Wert bricht ab sofort den Build, statt still ein leeres Feld zu zeigen.
 export const DOMAIN_ICONS: Record<Domain, (props: IconProps) => React.JSX.Element> = {
@@ -169,7 +169,7 @@ export const DOMAIN_ICONS: Record<Domain, (props: IconProps) => React.JSX.Elemen
   Web: IconWeb,
 };
 
-// Map: Stack-Disziplin auf Icon. Schlüssel ist `StackKey`, NICHT das Label — das
+// Map: Stack-Disziplin auf Icon. Schlüssel ist `StackKey`, NICHT das Label, das
 // wird auf /en übersetzt und wäre als Schlüssel still kaputt.
 export const STACK_ICONS: Record<StackKey, (props: IconProps) => React.JSX.Element> = {
   infra: IconInfra,

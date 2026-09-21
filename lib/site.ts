@@ -77,7 +77,7 @@ export const PORTFOLIO_REPO_URL = 'https://github.com/sami-djouhri/sami-portfoli
  * Neue Einträge nur einzeln und bewusst.
  *
  * ★ `status.djouhri.de` gehört hier NICHT hinein: der Block „extern gemessen“
- * direkt darüber verlinkt dieselbe Adresse bereits — und dort mit ihrer
+ * direkt darüber verlinkt dieselbe Adresse bereits, und dort mit ihrer
  * Begründung (7/7 erreichbar, Uptime). Stand sie zusätzlich hier, nannte das
  * schmale Panel eine Domain zweimal untereinander, wovon die zweite Nennung
  * nichts hinzufügte. Diese Zeile zeigt PRODUKTE, nicht den Messpunkt.

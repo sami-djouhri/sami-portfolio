@@ -104,7 +104,7 @@ export function CvDocument(
     skills: lang === 'en' ? 'Skills' : 'Fähigkeiten',
     languages: lang === 'en' ? 'Languages' : 'Sprachen',
   };
-  // Quelle: lib/cv.ts (CV_ZIEL) — derselbe Satz wie auf /cv, damit PDF und Seite
+  // Quelle: lib/cv.ts (CV_ZIEL), derselbe Satz wie auf /cv, damit PDF und Seite
   // nicht auseinanderlaufen koennen.
   const goal = getZiel(lang).satz;
 

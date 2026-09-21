@@ -4,7 +4,7 @@
  * Eine benutzbare Shell auf einer Seite, die seit Monaten wie ein Terminal aussieht.
  *
  * ★ Warum das kein Widerspruch zur Kritik „zu textlastig" ist: Eine Eingabezeile
- * fuegt keinen Text hinzu, den man lesen MUSS — sie ist Interaktion. Eine frueher
+ * fuegt keinen Text hinzu, den man lesen MUSS, sie ist Interaktion. Eine frueher
  * erwogene Shell-Deko (tmux-Statuszeile, Box-Drawing-Rahmen) wurde bewusst
  * verworfen, weil sie genau das getan haette. Hier entscheidet der Besucher, ob
  * ueberhaupt etwas erscheint.
@@ -12,7 +12,7 @@
  * ★★ Kein `eval`, keine Backend-Aufrufe, keine Freitext-Auswertung. Die Eingabe
  * wird an Leerzeichen zerlegt und gegen eine feste Tabelle geprueft; alles andere
  * ist „unbekannter Befehl". Die Daten sind dieselben Aggregate, die die Seite
- * ohnehin ausliefert — es gibt nichts zu erreichen, was nicht schon oeffentlich ist.
+ * ohnehin ausliefert, es gibt nichts zu erreichen, was nicht schon oeffentlich ist.
  *
  * Barrierefreiheit: echtes <form> mit beschriftetem Feld, Verlauf als role="log"
  * mit aria-live, Fokus folgt dem Klick auf die Flaeche. Ohne JavaScript erscheint
@@ -77,7 +77,7 @@ export function TerminalShell({ locale, daten }: { locale: Locale; daten: ShellD
   const feld = useRef<HTMLInputElement>(null);
   const ende = useRef<HTMLDivElement>(null);
 
-  // Nur nachfuehren, wenn schon etwas passiert ist — sonst zieht das Terminal beim
+  // Nur nachfuehren, wenn schon etwas passiert ist, sonst zieht das Terminal beim
   // Seitenaufbau den Blick zu sich, obwohl niemand damit gearbeitet hat.
   useEffect(() => {
     if (zeilen.length > 1) ende.current?.scrollIntoView({ block: 'nearest' });
@@ -187,7 +187,7 @@ export function TerminalShell({ locale, daten }: { locale: Locale; daten: ShellD
           </span>
         }
       />
-      {/* Klick irgendwo in die Flaeche setzt den Fokus ins Feld — wie in einem echten
+      {/* Klick irgendwo in die Flaeche setzt den Fokus ins Feld, wie in einem echten
           Terminalfenster. Das Feld selbst bleibt regulaer per Tab erreichbar. */}
       <div
         className="p-5 sm:p-6"

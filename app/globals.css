@@ -55,7 +55,7 @@
   }
   /* Lebendiger Terminal-Grund. Das Licht der Seite kommt jetzt vom PHOSPHOR-SCHIRM,
      also grün: der obere Glow und die wandernde CRT-Refresh-Zeile sind die Maschine.
-     Unten rechts bleibt bewusst eine warme Amber-Vignette stehen — sie ist das
+     Unten rechts bleibt bewusst eine warme Amber-Vignette stehen, sie ist das
      menschliche Gegengewicht und verhindert, dass der Grund ins Monochrom-Kalte
      kippt (rein grün auf schwarz ist genau der Matrix-Kitsch, den die Identität
      ausschliesst). Nur background-position bewegt sich (GPU-schonend, kein
@@ -91,7 +91,7 @@
   /* Dezente CRT-Scanlines, fest über dem Viewport, nicht interaktiv.
      ★ LESBARKEIT VOR EFFEKT (2026-08-24): diese Schicht lag mit `multiply` über
      ALLEM, also auch über jedem Buchstaben, und zog jede dritte Bildzeile ab. Auf
-     einem Bildschirm mit Streulicht — wo der Grund ohnehin schon aufgehellt wird —
+     einem Bildschirm mit Streulicht, wo der Grund ohnehin schon aufgehellt wird,
      addierte sich das zum Kontrastverlust, der die Seite draussen unlesbar machte.
      Deckkraft von 0.4 auf 0.16 und die Linie von 0.12 auf 0.08 zurückgenommen: die
      CRT-Textur bleibt spürbar, kostet aber keinen Text mehr. Wer eine sichtbarere
@@ -119,7 +119,7 @@
   }
 
   /* Terminal-Scrollbar: schmal, in der Palette, Thumb wandert bei Hover auf Grün.
-     Die Bildlaufleiste ist Fenster-Chrome, also Maschine — sie gehört zur grünen
+     Die Bildlaufleiste ist Fenster-Chrome, also Maschine, sie gehört zur grünen
      Stimme, nicht zur amberfarbenen.
      Firefox via scrollbar-* , Chromium/WebKit via ::-webkit-scrollbar. Rein
      dekorativ-neutral, kein Bewegungs-Budget. */
@@ -213,7 +213,7 @@
   /* ── Terminal-Signatur ──────────────────────────────────────────── */
 
   /* Prompt-String: vollständig in der grünen Stimme. Der Prompt IST die Maschine,
-     die spricht — vorher war der Pfad amber, was die Zeile mitten im Wortzeichen
+     die spricht: vorher war der Pfad amber, was die Zeile mitten im Wortzeichen
      die Stimme wechseln liess. Unterschieden wird jetzt über Helligkeit statt über
      Farbwechsel: user hell, Pfad mittel, Satzzeichen stumm. */
   .prompt {
@@ -412,7 +412,7 @@
   /* Code ist wörtlich die Maschine → grüne Stimme. */
   .prose-editorial code {
     @apply rounded border border-border bg-surface px-1.5 py-0.5 font-mono text-[0.85em] text-term;
-    /* Lange Pfade/Flags dürfen umbrechen — html{overflow-x:clip} würde sie sonst
+    /* Lange Pfade/Flags dürfen umbrechen: html{overflow-x:clip} würde sie sonst
        unsichtbar abschneiden statt zu scrollen. */
     overflow-wrap: anywhere;
   }
@@ -536,7 +536,7 @@
   }
   .hero-net__edge--static { stroke-dashoffset: 0; }
   /* Netz-Knoten: gedämpftes Grün. Der live-Knoten unterscheidet sich durch
-     HELLIGKEIT und Nachglühen, nicht durch einen Farbwechsel — ein Diagramm, das
+     HELLIGKEIT und Nachglühen, nicht durch einen Farbwechsel, ein Diagramm, das
      mitten im Bild die Farbfamilie wechselt, liest sich wie ein Fehler. */
   .hero-net__core {
     fill: #3f9a56;
@@ -606,7 +606,7 @@
     }
     /* Lichtwisch beim Überfahren: ein einzelner Durchlauf, wie wenn ein Terminal
        eine Zeile neu zeichnet. Bewusst grün (das Fenster reagiert, also spricht
-       die Maschine), während Rahmen und Titel amber werden (der Mensch handelt) —
+       die Maschine), während Rahmen und Titel amber werden (der Mensch handelt),
        beide Stimmen im selben Moment, das ist der Reiz.
        `:not(.term-frame)`, weil dort `::after` schon die Eck-Bracket-Rolle hat;
        ein zweites `::after` gibt es nicht, und die Ecke gewönne stillschweigend. */
@@ -700,7 +700,7 @@
   }
 
   /* ── Statusmatrix (ServiceMatrix) ───────────────────────────────────────── */
-  /* Ein einziger wandernder Lichtwisch über dem Zellenfeld — NICHT 162 einzeln
+  /* Ein einziger wandernder Lichtwisch über dem Zellenfeld, NICHT 162 einzeln
      animierte Zellen. Nur `transform` → composited, kein Layout/Paint je Frame,
      also auch auf schwacher Hardware ruhig. Start/Ende kommen als Custom
      Properties aus der Komponente, weil die Feldbreite von der Dienstzahl abhängt. */

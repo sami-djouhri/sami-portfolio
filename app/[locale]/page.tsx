@@ -319,7 +319,7 @@ function LivePanel({
       />
 
       {/* Kernaussage: erst das BILD, dann die Zahl als seine Beschriftung.
-          Vorher stand hier nur die Zahl — man musste sie lesen und dann in eine
+          Vorher stand hier nur die Zahl, man musste sie lesen und dann in eine
           Vorstellung übersetzen. Die Matrix zeigt Größenordnung und Gesundheit im
           selben Blick; die Zahl daneben belegt sie exakt. */}
       <div className="border-b border-border bg-bg/40 px-5 py-6">
@@ -332,7 +332,7 @@ function LivePanel({
             <CountUp to={services} />
           </span>
           {/* ★ Der Drift erscheint NUR, wenn er gemessen wurde. Bis 2026-08-27 stand
-              hier fest „0 Drift in der Service-Map" aus einer Konstanten — waehrend der
+              hier fest „0 Drift in der Service-Map" aus einer Konstanten: waehrend der
               Live-Check zweistellige Abweichungen fand. Lieber keine Zahl als eine
               erfundene: fehlt die Messung, nennt die Zeile nur die Dienste. */}
           <span className="text-sm leading-snug text-muted">
@@ -346,7 +346,7 @@ function LivePanel({
             ) : null}
           </span>
         </div>
-        {/* Frische der Messung. Ohne Zeitstempel ist eine Zahl eine Behauptung —
+        {/* Frische der Messung. Ohne Zeitstempel ist eine Zahl eine Behauptung,
             genau der Fehler, den dieses Panel bis 2026-08-27 gemacht hat. Ist die
             Messung aelter als MAX_FRISCHE_H, sagt die Zeile „Momentaufnahme" statt
             „gemessen", damit alte Daten nicht wie frische aussehen. */}
@@ -363,7 +363,7 @@ function LivePanel({
 
         {/* Der Beweis wird nachpruefbar statt nur lesbar: dieselben Zahlen liegen
             als JSON offen. Wer einem Betriebs-Portfolio nicht glaubt, soll es
-            abfragen koennen — das ist billiger als jedes weitere Adjektiv.
+            abfragen koennen, das ist billiger als jedes weitere Adjektiv.
             `/api/proof` ist deshalb in app/robots.ts von der /api/-Sperre
             ausgenommen. `select-all` macht den Befehl mit einem Klick kopierbar. */}
         <p className="mt-4 select-all break-all rounded-md border border-border/60 bg-bg/60 px-3 py-2 font-mono text-[0.7rem] text-muted-dim">

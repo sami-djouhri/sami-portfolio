@@ -91,17 +91,17 @@ export function ProjectListItem({
         // erscheint. Ohne das wäre die Einordnung für Screenreader ersatzlos weg.
         aria-label={`${tx.title} · ${project.domain}`}
       >
-        {/* Name + Pfad: der Scan-Anker. Vorne das Domänen-Zeichen — vorher stand dort
+        {/* Name + Pfad: der Scan-Anker. Vorne das Domänen-Zeichen, vorher stand dort
             für JEDE Zeile dasselbe `›`, ein Zeichen ohne Aussage. Jetzt sieht man am
             Umriss, ob eine Zeile Infrastruktur, KI oder Web ist, bevor man liest.
-            Der NAME hat Vorrang — vorher teilten sich Titel und Pfad eine 16-rem-
+            Der NAME hat Vorrang: vorher teilten sich Titel und Pfad eine 16-rem-
             Spalte, in der der Pfad `shrink-0` war: die Kürzung traf also immer den
             Namen („Modell…“, „Offline-Wiss…“, sechs von neun Zeilen). Jetzt darf der
             Titel umbrechen, der Pfad weicht zuerst. */}
         {/* 23rem ist gemessen, nicht geschaetzt: der groesste Bedarf (Domaenen-
             Zeichen + Titel + Pfad, beide Sprachen) liegt bei 360 px = 22,5 rem.
             Bei 21 rem brachen drei Titel zweizeilig um UND der Pfad wurde zu
-            `~/modell-vermittlu…` gekappt — ein gekappter Pfad ist weder lesbar
+            `~/modell-vermittlu…` gekappt, ein gekappter Pfad ist weder lesbar
             noch kopierbar, also die schlechteste Kombination aus beidem. Die
             Beschreibung daneben hat `line-clamp-2` und verkraftet die 32 px. */}
         <div className="flex min-w-0 items-center gap-3 sm:w-72 sm:shrink-0 lg:w-[23rem]">
@@ -120,7 +120,7 @@ export function ProjectListItem({
           </span>
         </div>
 
-        {/* Einzeiler: was es ist. Kein `truncate` mehr — der breitere Namensraum
+        {/* Einzeiler: was es ist. Kein `truncate` mehr, der breitere Namensraum
             nimmt der Spalte Platz weg, und ein mitten im Wort gekappter Satz
             („ohne Contai…“) ist schlechter als eine zweite Zeile. */}
         <p className="line-clamp-2 min-w-0 flex-1 text-sm leading-snug text-muted">
@@ -190,7 +190,7 @@ export function ProjectCardCompact({
 
       {(() => {
         // JEDE Karte trägt ein Bild (seit 2026-08-24). Vorher bekamen nicht-featured
-        // Karten `null` — die „Mehr aus dieser Domäne“-Reihe unter jeder Fallstudie
+        // Karten `null`, die „Mehr aus dieser Domäne“-Reihe unter jeder Fallstudie
         // war dadurch eine reine Textwand. Ein Kopfbild kostet hier nichts: beide
         // Fallbacks sind gerechnetes SVG, kein Asset und kein Client-JS.
         if (hasPreview) return <PreviewThumb id={project.id} />;

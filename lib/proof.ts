@@ -14,13 +14,13 @@
  * darf die Kernzahl nicht geraten sein.
  *
  * Lesereihenfolge, absteigende Verlässlichkeit:
- *   1. ${PORTFOLIO_DATA_DIR}/proof.json  — auf dem Control-Host gemessen, per
+ *   1. ${PORTFOLIO_DATA_DIR}/proof.json, auf dem Control-Host gemessen, per
  *      scripts/proof-collect.py + proof-push.sh ins Volume gelegt (mit Zeitstempel)
- *   2. PROOF_* aus der ENV                — manuelle Übersteuerung, ohne Zeitstempel
- *   3. PROOF_DEFAULTS                     — letzte Rückfallebene
+ *   2. PROOF_* aus der ENV: manuelle Übersteuerung, ohne Zeitstempel
+ *   3. PROOF_DEFAULTS: letzte Rückfallebene
  *
  * ★ Eine Stufe tiefer heißt IMMER: kein `measured`-Objekt. Die UI unterscheidet
- * daran „gemessen vor 2 h" von „Selbstauskunft" und behauptet nie fälschlich live —
+ * daran „gemessen vor 2 h" von „Selbstauskunft" und behauptet nie fälschlich live:
  * dasselbe Prinzip, das lib/live-status.ts für den Gatus-Abruf anwendet.
  *
  * Privacy-Regel: ausschließlich Aggregate. Keine Hostnames, IPs,
@@ -29,11 +29,11 @@
  */
 
 /**
- * Letzte Rückfallebene, wenn weder eine Messung noch ENV vorliegt — etwa beim
+ * Letzte Rückfallebene, wenn weder eine Messung noch ENV vorliegt: etwa beim
  * allerersten Build, bevor proof-push.sh je gelaufen ist.
  *
  * ★ Hier steht bewusst KEIN `drift` mehr. Bis 2026-08-27 stand hier `drift: 0`,
- * und die Seite zeigte diese Null öffentlich als „0 Drift in der Service-Map" —
+ * und die Seite zeigte diese Null öffentlich als „0 Drift in der Service-Map",
  * während der Live-Check an dem Tag 10-11 echte Abweichungen fand (fünf neue
  * Container auf dem Public-Host, zwei Tunnel aus dem Spielserver-Umzug, vier
  * Ghosts). Eine Null, die niemand gemessen hat, ist die teuerste Zahl auf einer
@@ -82,7 +82,7 @@ export interface ProofDeployed {
 export interface ProofMeasured {
   iso: string;
   age_hours: number;
-  /** Älter als MAX_FRISCHE_H — die UI darf das nicht mehr als „live“ zeigen. */
+  /** Älter als MAX_FRISCHE_H, die UI darf das nicht mehr als „live“ zeigen. */
   stale: boolean;
 }
 

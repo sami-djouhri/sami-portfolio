@@ -22,7 +22,7 @@ function getIO(): IntersectionObserver | null {
       for (const e of entries) {
         // `top < 0` faengt den uebersprungenen Fall: wer per Pos1/Ende, Anker-Link
         // oder schnellem Wischen an einer Sektion vorbeispringt, bekommt vom
-        // Observer nie ein `isIntersecting` — das Element waere dann DAUERHAFT
+        // Observer nie ein `isIntersecting`, das Element waere dann DAUERHAFT
         // unsichtbar, obwohl es im DOM steht. Ist es nach oben rausgelaufen, hat
         // der Besucher es passiert und es gehoert gezeigt.
         if (e.isIntersecting || e.boundingClientRect.top < 0) {

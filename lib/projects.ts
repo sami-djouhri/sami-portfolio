@@ -767,7 +767,7 @@ export const ABOUT = {
   tagline: 'Ich betreibe Systeme, die zusammenhängen und mir gehören.',
   // Antwort auf den `whoami`-Prompt im Hero. ★ Bewusst OHNE Fachgebiets-Aufzaehlung:
   // die stand hier bis 2026-08-27 als vierter Satz („Linux, gehaertete Infrastruktur,
-  // Betrieb und Automation“) — drei Zentimeter unter der Rollenzeile des Heros, die
+  // Betrieb und Automation“), drei Zentimeter unter der Rollenzeile des Heros, die
   // genau das schon sagt, und ein weiteres Mal im Footer. Was bleibt, ist das eine
   // Argument, das sonst nirgends steht.
   bio: 'Mir ist wichtig, dass ich verstehe, was bei mir läuft. Ein Fremdprodukt kann morgen seinen Preis verdreifachen oder die API abschalten, und dann steht man da. Also läuft hier möglichst wenig, das ich nicht selbst in der Hand habe, auch wenn die Lösungen dadurch kleiner ausfallen, und dokumentiert ist alles so, dass auch jemand anderes es übernehmen könnte.',
@@ -838,7 +838,7 @@ export type StackKey = 'infra' | 'backend' | 'frontend' | 'ai';
 
 export interface StackCategory {
   /** ★ Stabil über Sprachen hinweg. `label` wird übersetzt und taugt NICHT als
-   *  Schlüssel — ein Icon-Mapping über den Label-String bräche auf /en still. */
+   *  Schlüssel, ein Icon-Mapping über den Label-String bräche auf /en still. */
   key: StackKey;
   label: string;
   items: string[];
@@ -876,7 +876,7 @@ export interface Principle {
 
 export const PRINCIPLES: Principle[] = [
   // ★ Dieses Prinzip trug bis 2026-08-27 dasselbe Argument wie ABOUT.bio auf der
-  // Startseite („kleiner selbst gebaut schlaegt gross gemietet“) — und stand auf
+  // Startseite („kleiner selbst gebaut schlaegt gross gemietet“), und stand auf
   // /uber-mich zwei Zentimeter unter einem Absatz, der es ein drittes Mal sagte.
   // Ein Prinzip soll die BETRIEBLICHE Konsequenz nennen, nicht die These
   // wiederholen: wer selbst baut, hat auch die Reparaturpflicht.

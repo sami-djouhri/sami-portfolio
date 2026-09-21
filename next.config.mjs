@@ -44,7 +44,7 @@ const nextConfig = {
             // ⚠️ Wirksam ist dieser Header NICHT: der `djouhri.de`-Block in der
             // Caddyfile auf dem Edge-Server setzt Strict-Transport-Security selbst
             // und überschreibt ihn. Beide Werte werden deshalb gleich gehalten
-            // (2 Jahre, includeSubDomains) — wer hier ändert, muss auch Caddy
+            // (2 Jahre, includeSubDomains), wer hier ändert, muss auch Caddy
             // ändern, sonst driften Code und Auslieferung auseinander.
             // Bewusst OHNE `preload`: die Aufnahme in die Browser-Preload-Liste
             // ist praktisch unumkehrbar und bindet alle *.djouhri.de dauerhaft an

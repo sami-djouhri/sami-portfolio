@@ -66,10 +66,24 @@ export const PROOF_DEFAULTS = {
  *
  * Nach oben nachziehen, wenn die gemessene Zahl die nächste Zehnerschwelle
  * dauerhaft überschritten hat, nie vorher: im Zweifel untertreiben.
+ *
+ * ★ Am 2026-09-22 von „170" auf „180" gezogen, mit Messreihe statt Gefühl. Die
+ * control-map liefert je Änderung einen Stand, hier die Tageswerte: 162 (08-19)
+ * → 164 (08-25) → 166 (08-29) → 172 (08-30) → 175 (08-31 bis 09-06) → 178
+ * (09-12) → 182 (09-13) → 191 (seit 09-17, unverändert). Die Reihe fällt
+ * nirgends. Die Schwelle 180 ist damit seit neun Tagen durchgehend
+ * überschritten, 190 erst seit sechs; deshalb 180 und nicht 190, obwohl die
+ * Tageszahl das hergäbe. Eine Größenordnung, die eine Rückstufung überlebt, ist
+ * mehr wert als eine, die näher am Tageswert liegt.
+ *
+ * Nachmessen, bevor jemand die nächste Stufe zieht: im Repository der Service-Map
+ * je Revision von `services.yaml` die Einträge zählen, deren `expected_state`
+ * nicht in {manual, stopped, migrated, planned} liegt. Dieselbe Filterung nimmt
+ * `scripts/proof-collect.py`, damit Prosa und Panel dasselbe zählen.
  */
 export const DIENSTE_PROSA = {
-  de: { klein: 'über 170', gross: 'Über 170' },
-  en: { klein: 'over 170', gross: 'Over 170' },
+  de: { klein: 'über 180', gross: 'Über 180' },
+  en: { klein: 'over 180', gross: 'Over 180' },
 } as const;
 
 export interface ProofDeployed {

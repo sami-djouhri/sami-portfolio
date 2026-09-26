@@ -151,7 +151,7 @@ export const PROJECT_DETAILS_EN_1: Record<string, ProjectDetail> = {
       ],
     },
     result: [
-      'Over 170 services run live across the host fleet, measured against the canonical source, hardening wave 3 complete.',
+      `${DIENSTE_PROSA.en.gross} services run live across the host fleet, measured against the canonical source, hardening wave 3 complete.`,
       'The cluster now includes a small x86 virtualization cluster alongside the original single-board nodes; several AI services, among them a larger local language model as a quality lane, were relocated there, and the service map stayed the source everything is measured against.',
       'The knowledge gateway is searchable across seven curated knowledge sources, and an active route probe flags public domains about to tip over before anyone notices.',
       'A DR runbook with an RTO/RPO matrix, encrypted off-site backup live, and a restore drill that runs automatically on a schedule.',

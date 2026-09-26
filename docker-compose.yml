@@ -1,5 +1,11 @@
-# sami-portfolio, Public-Site auf node1, terminiert via cloudflared-Tunnel
-# (djouhri.de, eigene Cloudflare-Zone).
+# sami-portfolio, Compose fuer den lokalen Lauf auf der Arbeitsmaschine.
+#
+# ★ Das hier ist NICHT die Laufzeit von djouhri.de. Die oeffentliche Seite laeuft
+# seit dem 2026-06-28 auf dem DMZ-Server hinter dessen eigenem Caddy, gestartet
+# aus `docker-compose.netcup.yml`, die dort liegt und bewusst nicht im Repository
+# steht. Bis zum 2026-09-22 behauptete dieser Kopf noch die alte Heimat samt
+# Tunnel, drei Monate nach dem Umzug: wer die Datei zur Orientierung las, suchte
+# die Laufzeit am falschen Ort.
 #
 # Privacy-Regel: keine IPs, keine Container-Namen, keine Hostnames in der UI.
 # Quelle der Wahrheit ist lib/projects.ts (kuratiert).
@@ -22,7 +28,8 @@ services:
     environment:
       # Kontaktformular: POST → life-ops-api Briefkasten-Ingest (existierender Endpoint
       # ruft intern briefkasten_store.ingest + events.emit("mail.received") auf).
-      # In .env auf node1 setzen, kein Default-Wert hier, wenn unset, antwortet /api/contact 503.
+      # In der .env des Laufzeit-Hosts setzen, kein Default-Wert hier. Ist nichts
+      # gesetzt und greift auch keine der anderen Senken, antwortet /api/contact 503.
       CONTACT_UPSTREAM_URL: "${CONTACT_UPSTREAM_URL:-}"
       CONTACT_UPSTREAM_TOKEN: "${CONTACT_UPSTREAM_TOKEN:-}"
       BUILD_TIME: "${BUILD_TIME:-}"

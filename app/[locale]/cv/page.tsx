@@ -26,6 +26,22 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const params = await props.params;
   const locale = asLocale(params.locale);
+  // ★★ Der Schalter muss AUCH hier greifen, nicht nur in der Komponente.
+  // `generateMetadata` läuft, bevor unten `notFound()` ausgelöst wird: die
+  // Antwort war dadurch eine 404, die im Titel trotzdem „Lebenslauf" ankündigte
+  // und eine Beschreibung dazu mitlieferte. Im Browser gemessen am 2026-09-22
+  // sagte dieselbe Seite sichtbar „Diese Seite existiert nicht" und im Kopf
+  // „Lebenslauf · Sami Djouhri". Wer den Verweis teilt, bekommt also eine
+  // Vorschau auf ein Dokument, das bewusst nicht veröffentlicht ist.
+  // Dasselbe Muster wie bei unbekannten Projekten (`projekte/[id]`), das diese
+  // Frage bereits richtig beantwortet.
+  // ★ Bewusst ein LEERES Objekt und kein eigener 404-Titel. Gemessen: ein hier
+  // gesetzter Titel kommt bei einer ausgelösten `notFound()` nicht durch, die
+  // Antwort erbt den Seitentitel des Layouts; und `noindex` setzt Next für eine
+  // 404 ohnehin selbst. Übrig bleibt genau der Effekt, um den es geht: die 404
+  // kündigt keinen Lebenslauf mehr an. Code, der mehr behauptet, als er bewirkt,
+  // wäre hier die schlechtere Lösung.
+  if (!CV_OEFFENTLICH) return {};
   return {
     title: t(locale, 'nav.cv'),
     description:

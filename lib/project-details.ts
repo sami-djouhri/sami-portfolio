@@ -160,7 +160,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       ],
     },
     result: [
-      'Über 170 Dienste laufen live über die Host-Flotte, gemessen gegen die kanonische Quelle, Hardening Welle 3 abgeschlossen.',
+      `${DIENSTE_PROSA.de.gross} Dienste laufen live über die Host-Flotte, gemessen gegen die kanonische Quelle, Hardening Welle 3 abgeschlossen.`,
       'Der Verbund umfasst inzwischen einen kleinen x86-Virtualisierungs-Cluster neben den ursprünglichen Einplatinen-Knoten; mehrere AI-Dienste, darunter ein größeres lokales Sprachmodell als Qualitäts-Lane, wurden dorthin verlagert, und die Service-Map blieb dabei die Quelle, gegen die gemessen wird.',
       'Knowledge-Gateway über sieben kuratierte Wissensquellen durchsuchbar, eine aktive Routen-Probe meldet öffentliche Domänen, die kippen, bevor es jemand bemerkt.',
       'DR-Runbook mit RTO/RPO-Matrix, verschlüsseltes Off-Site-Backup live, Restore-Drill wiederkehrend automatisiert.',

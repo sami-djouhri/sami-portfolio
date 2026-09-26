@@ -18,6 +18,7 @@ import { StatusChip } from '../../../components/StatusBadge';
 import { CommandEyebrow, WindowBar } from '../../../components/Terminal';
 import { TopBar } from '../../../components/TopBar';
 import { asLocale, localeAlternates, localePath, localizedSlugPath, LOCALES, type Locale } from '@/lib/i18n/config';
+import { kurzbeschreibung } from '@/lib/seo';
 import { t } from '@/lib/i18n/dict';
 import { getProjectDetail, PROJECT_DETAILS } from '@/lib/project-details';
 import { localizedProject, localizedYear, type Architecture, type Project, type ProjectDetail, type RepoLink } from '@/lib/projects';
@@ -47,11 +48,16 @@ export async function generateMetadata(
   const path = `/${locale}${localizedSlugPath(locale, `/projekte/${p.id}`)}`;
   return {
     title: tx.title,
-    description: `${tx.tagline} ${tx.description}`,
+    // ★ Gekürzt, nicht verkettet stehen gelassen: `${tagline} ${description}`
+    // ergab auf diesen Seiten 504 bis 844 Zeichen, während Suchmaschinen bei
+    // etwa 155 abschneiden. Der überzählige Teil war nicht Reserve, er wurde
+    // verworfen, und der sichtbare Rest endete mitten im Satz. Begründung und
+    // Messwerte in lib/seo.ts.
+    description: kurzbeschreibung(`${tx.tagline} ${tx.description}`),
     alternates: localeAlternates(locale, `/projekte/${p.id}`),
     openGraph: {
       title: `${tx.title}, ${tx.tagline}`,
-      description: tx.description,
+      description: kurzbeschreibung(tx.description),
       url: path,
       type: 'article',
       locale: locale === 'en' ? 'en_US' : 'de_DE',
@@ -64,7 +70,7 @@ export async function generateMetadata(
     twitter: {
       card: 'summary_large_image',
       title: `${tx.title}, ${tx.tagline}`,
-      description: tx.description,
+      description: kurzbeschreibung(tx.description),
     },
   };
 }

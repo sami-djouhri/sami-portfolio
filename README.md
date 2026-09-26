@@ -44,4 +44,5 @@ Of all the repos here this is the one whose result you can simply go and look at
 still strips the deploy path and the host configuration, rewrites internal
 addresses to placeholders, and blocks the push unless two secret scanners agree.
 
-The history stays private, hence the single commit.
+The development history stays private, hence a public one that starts at the
+first release.

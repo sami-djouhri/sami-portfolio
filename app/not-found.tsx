@@ -35,9 +35,23 @@ export default function NotFound() {
   // `lang` steht serverseitig auf Deutsch und wird nach der Hydration auf die
   // Sprache des Pfades nachgezogen. `mitSkipLink`, weil über dieser Seite kein
   // Layout steht, das den Sprunglink mitbrächte.
+  //
+  // ★ Der Titel steht als Element im Baum, nicht als `metadata`-Export: für
+  // `not-found.tsx` ist der Export laut der mitgelieferten Doku nur bei
+  // `global-not-found` vorgesehen, und `global-not-found` greift hier nicht
+  //. React hebt ein `<title>` von selbst in den Kopf.
+  // Gemessen am 2026-09-22 im Browser: `/de/nixda` und `/en/nixda` hatten
+  // überhaupt keinen Titel, der Reiter zeigte die nackte Adresse.
+  // Bewusst sprachneutral, weil die Sprache hier erst im Browser feststeht und
+  // ein Request-API in dieser Datei alle Inhaltsseiten aus dem statischen
+  // Vorrendern zöge (siehe Kopf der Datei).
+  // ★ KEIN eigenes `robots`-Meta: Next setzt für eine 404 von sich aus
+  // `noindex`. Ein zusätzliches daneben ergab drei robots-Angaben in einem
+  // Dokument, gemessen im Browser, und die dritte sagte nichts Neues.
   return (
     <html lang="de" className={`dark ${serif.variable} ${mono.variable} ${sans.variable}`}>
       <body>
+        <title>404 · Sami Djouhri</title>
         <NotFoundInhalt mitSkipLink />
       </body>
     </html>

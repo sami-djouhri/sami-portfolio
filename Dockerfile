@@ -3,12 +3,12 @@
 # Basis node:24-alpine, nicht node:20: Node 20 ist seit April 2026 EOL und bekommt
 # keine Sicherheitsfixes mehr. 24 traegt ausserdem Alpine 3.24 statt 3.23 (neueres
 # openssl). Next 16 verlangt >= 20.9, 24 ist damit abgedeckt.
-FROM node:24-alpine AS deps
+FROM node:25-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
 
-FROM node:24-alpine AS builder
+FROM node:25-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -27,7 +27,7 @@ ENV BUILD_TIME=${BUILD_TIME}
 ENV BAU=dienst
 RUN npm run build
 
-FROM node:24-alpine AS runtime
+FROM node:25-alpine AS runtime
 WORKDIR /app
 # Auch zur Laufzeit (seit 2026-10-30): /api/proof liest das Datum aus der Umgebung,
 # und auf dem Wirt setzt es seit dem Bau im Haus niemand mehr.

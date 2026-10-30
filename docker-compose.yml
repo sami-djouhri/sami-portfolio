@@ -1,0 +1,55 @@
+# sami-portfolio, Compose fuer den lokalen Lauf auf der Arbeitsmaschine.
+#
+# Das hier ist NICHT die Laufzeit von djouhri.de. Die oeffentliche Seite laeuft
+# seit dem 2026-06-28 auf dem DMZ-Server hinter dessen eigenem Caddy, gestartet
+# aus `docker-compose.netcup.yml`, die dort liegt und bewusst nicht im Repository
+# steht. Bis zum 2026-09-22 behauptete dieser Kopf noch die alte Heimat samt
+# Tunnel, drei Monate nach dem Umzug: wer die Datei zur Orientierung las, suchte
+# die Laufzeit am falschen Ort.
+#
+# Privacy-Regel: keine IPs, keine Container-Namen, keine Hostnames in der UI.
+# Quelle der Wahrheit ist lib/projects.ts (kuratiert).
+
+services:
+  portfolio:
+    build:
+      context: .
+    container_name: sami-portfolio
+    restart: unless-stopped
+    mem_limit: 256m
+    memswap_limit: 256m   # == mem_limit → Swap aus, sauberer OOM statt Host-Thrashing
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m
+      - /app/.next/cache:size=128m
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      # Kontaktformular: POST → life-ops-api Briefkasten-Ingest (existierender Endpoint
+      # ruft intern briefkasten_store.ingest + events.emit("mail.received") auf).
+      # In der .env des Laufzeit-Hosts setzen, kein Default-Wert hier. Ist nichts
+      # gesetzt und greift auch keine der anderen Senken, antwortet /api/contact 503.
+      CONTACT_UPSTREAM_URL: "${CONTACT_UPSTREAM_URL:-}"
+      CONTACT_UPSTREAM_TOKEN: "${CONTACT_UPSTREAM_TOKEN:-}"
+      BUILD_TIME: "${BUILD_TIME:-}"
+      # Eigen-CMS: JSON-Store + Medien im beschreibbaren Volume.
+      PORTFOLIO_DATA_DIR: "/data"
+    volumes:
+      # CMS-Daten (Projekte/Leistungen/Posteingang/Medien), read_only-Root braucht
+      # ein beschreibbares Volume.
+      - portfolio-data:/data
+    ports:
+      # Public: nur localhost → cloudflared-Tunnel terminiert djouhri.de.
+      - "127.0.0.1:8210:3000"
+      # LAN/WireGuard: /admin ist NUR hierüber erreichbar (cloudflared-Ingress liefert
+      # /admin* öffentlich 404, zusätzlich blockt die App-Middleware cf-Header).
+      - "8211:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  portfolio-data:

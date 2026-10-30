@@ -1,0 +1,1582 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --term-line: rgba(236, 233, 224, 0.05);
+    /* Zentrale Motion-Tokens. Vorher waren Dauern/Easings quer durch globals.css
+       dupliziert, was Micro-Interaktionen inkonsistent wirken liess. */
+    --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --dur-1: 140ms;
+    --dur-2: 240ms;
+    --dur-3: 600ms;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+    /* Mobile-Safety-Net: in einem mono-lastigen Terminal-Layout kann ein einziges
+       leicht zu breites Element horizontalen Seiten-Scroll auslösen (unpoliert auf
+       360–390px). `clip` unterbindet das, OHNE, anders als `overflow-x: hidden` ,
+       einen Scroll-Container zu erzeugen → `position: sticky` (TopBar, Section-Index)
+       bleibt intakt. Vertikaler Scroll/Anchor-Sprünge unberührt. Graceful: alte
+       Engines ohne `clip`-Support ignorieren die Zeile (kein Netz, kein Schaden). */
+    overflow-x: clip;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+  body {
+    @apply bg-bg text-text font-sans;
+    /* Nur universell sichere Features (alle default-an), die frühere Kombi
+       'ss01','cv11' war für Serif/Mono ein No-op und würde am neuen Body-Font
+       (IBM Plex Sans) ungewollt Stil-Alternativen erzwingen. Default-Glyphen sind
+       hier bewusst gewollt. */
+    font-feature-settings: 'kern', 'liga', 'calt';
+    /* Statisches Punkt-Raster (Blueprint/Terminal-Grund). Die warmen
+       Phosphor-Glows liegen jetzt als atmende Schicht in body::before. */
+    background-image:
+      radial-gradient(circle at center, rgba(236, 233, 224, 0.022) 1px, transparent 1px);
+    background-size: 26px 26px;
+    background-attachment: fixed;
+  }
+  /* Moderne Typografie (progressive enhancement, alte Browser ignorieren):
+     Überschriften ausbalancieren (keine Ein-Wort-Waisen in den großen Serif-Titeln),
+     Fließtext sauberer umbrechen (kurze letzte Zeilen vermeiden). */
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  /* Lebendiger Terminal-Grund. Das Licht der Seite kommt jetzt vom PHOSPHOR-SCHIRM,
+     also grün: der obere Glow und die wandernde CRT-Refresh-Zeile sind die Maschine.
+     Unten rechts bleibt bewusst eine warme Amber-Vignette stehen, sie ist das
+     menschliche Gegengewicht und verhindert, dass der Grund ins Monochrom-Kalte
+     kippt (rein grün auf schwarz ist genau der Matrix-Kitsch, den die Identität
+     ausschliesst). Nur background-position bewegt sich (GPU-schonend, kein
+     Blob-Puls). z-index:-1, reduced-motion + print weiter unten neutralisiert. */
+  body::before {
+    content: "";
+    @apply pointer-events-none fixed inset-0;
+    z-index: -1;
+    background-image:
+      radial-gradient(
+        ellipse 68rem 48rem at 50% -20rem,
+        rgba(90, 197, 111, 0.05),
+        transparent 62%
+      ),
+      radial-gradient(
+        ellipse 84rem 56rem at 88% 116%,
+        rgba(224, 164, 88, 0.035),
+        transparent 70%
+      ),
+      linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(90, 197, 111, 0.028) 47%,
+        rgba(90, 197, 111, 0.055) 50%,
+        rgba(90, 197, 111, 0.028) 53%,
+        transparent 100%
+      );
+    background-repeat: no-repeat;
+    background-size: 100% 100%, 100% 100%, 100% 320%;
+    background-position: 50% 0, 88% 100%, 0 -110%;
+    animation: scan-sweep 16s linear infinite;
+  }
+  /* Dezente CRT-Scanlines, fest über dem Viewport, nicht interaktiv.
+     LESBARKEIT VOR EFFEKT (2026-08-24): diese Schicht lag mit `multiply` über
+     ALLEM, also auch über jedem Buchstaben, und zog jede dritte Bildzeile ab. Auf
+     einem Bildschirm mit Streulicht, wo der Grund ohnehin schon aufgehellt wird,
+     addierte sich das zum Kontrastverlust, der die Seite draussen unlesbar machte.
+     Deckkraft von 0.4 auf 0.16 und die Linie von 0.12 auf 0.08 zurückgenommen: die
+     CRT-Textur bleibt spürbar, kostet aber keinen Text mehr. Wer eine sichtbarere
+     Textur will, hebt die Linie an, NICHT die Deckkraft der Gesamtschicht. */
+  body::after {
+    content: "";
+    @apply pointer-events-none fixed inset-0 z-[1];
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.08) 3px
+    );
+    mix-blend-mode: multiply;
+    opacity: 0.16;
+  }
+  ::selection {
+    @apply bg-accent/30 text-text;
+    /* Markierter Text „phosphoresziert" leicht, verstärkt die CRT-Anmutung beim
+       Lesen. Degradiert sauber bei Engines ohne text-shadow-Support. */
+    text-shadow: 0 0 10px rgba(224, 164, 88, 0.45);
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-bg;
+  }
+
+  /* Terminal-Scrollbar: schmal, in der Palette, Thumb wandert bei Hover auf Grün.
+     Die Bildlaufleiste ist Fenster-Chrome, also Maschine, sie gehört zur grünen
+     Stimme, nicht zur amberfarbenen.
+     Firefox via scrollbar-* , Chromium/WebKit via ::-webkit-scrollbar. Rein
+     dekorativ-neutral, kein Bewegungs-Budget. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #33363f transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #33363f;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #5ac56f;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+@layer components {
+  .grid-rule {
+    background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.04) 1px,
+      transparent 1px
+    );
+    background-size: 6rem 100%;
+  }
+
+  .label {
+    @apply font-mono text-[0.7rem] uppercase tracking-widest text-muted;
+  }
+
+  .rule {
+    @apply border-t border-border;
+  }
+
+  /* Blöcke, die ohne JavaScript sinnlos wären (die Terminal-Shell). Ein totes
+     Eingabefeld ist schlimmer als gar keines: es lädt zu einer Handlung ein, die
+     nicht funktioniert. `js-ready` setzt das Inline-Script in layout.tsx vor dem
+     ersten Paint, deshalb flackert hier nichts. */
+  .nur-mit-js {
+    display: none;
+  }
+  html.js-ready .nur-mit-js {
+    display: block;
+  }
+
+  /* Terminal-Textlink: die Unterstreichung wächst bei Hover/Fokus von links ein,
+     statt eines harten Farb-Flips (background-size-Trick, currentColor → erbt die
+     Hover-Farbe). Bewusst NUR für reine Text-Links (Footer, Meta-Zeilen), nicht
+     für Buttons oder Karten. Degradiert sauber; reduced-motion killt die Dauer
+     global (dann erscheint die Linie ohne Wisch), print zeigt sie nicht. */
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    transition: background-size var(--dur-2) var(--ease-out), color var(--dur-1) var(--ease-out);
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  /* Pfeil-Nudge: ein → / ↗ am Linkende rückt bei Gruppen-Hover minimal in seine
+     Richtung, das klassische CLI-Detail „der Pfeil zeigt, wohin es geht". Nur
+     transform, hover-getriggert (kein Dauer-Loop → kein Bewegungs-Budget-Verbrauch). */
+  .nudge-x {
+    @apply inline-block;
+    transition: transform var(--dur-1) var(--ease-out);
+  }
+  .group:hover .nudge-x {
+    transform: translateX(3px);
+  }
+
+  .skip-link {
+    @apply absolute left-2 top-2 z-50 -translate-y-16 rounded-md bg-accent px-3 py-2 font-mono text-xs uppercase tracking-widest text-bg transition-transform focus-visible:translate-y-0;
+  }
+
+  /* ── Terminal-Signatur ──────────────────────────────────────────── */
+
+  /* Prompt-String: vollständig in der grünen Stimme. Der Prompt IST die Maschine,
+     die spricht: vorher war der Pfad amber, was die Zeile mitten im Wortzeichen
+     die Stimme wechseln liess. Unterschieden wird jetzt über Helligkeit statt über
+     Farbwechsel: user hell, Pfad mittel, Satzzeichen stumm. */
+  .prompt {
+    @apply font-mono text-sm;
+  }
+  .prompt-user { @apply text-term; }
+  .prompt-host { @apply text-text/70; }
+  .prompt-path { @apply text-term/75; }
+  .prompt-sign { @apply text-muted-dim; }
+
+  /* Blinkender Block-Cursor, die eine Bewegungs-Signatur. */
+  .term-cursor {
+    @apply ml-1 inline-block w-[0.6em] bg-term align-[-0.1em];
+    height: 1.05em;
+    box-shadow: 0 0 10px -1px rgba(90, 197, 111, 0.6);
+    animation: term-blink 1.1s steps(1) infinite;
+  }
+  .term-cursor--accent {
+    @apply bg-accent;
+    box-shadow: 0 0 10px -1px rgba(224, 164, 88, 0.6);
+  }
+
+  /* Domänen-Zeichen (DomainMark): in Ruhe grün, weil die Einordnung vom System
+     kommt; bei Hover/Fokus der umgebenden Karte oder Zeile nach Amber, weil dann
+     der Mensch handelt. Der Wechsel läuft über die `group` des Links. */
+  .group:hover .domain-mark,
+  .group:focus-within .domain-mark {
+    @apply border-accent/50 bg-accent/10 text-accent;
+  }
+
+  /* Eck-Brackets: TUI-Rahmen aus Crosshair-Ecken statt voller Box. */
+  .term-frame {
+    @apply relative;
+  }
+  /* Eck-Brackets sind Fenster-Chrome → grüne Stimme. */
+  .term-frame::before,
+  .term-frame::after {
+    content: "";
+    @apply pointer-events-none absolute size-3 border-term/60;
+  }
+  .term-frame::before {
+    @apply left-0 top-0 border-l border-t;
+  }
+  .term-frame::after {
+    @apply bottom-0 right-0 border-b border-r;
+  }
+
+  /* Fenster-Chrome: schmale Titelleiste mit drei Punkten. Die Punkte sind bewusst
+     in der Palette (kein Ampel-Kitsch), lesen sich aber physisch: eingelassen
+     (innerer Schatten) mit einer haardünnen oberen Lichtkante, Licht von oben,
+     dieselbe Lichtquelle wie der Panel-Bevel. */
+  .term-dots {
+    @apply flex items-center gap-1.5;
+  }
+  .term-dots > span {
+    @apply size-2 rounded-full border border-border-strong bg-surface-2;
+    box-shadow: inset 0 1px 1.5px rgba(0, 0, 0, 0.55), 0 0.5px 0 rgba(236, 233, 224, 0.06);
+  }
+
+  /* Fenster-Titelleiste als Material: dunklere Chrome-Basis (Trennung zum Panel-
+     Körper), eine haardünne obere Lichtkante (Bevel) und ein sehr feiner Top-lit-
+     Verlauf, dieselbe Lichtquelle von oben wie bei den Panels. Neutral, kein
+     Ampel-Kitsch. Auf nahezu jedem Panel → sitewide Tiefe aus einem Baustein. */
+  .window-bar {
+    @apply relative flex items-center gap-3 border-b border-border px-4 py-2.5;
+    background-color: rgba(11, 12, 14, 0.6);
+    background-image: linear-gradient(to bottom, rgba(236, 233, 224, 0.03), transparent 62%);
+    box-shadow: inset 0 1px 0 0 rgba(236, 233, 224, 0.05);
+  }
+
+  .glow-text {
+    text-shadow: 0 0 18px rgba(224, 164, 88, 0.35);
+  }
+  .glow-term {
+    text-shadow: 0 0 14px rgba(90, 197, 111, 0.45);
+  }
+
+  /* ── Status-Punkte ──────────────────────────────────────────────── */
+
+  .status-dot {
+    @apply inline-block size-1.5 rounded-full;
+  }
+  .status-dot--live {
+    @apply bg-term;
+    box-shadow: 0 0 9px rgba(90, 197, 111, 0.6);
+    animation: status-pulse 2.4s ease-in-out infinite;
+  }
+  .status-dot--build {
+    @apply bg-accent;
+    box-shadow: 0 0 9px rgba(224, 164, 88, 0.55);
+    animation: status-pulse 1.8s ease-in-out infinite;
+  }
+  /* Wartung: statisches, gedaempftes Amber (kein Puls = angehalten, im Gegensatz
+     zum pulsierenden im-aufbau-Amber). Bewusst KEINE dritte Farbe (Palette-Doktrin:
+     nur Amber + funktionales Gruen); das fruehere sky-400-Blau war ein Ausreisser. */
+  .status-dot--wartung {
+    @apply bg-accent/70;
+  }
+  .status-dot--pivot {
+    @apply bg-muted-dim;
+  }
+
+  /* ── Editorial-Schicht (das menschliche Gegengewicht zur Maschine) ─ */
+
+  /* .drop-cap am 2026-08-24 entfernt (Owner): der überhöhte Initialbuchstabe las
+     sich wie ein Märchenbuch und passte weder zur Terminal-Identität noch zu einem
+     Text, der Sachstand berichtet. Nicht wieder einführen. */
+
+  .accent-bar {
+    @apply relative border-l-2 border-accent pl-5;
+  }
+
+  .stat-major {
+    @apply font-display text-7xl leading-none tracking-tight text-text sm:text-8xl;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1, 'ss01', 'cv11';
+  }
+  .stat-minor {
+    @apply font-display text-3xl leading-none tracking-tight text-text sm:text-4xl;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1, 'ss01', 'cv11';
+  }
+  /* Ziffern-Ausrichtung fuer alles Numerische (CountUp, Balken-Werte, CV-Daten,
+     Proof-Strip). Ohne tabular-nums zappeln hochzaehlende Zahlen (Amateur-Marker). */
+  .nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  .pull-quote {
+    @apply relative pl-10 font-display text-xl leading-snug text-text/90 sm:text-2xl;
+  }
+  .pull-quote::before {
+    content: "\201C";
+    @apply absolute left-0 top-0 font-display text-6xl leading-none text-accent;
+  }
+
+  /* Sektions-Anker, Balken und Zeitachse sind Struktur, die das System vorgibt →
+     grüne Stimme. Vorher waren sie amber und konkurrierten damit optisch mit den
+     Knöpfen, obwohl sie nichts anbieten, worauf man klicken könnte. */
+  .section-anchor {
+    @apply font-mono text-2xl leading-none text-term/85 sm:text-3xl;
+  }
+
+  /* 9rem statt 8rem: bei 8rem brach das laengste Label der Stack-Liste
+     („05 · CLAUDE API“) in eine zweite Zeile und riss die Zeilenhoehe auf. */
+  .bar-row {
+    @apply grid grid-cols-[9rem_1fr_auto] items-center gap-4 text-sm;
+  }
+  .bar-track {
+    @apply h-2 rounded-full bg-border/60;
+  }
+  .bar-fill {
+    @apply h-full rounded-full bg-term;
+  }
+
+  .timeline-strand {
+    @apply relative border-l border-border pl-6;
+  }
+  .timeline-strand::before {
+    content: "";
+    @apply absolute left-[-1px] top-0 h-12 w-px bg-term;
+  }
+
+  .prose-editorial {
+    @apply max-w-3xl space-y-6 text-lg leading-relaxed text-text/90;
+  }
+  .prose-editorial p {
+    @apply max-w-prose;
+  }
+  .prose-editorial h2 {
+    @apply mt-12 font-mono text-xl font-medium uppercase tracking-wide text-text;
+  }
+  .prose-editorial h3 {
+    @apply mt-8 font-mono text-base font-medium uppercase tracking-wide text-text/90;
+  }
+  .prose-editorial ul {
+    @apply list-none space-y-2 pl-0;
+  }
+  .prose-editorial ul > li {
+    @apply relative pl-6;
+  }
+  /* Listen-Marker: gesetzt vom System, nicht vom Autor → grün. */
+  .prose-editorial ul > li::before {
+    content: "›";
+    @apply absolute left-0 top-0 font-mono text-term;
+  }
+  /* Links bleiben AMBER: ein Link ist ein Angebot an den Menschen, kein Systemzustand.
+     Damit bleibt die Hover-/Fokus-Farbe der ganzen Seite einheitlich amber. */
+  .prose-editorial a {
+    @apply text-accent underline decoration-accent/30 underline-offset-4 hover:decoration-accent;
+  }
+  .prose-editorial blockquote {
+    @apply accent-bar my-8 italic text-text/90;
+  }
+  /* Code ist wörtlich die Maschine → grüne Stimme. */
+  .prose-editorial code {
+    @apply rounded border border-border bg-surface px-1.5 py-0.5 font-mono text-[0.85em] text-term;
+    /* Lange Pfade/Flags dürfen umbrechen: html{overflow-x:clip} würde sie sonst
+       unsichtbar abschneiden statt zu scrollen. */
+    overflow-wrap: anywhere;
+  }
+  .prose-editorial code::before, .prose-editorial code::after { content: ''; }
+  .prose-editorial pre {
+    @apply mt-6 overflow-x-auto rounded-lg border border-border bg-bg/80 p-4 font-mono text-sm leading-relaxed text-text/90;
+  }
+  .prose-editorial pre code {
+    @apply border-0 bg-transparent p-0 text-[1em];
+  }
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.9); }
+}
+
+@keyframes term-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .term-cursor { opacity: 1 !important; }
+  /* Kein Pfeil-Sprung bei reduzierter Bewegung; die Underline erscheint ohne Wisch. */
+  .group:hover .nudge-x { transform: none !important; }
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  body::before, body::after { display: none; }
+  .no-print { display: none !important; }
+  .term-cursor, .term-frame::before, .term-frame::after { display: none !important; }
+  a { color: black !important; text-decoration: none !important; }
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #555;
+  }
+  .pull-quote {
+    padding-left: 0 !important;
+    font-family: Georgia, serif !important;
+    font-size: 1rem !important;
+    font-style: italic;
+  }
+  .pull-quote::before { display: none; }
+  .timeline-strand { border-left: none !important; padding-left: 0 !important; }
+  .timeline-strand::before { display: none; }
+  .bar-track, .bar-fill { display: none; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Liveliness-Layer (2026-06-26): Scroll-Reveal, generatives Netz-Visual,
+   System-Log-Ticker, Scan-Sweep, Karten-Hover, Hero-Boot-Typing, Spotlight,
+   Sticky-Index. Doktrin: dekorativ ausschließlich Amber (term-Grün nur funktional
+   am live-Knoten / Status-Token), rein transform/opacity/dashoffset; reduced-motion
+   + print am Ende neutralisiert.
+   ───────────────────────────────────────────────────────────────────────── */
+@layer components {
+  /* ── Scroll-Reveal ─────────────────────────────────────────────────────── */
+  /* Scroll-getrieben in reinem CSS (2026-10-02). Vorher trug das ein
+     IntersectionObserver in `Reveal.tsx`, und daran hingen drei Hilfskonstruktionen,
+     die es jetzt nicht mehr braucht:
+
+       - `html.js-ready` als Versteck-Gate, damit ohne JS nichts unsichtbar bleibt,
+       - `html.reveal-fallback` plus ein 4-Sekunden-Watchdog in `layout.tsx` fuer den
+         Fall, dass die Hydration ausbleibt,
+       - eine `top < 0`-Sonderbehandlung im Observer fuer den uebersprungenen Fall
+         (Pos1/Ende, Anker-Link, schnelles Wischen): wer daran vorbeispringt, bekam
+         nie ein `isIntersecting` und das Element blieb DAUERHAFT unsichtbar.
+
+     Alle drei entfallen strukturell, weil der Fortschritt hier aus der Geometrie
+     kommt und nicht aus einem Ereignis. Am 2026-10-02 gegengeprueft (Werkzeug
+     interne Notiz, Chromium 151): ein Sprung von 0
+     direkt auf die Zielposition zeigt das Element voll sichtbar, gleichauf mit einer
+     Kontrollbox ohne jede Animation.
+
+     Das `@supports` IST das Sicherheitsnetz: wo `animation-timeline` fehlt, greift
+     keine einzige Regel, also ist alles von Anfang an sichtbar. Das ist derselbe
+     Schutz wie frueher `js-ready`, nur ohne JavaScript und ohne Zeitfenster.
+
+     ⚠️ Die Staffelung der Gruppen-Kinder ist nicht mehr zeitlich (vorher
+     `--i * 70ms` ueber zwoelf nth-child-Regeln), sondern geometrisch: jedes Kind
+     hat seine eigene Zeitachse und animiert, wenn es selbst eintritt. In einer
+     senkrechten Liste ist das dieselbe Wirkung, in einem drei-spaltigen Raster
+     treten die drei einer Reihe jetzt gleichzeitig auf. */
+  @supports (animation-timeline: view()) {
+    .reveal,
+    .reveal-group > * {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+  @keyframes reveal-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 12px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ── Lesefortschritt ───────────────────────────────────────────────────── */
+  /* Der Balken am oberen Rand folgt dem Scroll des Dokuments. Vorher rechnete
+     das ein scroll-Lauscher mit rAF-Drossel in `ReadingProgress.tsx` bei jedem
+     Scrollschritt auf dem Haupt-Thread nach.
+
+     `scroll(root block)` ist bewusst ausgeschrieben: das Element haengt an
+     `position: fixed`, und ein argumentloses `scroll()` sucht den naechsten
+     scrollbaren Vorfahren, was hier zwar derselbe ist, aber nicht ablesbar.
+
+     Ohne Unterstuetzung bleibt der Ausgangswert `scaleX(0)` stehen, der Balken
+     ist dann unsichtbar statt falsch. */
+  .lesefortschritt {
+    transform: scaleX(0);
+  }
+  @supports (animation-timeline: scroll()) {
+    .lesefortschritt {
+      animation: lesefortschritt linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+  @keyframes lesefortschritt {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* ── Generatives Netz-Visual (HeroConstellation) ───────────────────────── */
+  .hero-net__edge { stroke-dasharray: 5 7; }
+  .hero-net__edge:not(.hero-net__edge--static) {
+    animation: net-flow 9s linear infinite;
+  }
+  .hero-net__edge--static { stroke-dashoffset: 0; }
+  /* Netz-Knoten: gedämpftes Grün. Der live-Knoten unterscheidet sich durch
+     HELLIGKEIT und Nachglühen, nicht durch einen Farbwechsel, ein Diagramm, das
+     mitten im Bild die Farbfamilie wechselt, liest sich wie ein Fehler. */
+  .hero-net__core {
+    fill: #3f9a56;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .hero-net__core--pulse { animation: net-pulse 3.6s ease-in-out infinite; }
+  .hero-net__core--live {
+    fill: #8ee0a0;
+    filter: drop-shadow(0 0 4px rgba(90, 197, 111, 0.65));
+    animation: net-pulse 2.6s ease-in-out infinite;
+  }
+
+  /* ── System-Log-Ticker ─────────────────────────────────────────────────── */
+  .log-line { animation: log-cycle 3.6s ease-in-out both; }
+
+  /* ── Scan-Sweep über WindowBar-Panels (once) ───────────────────────────── */
+  .scan-host { position: relative; }
+  .scan-host[data-seen='1']::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    /* Panel-Scan beim ersten Sichtbarwerden: das Fenster zeichnet sich auf, das ist
+       die Maschine → grün (vorher amber). */
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(90, 197, 111, 0.08),
+      transparent
+    );
+    transform: translateX(-120%);
+    animation: term-sweep 0.95s ease-out 1;
+  }
+
+  /* ── Reicher Karten-Hover (Lift + Amber-Glow) ──────────────────────────── */
+  .card-interactive {
+    /* Ruhe-Elevation: dezente neutrale Tiefe + Top-Bevel, damit Karten schon im
+       Ruhezustand "gefraest" statt flach aufgemalt wirken (vorher: nur Border). */
+    box-shadow:
+      0 1px 2px -1px rgba(0, 0, 0, 0.5),
+      0 1px 3px -1px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 0 rgba(236, 233, 224, 0.045);
+    transition:
+      transform var(--dur-2) var(--ease-out),
+      border-color var(--dur-2) var(--ease-out),
+      box-shadow var(--dur-2) var(--ease-out);
+  }
+  /* Tap-Feedback auch ohne Hover-Fähigkeit: kurzer Druck-Settle beim Antippen. */
+  .card-interactive:active {
+    transform: translateY(1px);
+    border-color: rgba(224, 164, 88, 0.4);
+    transition-duration: var(--dur-1);
+  }
+  /* Hover-Effekte NUR auf Hover-fähigen Geräten, verhindert Sticky-Hover auf Touch
+     und hält die term-frame-Eck-Brackets dort sichtbar (Basis-term-frame). */
+  @media (hover: hover) {
+    .card-interactive:hover {
+      transform: translateY(-4px);
+      border-color: rgba(224, 164, 88, 0.4);
+      box-shadow:
+        0 0 0 1px rgba(224, 164, 88, 0.16),
+        0 12px 34px -14px rgba(224, 164, 88, 0.28),
+        0 16px 44px -22px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 0 rgba(236, 233, 224, 0.06);
+    }
+    /* Lichtwisch beim Überfahren: ein einzelner Durchlauf, wie wenn ein Terminal
+       eine Zeile neu zeichnet. Bewusst grün (das Fenster reagiert, also spricht
+       die Maschine), während Rahmen und Titel amber werden (der Mensch handelt),
+       beide Stimmen im selben Moment, das ist der Reiz.
+       `:not(.term-frame)`, weil dort `::after` schon die Eck-Bracket-Rolle hat;
+       ein zweites `::after` gibt es nicht, und die Ecke gewönne stillschweigend. */
+    .card-interactive:not(.term-frame)::after {
+      content: "";
+      @apply pointer-events-none absolute inset-0 z-[4] opacity-0;
+      background-image: linear-gradient(
+        100deg,
+        transparent 34%,
+        rgba(90, 197, 111, 0.11) 50%,
+        transparent 66%
+      );
+      background-size: 260% 100%;
+      background-position: 130% 0;
+      transition: opacity var(--dur-2) var(--ease-out);
+    }
+    .card-interactive:not(.term-frame):hover::after {
+      opacity: 1;
+      animation: card-sheen 0.85s var(--ease-out) 1 forwards;
+    }
+
+    /* term-frame-Eck-Brackets: Dauer-sichtbar → Hover-Reveal (nur wo term-frame real). */
+    .card-interactive.term-frame::before,
+    .card-interactive.term-frame::after {
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .card-interactive.term-frame:hover::before,
+    .card-interactive.term-frame:hover::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* ── Hero-Boot: der mono-Command „wischt" sich einmal ein ──────────────── */
+  /* max-width statt width → kein inline-Var nötig, funktioniert für jede
+     Command-Länge; die Box bleibt textbreit (max-width klippt nur). */
+  .boot-cmd {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: bottom;
+    animation: boot-type 0.6s ease-out 0.1s both;
+  }
+
+  /* Hero-Boot: die EINE orchestrierte Signatur. Prompt „tippt" (boot-cmd), dann
+     assemblieren sich Name/Rolle/System-Zeile gestaffelt (Stagger via inline
+     animationDelay). Reines CSS → spielt auf First Paint auch ohne JS; SEO/no-JS
+     sehen den Text (fill: both startet nur die Deko-Phase). reduced-motion + print
+     unten neutralisiert → sofort sichtbar, kein Layout-Sprung.
+
+     LCP-Disziplin (robust vor cool): das H1 (der Name) ist der LCP-Kandidat und
+     darf NIE opacity:0 sein, sonst zählt der Browser es nicht als „gemalt" und
+     LCP rutscht um Delay+Dauer nach hinten. Daher zwei Boot-Rollen:
+       .boot-anchor = H1: NUR transform-Settle, opacity bleibt 1 → bei First Paint
+                       gemalt, LCP ungebremst (transform ist composited, kein CLS).
+       .boot-rise   = die kleineren Zeilen darunter (Rolle/System): dürfen faden. */
+  .boot-anchor {
+    animation: boot-settle var(--dur-3) var(--ease-out) 0.1s both;
+  }
+  .boot-rise {
+    animation: boot-rise var(--dur-3) var(--ease-out) both;
+  }
+
+  /* ── Pointer-Spotlight auf großen Panels (nur feiner Pointer) ───────────── */
+  .spotlight { position: relative; isolation: isolate; }
+  .spotlight > * { position: relative; z-index: 1; }
+  @media (hover: hover) {
+    .spotlight::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      background: radial-gradient(
+        16rem 16rem at var(--mx, 50%) var(--my, 0%),
+        rgba(224, 164, 88, 0.10),
+        transparent 70%
+      );
+    }
+    .spotlight:hover::before { opacity: 1; }
+  }
+
+  /* ── Sticky-Sektions-Index (ruhiger Scroll-Rhythmus, reines CSS) ────────── */
+  .section-index {
+    position: sticky;
+    top: 5rem;
+  }
+}
+
+@keyframes card-sheen {
+  from { background-position: 130% 0; }
+  to { background-position: -60% 0; }
+}
+
+/* Scan-Sweep: nur die dritte (lineare) Ebene wandert nach unten, die beiden
+   radialen Glows bleiben ortsfest (ihre Positionen wiederholen sich als erste
+   zwei Keyframe-Werte). */
+@keyframes scan-sweep {
+  0% { background-position: 50% 0, 88% 100%, 0 -110%; }
+  100% { background-position: 50% 0, 88% 100%, 0 210%; }
+}
+@keyframes net-flow { to { stroke-dashoffset: -48; } }
+@keyframes net-pulse {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.82); }
+}
+@keyframes log-cycle {
+  0%, 4% { opacity: 0; transform: translateY(5px); }
+  12%, 88% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-5px); }
+}
+@keyframes term-sweep {
+  from { transform: translateX(-120%); }
+  to { transform: translateX(120%); }
+}
+/* clip-path-Wisch (längenunabhängig, klippt finalen Text nie → für jeden Command
+   wiederverwendbar; ersetzt das frühere max-width-Verfahren). */
+@keyframes boot-type {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes boot-rise {
+  from { opacity: 0; transform: translate3d(0, 10px, 0); }
+  to { opacity: 1; transform: none; }
+}
+/* Anchor (H1 / LCP-Kandidat): transform-only, opacity bleibt 1 → das größte
+   Element wird bei First Paint gemalt, LCP bleibt ungebremst (siehe .boot-anchor). */
+@keyframes boot-settle {
+  from { transform: translate3d(0, 6px, 0); }
+  to { transform: none; }
+}
+
+/* reduced-motion: neue Bewegungen hart neutralisieren. Die globale *-Regel killt nur
+   die Animations-DAUER, NICHT die Hidden-States (opacity:0/transform), daher hier
+   explizite Sichtbar-Overrides, sonst blieben Reveals unsichtbar (A11y-Regression). */
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
+  .reveal,
+  .reveal-group > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .hero-net__edge,
+  .hero-net__core,
+  .hero-net__core--pulse,
+  .hero-net__core--live {
+    animation: none !important;
+  }
+  .log-line { animation: none !important; opacity: 1; transform: none; }
+  .scan-host[data-seen]::before { animation: none !important; display: none; }
+  .card-interactive:hover { transform: none; }
+  .card-interactive:not(.term-frame)::after,
+  .card-interactive:not(.term-frame):hover::after {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+  .card-interactive.term-frame::before,
+  .card-interactive.term-frame::after { opacity: 1; transform: none; }
+  .boot-cmd { animation: none !important; clip-path: none; }
+  .boot-anchor { animation: none !important; transform: none !important; }
+  .boot-rise { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .spotlight::before { transition: none; }
+  /* Die Matrix bleibt sichtbar (sie TRÄGT die Aussage), nur ihr Lichtwisch geht weg. */
+}
+
+/* print: jede Deko/Animation aus dem CV-Druck halten. */
+@media print {
+  body::before { display: none !important; }
+  .hero-net,
+  .contour-field,
+  .log-line,
+  .scan-host::before,
+  .spotlight::before { display: none !important; }
+  .reveal,
+  .reveal-group > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .boot-cmd { animation: none !important; clip-path: none !important; }
+  .boot-anchor { animation: none !important; transform: none !important; }
+  .boot-rise { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .section-index { position: static !important; }
+}
+
+/* ── Command-Palette (⌘K) ───────────────────────────────────────────────────
+   Overlay + Panel im Terminal-Look. Bewegung minimal (Einblenden), bleibt im
+   Bewegungs-Budget und wird von reduced-motion/print neutralisiert. */
+.cmdk-overlay {
+  background: rgba(6, 7, 9, 0.72);
+  backdrop-filter: blur(3px);
+  animation: cmdk-fade 0.12s ease-out;
+}
+.cmdk-panel {
+  animation: cmdk-rise 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes cmdk-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cmdk-rise {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ── View-Transitions zwischen Routen ───────────────────────────────────────
+   Sanfter Cross-Fade per CSS View Transitions API. BEWUSST nur Progressive
+   Enhancement: greift bei Hard-Navigation/Reload (MPA). Echte SPA-Transitions
+   für den App-Router-Client-Wechsel bräuchten Next 15 (experimental) oder eine
+   neue Dep, beides bewusst nicht (Dep-Budget). Zero-Risk, no-op wo nicht aktiv. */
+@view-transition { navigation: auto; }
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmdk-overlay, .cmdk-panel { animation: none !important; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none !important; }
+}
+@media print {
+  .cmdk-overlay { display: none !important; }
+}
+
+/* ══ WERKFELD (Entwurf, 2026-10-15) ════════════════════════════════════════
+   Die Startseite als Schaltpult statt als Kopfbereich mit Text darunter.
+   Vorgaben dieser Runde: „aufwendig und beeindruckend", das Handy fuehrt,
+   dunkel bleibt, und die unverwechselbare Note sind der Prompt und **die Menge
+   selbst**. Die Menge traegt deshalb die Flaeche: alle Arbeiten auf einmal, dicht,
+   als ein Feld und nicht als Liste.
+
+   EIN Effekt, 25 Mal, mit Versatz: jede Zelle rastet beim Eintritt in den
+   Blick ein, wie ein Messgeraet. Kein zweiter Effekt daneben, sonst wird aus
+   einem orchestrierten Moment Rauschen.
+
+   Scroll-getrieben ueber `animation-timeline: view()`, nicht ueber einen
+   Observer: dieselbe Entscheidung wie beim Reveal-Umbau vom 02.10., und aus
+   demselben Grund. Ohne Unterstuetzung steht alles sofort auf dem Endzustand,
+   die Seite ist dann ruhig statt kaputt. */
+
+.werkfeld {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  /* Die Fuge zwischen zwei Zellen ist jetzt staerker als jede Linie INNEN.
+     Vorher trugen beide denselben Wert, und damit war die wichtigste Grenze
+     der Seite (hier endet eine Arbeit, hier faengt die naechste an) genauso
+     laut wie eine Trennlinie innerhalb einer Zelle. Gemessen am Bild hat das
+     die Zahl einer Zelle an den Titel der Zelle darueber gebunden. */
+  background: theme('colors.border');
+  border: 1px solid theme('colors.border');
+}
+@media (min-width: 768px) { .werkfeld { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .werkfeld { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* Die Zelle. Der 1px-gap plus der Feld-Hintergrund ergeben die Haarlinien,
+   deshalb traegt die Zelle selbst KEINEN Rahmen: ein Rahmen je Zelle waere an
+   jeder Innenkante doppelt.
+
+   Seit dem 2026-10-18 ein `subgrid` statt einer Flex-Spalte, und das ist
+   kein Umbau aus Geschmack. Gemessen am laufenden Dienst standen die Namen
+   einer Reihe bis zu **44 px** auseinander (bei 1440; 20 px bei 390), die
+   Zahlen bis zu **24 px** (bei 390). Auf einer Linie lag allein die Unterkante
+   der Zelle. Die Ursache ist die Materialflaeche: bei einem Bildschirmfoto
+   liegt sie auf `16/10` fest, bei einem Satz waechst sie mit dem Text, und in
+   6 von 12 Reihen am Telefon stehen beide Arten nebeneinander.
+
+   Mit `grid-template-rows: subgrid` teilen alle Zellen einer Reihe dieselben
+   vier Zeilen. Jede Zeile ist so hoch wie ihr hoechster Inhalt in dieser
+   Reihe, und damit liegen Material, Name und Zahl je Reihe auf derselben
+   Linie. Die Zellen werden dadurch etwas hoeher, das ist der Preis.
+
+   ⚠️ **Der Zeilenabstand eines `subgrid` kommt vom ELTERNraster**, nicht von
+   der Zelle. `gap` an der Zelle wirkt hier nicht, und der geerbte Wert ist der
+   1px des Feldes. Die Abstaende stehen deshalb als Margins an den vier
+   Kindern. Wer hier `gap` einsetzt, aendert nichts und sucht den Fehler dann
+   im Raster.
+   ⚠️ Die Fugen INNERHALB der Zelle zeichnen keine Haarlinie, obwohl der
+   Feldgrund durchscheinen koennte: die Zelle spannt alle vier Zeilen und
+   deckt deren Fugen mit ihrem eigenen Grund ab. Sichtbar bleibt nur die Fuge
+   ZWISCHEN zwei Zellen, und das ist die Grenze, die zaehlt.
+   Ohne `subgrid` (Browser vor Chrome 117 / Safari 16) fallen genau zwei
+   Deklarationen weg. Die Zelle bleibt ein Raster, die Reihen richten sich nur
+   nicht aneinander aus. Die Seite ist dann wie vorher, nicht kaputt. */
+.werkzelle {
+  position: relative;
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 4;
+  background: theme('colors.bg');
+  isolation: isolate;
+  transition: background-color 0.25s ease;
+}
+/* Jedes der vier Kinder in seine Zeile, ausdruecklich statt per
+   Auto-Platzierung: eine Zelle, der ein Teil fehlt, wuerde sonst alles
+   nachfolgende eine Zeile hoeher setzen und die Ausrichtung genau dort
+   verlieren, wo sie gebraucht wird. */
+/* `stretch` ausdruecklich. Ohne die Zeile gilt `normal`, und das verhaelt
+   sich bei einem Kasten mit Seitenverhaeltnis wie `start`: die Materialflaeche
+   behielte ihre 16/10 und liesse in einer hohen Reihe eine Luecke zwischen
+   Bildunterkante und Namen, die wie ein Loch aussieht. Mit `stretch` fuellt
+   das Material seine Zeile, das Bild beschneidet dafuer etwas mehr
+   (`object-cover`). */
+.werkzelle > .werkbild  { grid-row: 1; align-self: stretch; }
+.werkzelle > .zellkopf  { grid-row: 2; }
+.werkzelle > .werkname  { grid-row: 3; }
+.werkzelle > .kennwert  { grid-row: 4; }
+
+/* Das Material sitzt randlos an der Oberkante, der Text bekommt seinen Rand
+   ueber die Geschwister-Regel. Padding an der Zelle selbst waere falsch: das
+   Bild soll die volle Breite der Zelle haben, der Satz nicht. */
+.werkzelle > *:not(.werkbild) { margin-inline: 0.875rem; }
+.werkzelle > .zellkopf { margin-top: 0.5rem; }
+.werkzelle > .werkname { margin-top: 0.5rem; }
+.werkzelle > .kennwert { margin-top: 0.5rem; margin-bottom: 1rem; }
+@media (min-width: 768px) {
+  .werkzelle > *:not(.werkbild) { margin-inline: 1.25rem; }
+  .werkzelle > .kennwert { margin-bottom: 1.25rem; }
+}
+
+/* Das Bildfeld. Fester Seitenanteil, damit das Raster ruhig bleibt, auch wenn
+   die Quellen unterschiedliche Formate haben (Bildschirmfoto hochkant, Beleg
+   quer, Zeichnung 16:9). */
+.werkbild {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-bottom: 1px solid theme('colors.border' / 45%);
+  background: theme('colors.bg-elev');
+}
+.werkbild > * { height: 100%; width: 100%; }
+/* Die Zeichnung bringt ihren eigenen Rahmen mit, hier waere er doppelt. */
+.werkbild > div { border-bottom: 0; }
+.werkbild img {
+  opacity: 0.62;
+  transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.werkzelle:hover .werkbild img { opacity: 1; transform: scale(1.03); }
+
+/* Der Messkopf: eine Linie, die beim Einrasten durch die Oberkante laeuft.
+   Sie ist das Signal „diese Zelle ist jetzt gelesen", und sie ist der einzige
+   Bewegungsteil, den die Zelle mitbringt. */
+.werkzelle::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto auto 0;
+  height: 2px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: linear-gradient(to right, theme('colors.term'), theme('colors.term' / 0%));
+  z-index: 2;
+}
+
+.werkzelle:hover { background: theme('colors.surface' / 50%); }
+
+/* Der Kennwert liegt vor dem Einrasten gedaempft da und wird scharf. Bewusst
+   NICHT opacity 0: die Zelle soll vollstaendig lesbar sein, auch wenn die
+   Bewegung nie laeuft (kein JavaScript, alte Browser, reduzierte Bewegung). */
+.werkzelle .kennwert { opacity: 0.55; transition: opacity 0.3s ease; }
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .werkzelle::before {
+      animation: messkopf linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 28%;
+    }
+    .werkzelle .kennwert,
+    .werkzelle .werkbild img {
+      animation: kennwert-scharf linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 30%;
+    }
+  }
+}
+@keyframes messkopf {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes kennwert-scharf {
+  from { opacity: 0.35; }
+  to   { opacity: 1; }
+}
+/* Das Bild bleibt auch im Endzustand unter voller Deckkraft. Sonst zieht es
+   den Blick vom Namen weg, und 25 Bilder auf voller Staerke nebeneinander
+   ergeben eine Bilderwand statt eines Feldes. Volle Staerke gibt es nur beim
+   Ueberfahren, also dort, wo gerade jemand hinsieht. */
+.werkzelle .werkbild img { animation-name: bild-scharf !important; }
+@keyframes bild-scharf {
+  from { opacity: 0.3; }
+  to   { opacity: 0.62; }
+}
+
+/* Ohne Bewegung: Endzustand. Gilt fuer reduzierte Bewegung, fehlende
+   Unterstuetzung und den Druck. */
+@media (prefers-reduced-motion: reduce) {
+  .werkzelle::before { transform: scaleX(1); }
+  .werkzelle .kennwert { opacity: 1; }
+  .werkzelle .werkbild img { opacity: 0.85; }
+}
+@media print {
+  .werkzelle::before { display: none; }
+  .werkzelle .kennwert { opacity: 1; }
+}
+@supports not (animation-timeline: view()) {
+  .werkzelle::before { transform: scaleX(1); }
+  .werkzelle .kennwert { opacity: 1; }
+  .werkzelle .werkbild img { opacity: 0.85; }
+}
+
+/* Statusband ueber dem Feld. Mono in Schaugroesse statt als Zehn-Pixel-Marke
+   (Befund „Mono gross, nicht klein" aus dem fuenften Vorbild-Durchgang). */
+.statusband {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1.25rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Die typografische Zelle: Material fuer Arbeiten ohne Bildschirmfoto. Sie
+   traegt seit dem 2026-10-17 den SATZ zur Sache, nicht mehr die Zahl: die Zahl
+   steht jetzt in jeder Zelle unten, und oben steht in jeder Zelle Material.
+
+   ⚠️ Sie heisst deshalb nicht mehr `.werkzahl`. Eine Klasse namens „Werkzahl",
+   die einen Satz enthaelt, ist genau der Fall „ein Name, zwei Bedeutungen",
+   an dem im Haus schon mehrfach jemand haengen geblieben ist.
+
+   Anders als das Bildfeld hat sie KEIN festes Seitenverhaeltnis. Gemessen:
+   die Flaeche ist am Telefon rund 150 px breit und bei 16:10 nur rund 83 px
+   hoch, das traegt etwa 90 Zeichen. Die Saetze sind 53 bis 119 Zeichen lang,
+   ein Teil waere also abgeschnitten worden, und ein abgeschnittener Satz
+   liest sich als Defekt. Die Flaeche waechst deshalb mit ihrem Inhalt; die
+   Rasterzeile zieht die Nachbarzellen mit, das Raster bleibt rechteckig. */
+.werkflaeche {
+  aspect-ratio: auto;
+  display: flex;
+  align-items: center;
+  min-height: 6.5rem;
+  /* Die Flaeche muss als Flaeche LESBAR sein, nicht nur vorhanden. Vorher
+     stand hier `bg-elev` (#101216) ueber dem Zellgrund (#0b0c0e), also fuenf
+     Helligkeitsstufen Unterschied, und am Handy sah man davon nichts. Folge,
+     am laufenden Dienst fotografiert: die Zahl einer Zelle klebte optisch am
+     TITEL DER ZELLE DARUEBER. Wo zwei bildlose Zellen aufeinanderfolgen, las
+     sich die Seite als „HOME DIGITAL TWIN / 10 Pruefbereiche je Lauf", und die
+     10 gehoerte zu „Defense in Depth" zwei Zeilen weiter unten.
+     Beim Bildschirmfoto stellt sich die Frage nie, weil ein Bild erkennbar
+     eine Tafel ist. Text fliesst mit anderem Text, solange er nicht sichtbar
+     auf etwas steht. Mit `surface` sind es zehn Stufen, dazu die Trennlinie
+     der Tafel darunter. */
+  background:
+    radial-gradient(120% 100% at 0% 0%, theme('colors.surface-2' / 75%), transparent 72%),
+    theme('colors.surface');
+}
+.werksatz {
+  /* Serife, nicht die Fliesstext-Schrift: der Satz steht an der Stelle eines
+     Bildes und ist Material, kein Absatz. In der Fliesstext-Schrift saehe das
+     Feld nach einer Linkliste mit Beschreibungen aus. */
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(0.95rem, 3.8vw, 1.2rem);
+  line-height: 1.3;
+  color: theme('colors.text' / 85%);
+  padding: 0.875rem;
+  /* Letzte Sicherung gegen einen Satz, der die Grenze doch reisst. Das Gate
+     `scripts/werkauszug-pruefen.mjs` haelt ihn eigentlich davor ab. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 8;
+  line-clamp: 8;
+  overflow: hidden;
+}
+
+/* Die Zahl, in jeder Zelle unten. `.kennwert` traegt weiter die
+   scroll-getriebene Schaerfung, deshalb sitzt der Eroeffnungs-Ruck auf dem
+   inneren `.kennwert-zahl`: zwei zeitgesteuerte Animationen auf demselben
+   Element wuerden sich ueberschreiben. */
+.kennwert-zahl {
+  display: block;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.8rem, 7.4vw, 2.6rem);
+  line-height: 0.9;
+  color: theme('colors.term');
+  animation: zahl-ein 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+/* Drei Stufen nach der Laenge der Zahl, gesetzt in `ziffernStufe()`. Jede
+   Zelle traegt eine Zahl, und in EINER Groesse gesetzt stuende unter dem Feld
+   eine Wand aus gleich grossen Ziffern. Der Rhythmus kommt damit aus den
+   Daten und nicht aus einer Ausnahmeliste.
+   ⚠️ Die Stufe muss sein, nicht nur zieren: `19,3 Mio.` bricht in der
+   groessten Stufe am Handy um und schob die Einheit aus der Zelle. */
+.kennwert-zahl[data-stufe='mittel'] { font-size: clamp(1.5rem, 6vw, 2.1rem); }
+.kennwert-zahl[data-stufe='klein'] { font-size: clamp(1.15rem, 4.4vw, 1.6rem); }
+.kennwert-einheit {
+  display: -webkit-box;
+  margin-top: 0.2rem;
+  /* 0,8 rem statt 0,7 seit 2026-10-30: am Handy waren das 11 px, bei
+     gedaempfter Farbe auf dunklem Grund die schwaechste Zeile der Zelle. */
+  font-size: 0.8rem;
+  line-height: 1.3;
+  color: theme('colors.muted');
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+/* Nur `transform`, nie Deckkraft: die Zahl ist der groesste Text der Zelle
+   und damit ein moeglicher LCP-Kandidat. Siehe `.boot-anchor` auf der
+   Startseite, dieselbe Regel und derselbe verifizierte Defekt dahinter. */
+@keyframes zahl-ein {
+  from { transform: translateY(0.4rem); }
+  to   { transform: none; }
+}
+/* Die vierte Zeile einer Zelle ohne Zahl: der Grund, warum es keine gibt.
+   Gemessen blieben dort 90 px leer am Telefon und 125 px am Breitbild.
+
+   Er steht in der Fliesstext-Schrift und nicht in der Serife der Zahlen, und
+   er ist kleiner als jede Zahl: er soll als Aussage lesbar sein und nicht als
+   Schaugroesse mitgezaehlt werden. Die Farbe ist die der Einheiten, nicht die
+   gruene der Maschine. Gruen traegt auf dieser Seite Messwerte, und das hier
+   ist das Gegenteil eines Messwerts. */
+.kennwert-grund {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: theme('colors.muted');
+  /* Kein `animation` und kein Einruecken: die Zahlen ruecken im
+     Eroeffnungsmoment ein, dieser Satz nicht. Er ist kein Messwert, und eine
+     Bewegung wuerde ihn als einen ausgeben. */
+}
+
+@media (min-width: 768px) {
+  .werksatz { padding: 1.25rem; font-size: 1.2rem; }
+  .werkflaeche { min-height: 8rem; }
+  .kennwert-grund { font-size: 0.82rem; }
+  .kennwert-zahl { font-size: clamp(2rem, 2.8vw, 2.5rem); }
+  /* Die Stufen muessen hier mitkommen: `[data-stufe]` ist spezifischer als die
+     Klasse und wuerde die Breitbild-Groesse sonst ueberstimmen. */
+  .kennwert-zahl[data-stufe='mittel'] { font-size: clamp(1.7rem, 2.3vw, 2.1rem); }
+  .kennwert-zahl[data-stufe='klein'] { font-size: clamp(1.3rem, 1.8vw, 1.6rem); }
+}
+
+/* ══ DAS PANEL ALS FELDZELLE ═══════════════════════════════════════════════
+   `live --watch` sitzt am Fuss des Feldes und ueber die volle Breite. Es
+   bringt deshalb weder Rundung noch eigenen Rahmen mit: die Haarlinien
+   entstehen aus dem 1px-Abstand des Rasters, ein eigener Rahmen waere an
+   jeder Kante doppelt. Dieselbe Begruendung wie bei `.werkzelle`.
+
+   `order: 999` ist kein Schoenheitswert. Die Konsole sortiert das Feld,
+   indem sie `style.order` auf alle `[data-arbeit]` setzt (0 bis 24). Das
+   Panel traegt kein `data-arbeit`, bliebe also auf dem Vorgabewert 0 und
+   spraenge beim ersten `ordne jahr` an den ANFANG des Feldes. */
+.feldpanel {
+  grid-column: 1 / -1;
+  order: 999;
+  overflow: hidden;
+  background: theme('colors.surface' / 90%);
+}
+
+/* Der lebende Grund. Liegt fest im Fenster, nicht im Fluss: dadurch wandert das
+   Werkfeld beim Scrollen ueber ein ruhendes Feld, und es entsteht Tiefe, ohne
+   dass irgendetwas mitgerechnet werden muss.
+
+   z-index 0 und der Inhalt auf 1. Die Zellen sind deckend, das Feld sieht man
+   also in den Fugen des Rasters, ueber dem Statusband und unter dem Abschluss,
+   nicht hinter dem Text. */
+.anlagenfeld {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.anlagen-inhalt { position: relative; z-index: 1; }
+
+/* Die Zelle laesst beim Ueberfahren ihren Untergrund durch, das Punktraster
+   des Anlagenfelds. */
+.werkzelle { background: theme('colors.bg'); }
+.werkzelle:hover { background: theme('colors.bg' / 86%); }
+
+@media print {
+  .anlagenfeld { display: none; }
+}
+
+/* Die Selbstmessung erscheint erst, wenn sie einen Wert hat. Kein Platzhalter,
+   kein Springen: sie bekommt denselben Fluss wie die uebrigen Bandeintraege und
+   schiebt sich beim Eintreffen an deren Ende. */
+.eigenmessung {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  animation: messung-ein 0.4s ease both;
+}
+@keyframes messung-ein {
+  from { opacity: 0; transform: translateY(2px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eigenmessung { animation: none; }
+}
+
+/* ══ EROEFFNUNG ════════════════════════════════════════════════════════════
+   Beim Laden ist der Grund der Zellen durchsichtig: man sieht gut eine Sekunde
+   lang die ganze Anlage hochfahren, und erst dann legen sich die Arbeiten
+   darueber. Danach bleibt das Feld in den Fugen und an den Raendern sichtbar.
+
+   Der TEXT ist davon ausgenommen und vom ersten Bild an voll sichtbar.
+   Animiert wird ausschliesslich der Hintergrund der Zelle. Das ist nicht
+   Vorsicht, sondern die LCP-Regel dieser Seite: ein Titel, der auf eine
+   Animation wartet, zaehlt dem Browser nicht als gemalt, und die Seite misst
+   sich selbst schlechter (verifizierter Defekt aus R1).
+
+   Einmalig und ohne Wiederholung. Ein Effekt, der bei jedem Scrollen neu
+   anspringt, ist nach dem dritten Mal eine Zumutung.
+
+   Seit dem 2026-10-17 setzen sich die Zellen NACHEINANDER statt alle auf
+   einmal (Entscheid „der Auftritt darf wachsen, danach Ruhe"). Der
+   Versatz je Zelle kommt aus `auftrittTakt()` in der Seite und steht inline
+   als `animation-delay`; hier steht nur die Dauer. Drei Stufen:
+
+     0,00 bis 0,45 s   nur der Grund, die Anlage faehrt in Wellen hoch
+     0,45 bis 1,74 s   die Zellen setzen sich, Reihe fuer Reihe darueber
+     0,75 bis 2,24 s   die Zahlen ruecken ein (nur `transform`)
+
+   Danach bewegt sich nichts Neues mehr. Das Dauer-Budget der Seite bleibt bei
+   drei Elementen (Block-Cursor, Status-Puls, atmender Grund), der Auftritt
+   ist der eine orchestrierte Moment und laeuft genau einmal. */
+.werkzelle {
+  animation: zelle-deckend 0.9s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes zelle-deckend {
+  from { background-color: rgb(11 12 14 / 0%); }
+  to   { background-color: rgb(11 12 14 / 100%); }
+}
+
+/* Die Haarlinien kommen mit. Ohne das zeichnet sich das Raster schon vollstaendig
+   ab, waehrend die Flaechen noch leer sind, und der Moment zerfaellt.
+   Das Raster kann nicht Zelle fuer Zelle kommen (es ist EIN Hintergrund
+   hinter allen Fugen), es faehrt deshalb ueber die ganze Staffelung hinweg
+   hoch und ist am Ende der letzten Zelle voll da. */
+.werkfeld {
+  animation: raster-ein 1.3s cubic-bezier(0.4, 0, 0.2, 1) 0.45s both;
+}
+@keyframes raster-ein {
+  from { background-color: rgb(38 40 47 / 0%); border-color: rgb(38 40 47 / 0%); }
+  /* ⚠️ Der Endwert steht hier ein zweites Mal und muss dem der Regel oben
+     entsprechen. Mit `both` bleibt die Animation auf ihrem letzten Bild
+     stehen: ein abweichender Wert hier wuerde den der Regel still
+     ueberschreiben, und zwar erst nach Ablauf der Animation. */
+  to   { background-color: rgb(38 40 47 / 100%); border-color: rgb(38 40 47 / 100%); }
+}
+
+/* ⚠️ Das Panel ist eine Zelle des Feldes, aber KEINE `.werkzelle`. Ohne diese
+   Zeile bliebe es waehrend des ganzen Auftritts auf seinem Endzustand stehen,
+   waehrend ringsum alles erst kommt, und zoege damit den Blick genau dorthin,
+   wo er zuletzt hin soll. Es kommt als Letztes, nach der letzten Arbeit.
+
+   ⚠️⚠️ Es bekommt eigene Bilder und NICHT `zelle-deckend`. Jene endet auf dem
+   Seitengrund `#0b0c0e`; das Panel steht auf `surface` `#15171c`, und mit
+   `both` haette die Animation seinen Grund nach 2,25 s still auf den falschen
+   Wert gesetzt. Genau die Falle, vor der der Kommentar bei `raster-ein` schon
+   einmal warnt: ein Endbild, das eine Regel ueberschreibt, und zwar erst nach
+   Ablauf der Animation, also lange nachdem jemand hingesehen hat. */
+.feldpanel {
+  animation: panel-ein 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.35s both;
+}
+@keyframes panel-ein {
+  from { background-color: rgb(21 23 28 / 0%); }
+  to   { background-color: rgb(21 23 28 / 90%); }
+}
+
+/* Die Fuellzelle hinter der letzten Arbeit (Begruendung in der Seite). Sie
+   steht im Grund der Zellen und kommt mit ihnen, als letzte vor dem Panel.
+   `order: 998`: die Konsole setzt beim Sortieren 0 bis 24 auf die Arbeiten,
+   das Panel steht auf 999, die Fuellung muss dazwischen bleiben.
+   ⚠️ Jede Stufe schaltet die vorige erst aus (`[data-r2]` usw. mit gleicher
+   Spezifitaet, spaeter notiert), sonst bliebe die Handy-Fuellung bei drei
+   Spalten stehen und erzeugte eine eigene Reihe. */
+.werkrest {
+  display: none;
+  order: 998;
+  grid-row: span 4;
+  background: theme('colors.bg');
+  animation: zelle-deckend 0.9s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.werkrest[data-r2='1'] { display: block; grid-column: span 1; }
+@media (min-width: 768px) {
+  .werkrest[data-r2] { display: none; }
+  .werkrest[data-r3='1'] { display: block; grid-column: span 1; }
+  .werkrest[data-r3='2'] { display: block; grid-column: span 2; }
+}
+@media (min-width: 1024px) {
+  .werkrest[data-r3] { display: none; }
+  .werkrest[data-r4='1'] { display: block; grid-column: span 1; }
+  .werkrest[data-r4='2'] { display: block; grid-column: span 2; }
+  .werkrest[data-r4='3'] { display: block; grid-column: span 3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .werkzelle, .werkfeld, .feldpanel, .kennwert-zahl, .werkrest { animation: none; }
+}
+@media print {
+  .werkzelle, .werkfeld, .feldpanel, .kennwert-zahl, .werkrest { animation: none; }
+}
+
+/* ══ LEITSTAND ═════════════════════════════════════════════════════════════
+   Die Konsole ueber dem Werkfeld. Sie ist keine Verzierung: was sie ausgibt,
+   steht sonst nirgends, und was sie schaltet, aendert die Ansicht darunter. */
+.leitstand { margin-top: 1.25rem; }
+
+.leitstand-zeile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid theme('colors.border');
+  padding-bottom: 0.5rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8rem;
+}
+.leitstand-prompt { white-space: nowrap; color: theme('colors.term'); }
+.leitstand-eingabe {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: theme('colors.text');
+  outline: none;
+  font: inherit;
+}
+.leitstand-eingabe::placeholder { color: theme('colors.muted-dim'); }
+.leitstand-messung {
+  white-space: nowrap;
+  font-size: 0.7rem;
+  color: theme('colors.term');
+}
+
+.leitstand-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding-top: 0.6rem;
+}
+.leitstand-chip {
+  border: 1px solid theme('colors.border');
+  border-radius: 0.375rem;
+  padding: 0.3rem 0.6rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.65rem;
+  color: theme('colors.muted');
+  /* Deckender Grund, und zwar aus einem gemessenen Grund: der Knopf hatte
+     keinen, und damit stand seine 10,4-px-Schrift direkt auf dem lebenden
+     Feld. Wo ein atmender Punkt hinter einem Buchstaben sass, fiel der
+     Kontrast dort auf 3,2:1 (gemessen am laufenden Dienst, gefordert sind
+     4,5:1). Der Punkt ist klein, die Schrift ist duenn, und beide treffen
+     sich unvermeidlich. Ein Knopf ist ohnehin eine Flaeche und keine Fuge:
+     durchscheinen soll der Grund zwischen den Zellen, nicht unter der
+     Schrift. */
+  background: theme('colors.surface');
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.leitstand-chip:hover { border-color: theme('colors.accent' / 60%); color: theme('colors.accent'); }
+
+.leitstand-verlauf {
+  max-height: 11rem;
+  overflow-y: auto;
+  padding-top: 0.6rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  line-height: 1.6;
+}
+
+/* Gefiltert wird ueber Deckkraft und nicht ueber `display: none`. Drei Gruende,
+   und der dritte war nicht geplant:
+   1. Das Raster behaelt seine Form, nichts springt.
+   2. Man sieht, wie viel weggefiltert wurde, also wie gross der Bestand ist.
+      Genau das ist hier das Argument.
+   3. Durch die zurueckgenommenen Zellen wird der Dienst-Grund sichtbar. Das
+      ergibt beim Filtern ein Bild, das stimmt: was gerade nicht im Blick ist,
+      laeuft trotzdem weiter. Mit `display: none` waere die Flaeche leer gewesen
+      und die Aussage weg. */
+.werkfeld[data-filter] .werkzelle { transition: opacity 0.35s ease, filter 0.35s ease; }
+.werkfeld[data-filter] .werkzelle:not([data-domain]) { opacity: 1; }
+.werkfeld[data-filter='Suite'] .werkzelle:not([data-domain='Suite']),
+.werkfeld[data-filter='Infra'] .werkzelle:not([data-domain='Infra']),
+.werkfeld[data-filter='AI'] .werkzelle:not([data-domain='AI']),
+.werkfeld[data-filter='Web'] .werkzelle:not([data-domain='Web']),
+.werkfeld[data-filter='Bots'] .werkzelle:not([data-domain='Bots']) {
+  opacity: 0.12;
+  filter: grayscale(1);
+  pointer-events: none;
+}
+
+/* Die Ordnungs-Angabe im Statusband steht bewusst am Ende und leiser als der
+   Rest: sie ist eine Fussnote zum Feld, keine Kennzahl. */
+.statusband-ordnung { color: theme('colors.muted-dim'); opacity: 0.75; }
+
+/* Hier lagen bis zum 2026-10-25 `.zielzeile` und `.zielzeile-punkt`, die
+   Gestaltung der gesuchten Rolle zwischen Statusband und Konsole. Mit dem
+   Entscheid „Schaufenster fuehrt, Bereitschaft als Nebensatz" ist die
+   Zeile an den Fuss der Startseite gewandert und steht dort im Fliesstext des
+   Abschlussabsatzes. Die beiden Regeln sind deshalb ersatzlos weg, nicht nur
+   unbenutzt: ungenutztes CSS neben einer bewussten Entscheidung liest sich beim
+   naechsten Lesen wie ein vergessener Rest. Der Stand davor steht im Git. */
+
+/* ══ EINE ARBEIT IM FELD GEOEFFNET ═════════════════════════════════════════
+   `zeig <kennung>` in der Konsole klappt eine Arbeit an ihrem Platz im Feld
+   auf, statt auf die Fallstudie zu springen. Damit ist die Konsole der
+   Hauptweg durch die Seite und nicht ein Kasten darueber (Entscheid
+   2026-10-17).
+
+   Die Mechanik ist dieselbe wie beim Filtern: die Konsole setzt ein Attribut,
+   das Stilblatt entscheidet. Hier `data-offen` an der gewaehlten Zelle. Kein
+   React-Zustand, kein Neuaufbau, kein neu geladenes Bild.
+
+   Die geoeffnete Zelle verlaesst ihr Vierer-Band (`grid-row: auto`) und
+   nimmt eine eigene, volle Zeile. Sie ist dann **kein subgrid mehr**: der
+   Tiefen-Block ist ein fuenftes Kind, und ein subgrid kann keine fuenfte Zeile
+   anlegen, weil seine Zeilenzahl von seiner Spanne im Elternraster festliegt.
+   Geschlossen stellt sich die Frage nicht, dort ist der Block `display: none`
+   und damit gar kein Rasterkind.
+
+   Keine Animation. Der Eroeffnungsmoment der Seite ist der eine
+   orchestrierte Moment; das Aufklappen darf kein zweiter werden. Es erscheint,
+   und die Konsole schiebt die Zelle in den Blick. */
+.werkdetail { display: none; }
+
+.werkzelle[data-offen] {
+  grid-column: 1 / -1;
+  grid-row: auto;
+  grid-template-rows: none;
+  display: block;
+  background: theme('colors.surface' / 70%);
+  z-index: 3;
+}
+.werkzelle[data-offen] > .werkbild { grid-row: auto; }
+.werkzelle[data-offen] .werkdetail { display: block; }
+
+/* Die geoeffnete Arbeit bleibt sichtbar, auch wenn der Filter alles andere
+   zurueckgenommen hat. ⚠️ Die Spezifitaet muss die der Filter-Regel oben
+   erreichen (vier Klassen/Attribute), sonst gewinnt die Daempfung und die
+   geoeffnete Zelle liegt bei 12 Prozent Deckkraft da. */
+.werkfeld[data-filter] .werkzelle[data-offen] {
+  opacity: 1;
+  filter: none;
+  pointer-events: auto;
+}
+
+/* Im geoeffneten Zustand traegt das Material eine Obergrenze. Ueber die volle
+   Feldbreite waere ein 16/10-Bild am Breitbild rund 700 px hoch und schoebe
+   den Text aus dem Blick. */
+.werkzelle[data-offen] > .werkbild {
+  max-height: 14rem;
+  aspect-ratio: auto;
+}
+.werkzelle[data-offen] > .werkflaeche { max-height: none; }
+
+.werkdetail { margin-top: 0.85rem; }
+.werkdetail > * + * { margin-top: 0.6rem; }
+.werkdetail-satz {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.1rem;
+  line-height: 1.35;
+  color: theme('colors.text' / 85%);
+}
+.werkdetail-text {
+  max-width: 68ch;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: theme('colors.muted');
+}
+.werkdetail-rolle {
+  max-width: 68ch;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: theme('colors.text' / 80%);
+}
+.werkdetail-marke {
+  margin-right: 0.5rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: theme('colors.term');
+}
+.werkdetail-stack {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: theme('colors.muted-dim');
+}
+.werkdetail-weiter {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: theme('colors.accent');
+}
+
+/* Am Breitbild steht das Material neben dem Text statt darueber.
+
+   ⚠️ Die erste Fassung nahm dafuer einen Float, und das war am Bild sofort
+   falsch: ein Absatz neben einem Float bekommt seine KASTENbreite vom
+   Elternelement, nur seine ZEILEN weichen aus. Mit `max-width: 68ch` am
+   Absatz blieben neben dem Bild drei Woerter je Zeile uebrig, darunter lief
+   der Text wieder breit. Das sah aus wie ein Umbruchfehler.
+
+   Jetzt zwei feste Spalten. Jedes Kind bekommt seinen Platz ausdruecklich:
+   die Zelle traegt im geoeffneten Zustand fuenf Kinder, und eines davon
+   (`.kennwert`) kann fehlen. Auto-Platzierung haette dann alles verschoben. */
+@media (min-width: 768px) {
+  .werkzelle[data-offen] {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr);
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: 1.75rem;
+  }
+  /* Das Material fuellt die linke Spalte ueber alle Zeilen und behaelt dabei
+     sein Seitenverhaeltnis (`start` statt `stretch`): gestreckt ueber eine
+     lange Beschreibung wuerde das Bildschirmfoto zum Plakat. */
+  .werkzelle[data-offen] > .werkbild {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: start;
+    max-height: 22rem;
+    border-bottom: 0;
+    border-right: 1px solid theme('colors.border' / 45%);
+  }
+  .werkzelle[data-offen] > .zellkopf  { grid-column: 2; grid-row: 1; }
+  .werkzelle[data-offen] > .werkname  { grid-column: 2; grid-row: 2; }
+  .werkzelle[data-offen] > .kennwert  { grid-column: 2; grid-row: 3; }
+  .werkzelle[data-offen] > .werkdetail { grid-column: 2; grid-row: 4; }
+  /* Rechte Spalte: der Innenabstand gehoert an die Textspalte, nicht an die
+     Zelle. Das Material sitzt wie im geschlossenen Zustand randlos. */
+  .werkzelle[data-offen] > .zellkopf,
+  .werkzelle[data-offen] > .werkname,
+  .werkzelle[data-offen] > .kennwert,
+  .werkzelle[data-offen] > .werkdetail { margin-inline: 0 1.25rem; }
+  .werkzelle[data-offen] > .zellkopf { margin-top: 1.25rem; }
+  .werkzelle[data-offen] > .werkdetail { margin-bottom: 1.25rem; }
+}

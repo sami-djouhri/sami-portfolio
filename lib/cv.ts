@@ -148,13 +148,6 @@ export const CV_PROJECTS_FEATURED: CvProject[] = [
     stack: ['Python', 'Proxmox · LXC', 'systemd', 'VPN', 'Paketfilter'],
   },
   {
-    id: 'ops-cockpit',
-    name: 'Ops-Fläche',
-    year: '2026 bis heute',
-    oneLiner: 'Eigene Kontrollebene über die Host-Flotte: Live-Metriken, Backup-Frische, Drift-Erkennung, ohne Host-Shell.',
-    stack: ['Svelte', 'Prometheus', 'Docker', 'Firewall-Lockdown'],
-  },
-  {
     id: 'saganta',
     name: 'Saganta',
     year: '2026 bis heute',
@@ -163,10 +156,10 @@ export const CV_PROJECTS_FEATURED: CvProject[] = [
   },
   {
     id: 'lernen',
-    name: 'Coach-Familie',
+    name: 'Lernstufe',
     year: '2025 bis heute',
-    oneLiner: 'Mehrere Lern-Marken auf einem Kern, Web und Android, gemeinsame Basis.',
-    stack: ['Next.js', 'SQLite', 'Compose Multiplatform'],
+    oneLiner: 'Eine Lern-App für alle Bereiche, im November 2026 aus sechs Apps zusammengeführt.',
+    stack: ['Next.js', 'SQLite', 'Kotlin'],
   },
   {
     id: 'marktwatch',
@@ -265,13 +258,6 @@ const CV_PROJECTS_FEATURED_EN: CvProject[] = [
     stack: ['Python', 'Proxmox · LXC', 'systemd', 'VPN', 'Paketfilter'],
   },
   {
-    id: 'ops-cockpit',
-    name: 'Ops view',
-    year: '2026 to present',
-    oneLiner: 'My own control plane across the host fleet: live metrics, backup freshness, drift detection, no host shell.',
-    stack: ['Svelte', 'Prometheus', 'Docker', 'Firewall lockdown'],
-  },
-  {
     id: 'saganta',
     name: 'Saganta',
     year: '2026 to present',
@@ -280,10 +266,10 @@ const CV_PROJECTS_FEATURED_EN: CvProject[] = [
   },
   {
     id: 'lernen',
-    name: 'Coach family',
+    name: 'Lernstufe',
     year: '2025 to present',
-    oneLiner: 'Several learning brands on one core, web and Android, a shared foundation.',
-    stack: ['Next.js', 'SQLite', 'Compose Multiplatform'],
+    oneLiner: 'One learning app for every area, merged from six apps in November 2026.',
+    stack: ['Next.js', 'SQLite', 'Kotlin'],
   },
   {
     id: 'marktwatch',

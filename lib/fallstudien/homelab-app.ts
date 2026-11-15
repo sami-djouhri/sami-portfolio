@@ -197,6 +197,20 @@ const homelabApp: Fallstudie = {
         en: 'The app checks locally, but the truth about authorization and rate limits lives in the gateway. Client-side checks are additional layers, so a tampered device does not become an open door.',
       },
     },
+    {
+      title: { de: 'Keine Host-Shell, kein Container-Exec', en: 'No host shell, no container exec' },
+      body: {
+        de: 'App und Web-Portal steuern Dienste und lesen Logs über denselben Weg. Der greift nie direkt auf den Docker-Socket zu, sondern über einen eingeschränkten Proxy, in dem Container-Exec abgeschaltet ist. Eine Shell auf dem Host gibt es nicht. Auch eine übernommene Oberfläche erreicht den Host deshalb nur über diesen Proxy.',
+        en: 'App and web portal control services and read logs through the same path. It never touches the Docker socket directly but goes through a restricted proxy with container exec switched off. There is no shell on the host. So even a compromised interface reaches the host only through this proxy.',
+      },
+    },
+    {
+      title: { de: 'Die Sperre sitzt auf der richtigen Kette', en: 'The lock sits on the right chain' },
+      body: {
+        de: 'Veröffentlichte Container-Ports umgehen die übliche Host-Firewall. Deshalb sitzt die Sperre für den Proxy auf der Kette, die Container-Verkehr wirklich sieht, und lässt nur eine Steuerebene durch. Sie ist an den Container-Stack gekoppelt und gilt auch direkt nach einem Neustart.',
+        en: 'Published container ports bypass the usual host firewall. So the lock for the proxy sits on the chain that actually sees container traffic and lets only one control plane through. It is tied to the container stack and holds right after a reboot too.',
+      },
+    },
   ],
   metrics: [
     {

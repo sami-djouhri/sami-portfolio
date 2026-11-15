@@ -1,169 +1,135 @@
 import type { Fallstudie } from './typ';
 
+// Neu erhoben am 2026-11-13 aus dem Repo `lernen/lernstufe` und den Umstiegsnotizen
+// vom 07.11.: die sechs Lern-Apps sind seit dem 07.11. eine App. Die Route-ID bleibt
+// `lernen`, damit bestehende Verweise auf /projekte/lernen gueltig bleiben.
 const lernen: Fallstudie = {
   problem: {
-    de: 'Lernplattformen am Markt sind generisch, entweder LMS-Schwergewichte oder Karteikarten-Apps. Beides passt nicht für jemanden, der über mehrere Domänen gleichzeitig lernt: IT-Zertifikate, Fahrschule, Schulstoff, Allgemeinbildung. Jede Domäne hat eigene Logik, eigene Visualisierungen, eigenes Tempo.',
-    en: 'Learning platforms on the market are generic: either LMS heavyweights or flashcard apps. Neither fits someone learning across several domains at once: IT certifications, driving school, school material, general knowledge. Each domain has its own logic, its own visualizations, its own pace.',
+    de: 'Ich lerne in mehreren Bereichen gleichzeitig: IT-Zertifikate, Ausbildung, Führerschein, Schulstoff. Lange lief jeder Bereich als eigene App mit eigener Datenbank und eigenem Konto. Jede Änderung am gemeinsamen Teil musste ich sechsmal ausrollen. Deshalb gibt es seit November 2026 nur noch eine App für alle Bereiche.',
+    en: 'I study in several areas at once: IT certifications, vocational training, driving licence, school subjects. For a long time each area ran as its own app with its own database and its own account. Every change to the shared part had to be rolled out six times. Since November 2026 there is one app for all areas.',
   },
   approach: [
     {
-      de: 'Sechs eigenständige Next.js-Apps, keine Monolith-Plattform. Jede hat ihre eigene, in die App eingebettete SQLite-Datenbank (better-sqlite3), ihr eigenes Theme und ihr eigenes Auth. Eine Änderung an einer App berührt die anderen fünf nicht.',
-      en: 'Six standalone Next.js apps, not one monolith. Each has its own SQLite database embedded in the app (better-sqlite3), its own theme, its own auth; what does not belong together does not get built together.',
+      de: 'Ein Server, eine Datenbank, ein Konto. Die Bereiche sind die oberste Ebene, darunter Kurs, Modul und Thema.',
+      en: 'One server, one database, one account. The areas are the top level, below them course, module and topic.',
     },
     {
-      de: 'Geteilte Web-Bausteine über ein Design-System (`design-system`), Tailwind-Tokens + Compose-Tokens werden in alle Apps synchronisiert, nicht copy-pasted.',
-      en: 'Shared web building blocks through a design system (`design-system`); Tailwind and Compose tokens are synced into every app, never copy-pasted.',
+      de: 'Ein Skript führt Lernstoff, Fragen und Kurslisten der sechs alten Apps zusammen. Es lässt sich wiederholen, und ein Zahlenabgleich gegen die alten Apps prüft, dass keine Frage fehlt.',
+      en: 'A script merges the material, questions and course lists of the six old apps. It can be rerun, and a count against the old apps checks that no question is missing.',
     },
     {
-      de: 'Drei Pilot-Apps nativ für Android über Compose Multiplatform mit Hilt-Dependency-Injection und Custom-Tab-Login.',
-      en: 'Three pilot apps native on Android via Compose Multiplatform, with Hilt dependency injection and Custom-Tab login.',
+      de: 'Konten werden über die E-Mail-Adresse zusammengeführt. Der Fortschritt aus allen alten Apps landet im selben Konto.',
+      en: 'Accounts are merged by e-mail address. Progress from all old apps ends up in the same account.',
     },
     {
-      de: 'Ein Hub als Karten-Dashboard, der die Apps bündelt, auch das ein eigener Stack, kein Wrapper.',
-      en: 'A hub as a card dashboard that ties the apps together, its own stack too, not a wrapper.',
+      de: 'Die Startseite zeigt unter „Heute“ fällige Wiederholungen und das nächste Thema über alle Kurse hinweg. Ein Tagesziel in Minuten lässt sich setzen und ist anfangs aus.',
+      en: 'The start page shows due reviews and the next topic across all courses under "Today". A daily goal in minutes can be set and is off by default.',
     },
   ],
   architecture: {
     summary: {
-      de: 'Hub, sechs Web-Apps und die Android-Piloten teilen sich ein Design-System und die Lernlogik über Sync-Skripte, laufen aber je App vollständig isoliert mit eigener Datenbank, eigenem Auth und eigenem Theme, geteilt wird, was geteilt gehört, getrennt der Rest.',
-      en: 'Hub, six web apps and the Android pilots share a design system and the learning logic through sync scripts, but each app runs fully isolated with its own database, auth and theme. Share what should be shared, keep the rest apart.',
+      de: 'Browser und Android-App sprechen denselben Server. Er hält alle Bereiche und Kurse in einer Datenbank. Die alten Adressen leiten auf den passenden Bereich weiter.',
+      en: 'Browser and Android app talk to the same server. It keeps all areas and courses in one database. The old addresses redirect to the matching area.',
     },
     tiers: [
       {
         label: { de: 'Zugänge', en: 'Entry points' },
         nodes: [
+          { id: 'web', kind: 'edge', label: { de: 'Browser', en: 'Browser' } },
+          { id: 'android', kind: 'edge', label: { de: 'Android-App', en: 'Android app' } },
           {
-            id: 'hub',
+            id: 'alt',
             kind: 'edge',
-            label: { de: 'Hub', en: 'Hub' },
-            note: { de: 'Karten-Dashboard', en: 'card dashboard' },
-          },
-          {
-            id: 'web',
-            kind: 'edge',
-            label: { de: 'Sechs Web-Apps', en: 'Six web apps' },
-          },
-          {
-            id: 'android',
-            kind: 'edge',
-            label: { de: 'Android-Piloten', en: 'Android pilots' },
+            label: { de: 'Alte Adressen', en: 'Old addresses' },
+            note: { de: 'Weiterleitung', en: 'redirect' },
           },
         ],
       },
       {
-        label: { de: 'Geteilte Bausteine', en: 'Shared building blocks' },
+        label: { de: 'Anwendung', en: 'Application' },
         nodes: [
           {
-            id: 'design',
+            id: 'app',
             kind: 'core',
-            label: { de: 'Design-System', en: 'Design system' },
-            note: { de: 'Web- + Compose-Tokens', en: 'web + Compose tokens' },
+            label: { de: 'Lernstufe', en: 'Lernstufe' },
+            note: { de: 'ein Server', en: 'one server' },
           },
           {
-            id: 'logic',
+            id: 'pruefung',
             kind: 'core',
-            label: { de: 'Lernlogik', en: 'Learning logic' },
-          },
-          {
-            id: 'sync',
-            kind: 'core',
-            label: { de: 'Sync-Skripte', en: 'Sync scripts' },
-            note: { de: 'kein copy-paste', en: 'no copy-paste' },
+            label: { de: 'Prüfungssimulator', en: 'Exam simulator' },
           },
         ],
       },
       {
-        label: { de: 'Pro App isoliert', en: 'Per app isolated' },
+        label: { de: 'Daten', en: 'Data' },
         nodes: [
           {
             id: 'db',
             kind: 'data',
-            label: { de: 'Eigene Datenbank', en: 'Own database' },
-            note: { de: 'SQLite, pro App', en: 'SQLite, per app' },
+            label: { de: 'Eine Datenbank', en: 'One database' },
+            note: { de: 'SQLite', en: 'SQLite' },
           },
           {
-            id: 'auth',
+            id: 'sicherung',
             kind: 'data',
-            label: { de: 'Eigenes Auth', en: 'Own auth' },
-          },
-          {
-            id: 'theme',
-            kind: 'data',
-            label: { de: 'Eigenes Theme', en: 'Own theme' },
+            label: { de: 'Sicherung', en: 'Backup' },
           },
         ],
       },
     ],
     flows: [
-      {
-        from: 'design',
-        to: 'web',
-        label: { de: 'synchronisiert', en: 'synced' },
-      },
-      {
-        from: 'design',
-        to: 'android',
-        label: { de: 'Compose-Tokens', en: 'Compose tokens' },
-      },
-      {
-        from: 'web',
-        to: 'db',
-        label: { de: 'pro App getrennt', en: 'separate per app' },
-      },
+      { from: 'alt', to: 'app', label: { de: '301 auf den Bereich', en: '301 to the area' } },
+      { from: 'android', to: 'app', label: { de: 'dasselbe Konto', en: 'same account' } },
+      { from: 'app', to: 'db' },
+      { from: 'db', to: 'sicherung', label: { de: 'eigener Container', en: 'own container' } },
     ],
   },
   result: [
     {
-      de: 'Sechs Apps live auf einem geteilten Kern; wo noch keine Inhalte vorliegen, steht das auch so da. Der frühere Monolith ist dafür stillgelegt.',
-      en: 'Six apps live on a shared core, with honest empty states everywhere; an earlier monolith was retired in favor of the split apps.',
+      de: 'Seit dem 07.11.2026 läuft nur noch Lernstufe. Die sechs alten Apps sind gestoppt, aber nicht gelöscht, und dienen als Rückweg.',
+      en: 'Since 7 November 2026 only Lernstufe runs. The six old apps are stopped but not deleted and serve as a way back.',
     },
     {
-      de: 'Ein Prüfungssimulator zieht aus domänen-spezifischen Fragen-Pools echte Mock-Prüfungen mit Auswertung nach Themengebiet, ohne eine starre Fragenliste abzuspulen.',
-      en: 'An exam simulator pulls real mock exams from domain-specific question pools and grades them per topic, without grinding through a fixed list.',
+      de: 'Beim Zusammenführen kamen 20 Fragen-Kennungen ans Licht, die in zwei Apps für verschiedene Fragen vergeben waren. Gefunden hat sie der Zahlenabgleich gegen die alten Apps.',
+      en: 'The merge surfaced 20 question IDs that two apps had used for different questions. The count against the old apps found them.',
     },
     {
-      de: 'Eine Abo- und Freischalt-Logik trennt Gratis von Premium pro App, inklusive Ablauf-Downgrade und Schutz gegen doppelte Freischaltung.',
-      en: 'Subscription and entitlement logic separates free from premium per app, including expiry downgrade and protection against double redemption.',
-    },
-    {
-      de: 'Native Android-Builds für die Apps, mit eigenem Passwort-Login im geteilten Kern, ohne Zwang zu einer Fremd-Anmeldung.',
-      en: 'Native Android builds for the apps, with their own password login in the shared core, so nobody is forced into a third-party sign-in.',
+      de: 'Die alten Android-Apps bekamen ein letztes Update. Es zeigt einen Hinweis und installiert die neue App über den vorhandenen Updater.',
+      en: 'The old Android apps received one last update. It shows a notice and installs the new app through the existing updater.',
     },
   ],
   decisions: [
     {
-      title: { de: 'Warum sechs Apps', en: 'Why six apps' },
+      title: { de: 'Eine App statt sechs', en: 'One app instead of six' },
       body: {
-        de: 'Plugins, Module und Rollen in einer Monolith-Plattform tragen ihren eigenen Overhead. Ein gemeinsames Datenmodell hätte bedeutet, dass eine Schema-Änderung für eine Prüfung alle sechs anfasst. Sechs schlanke Apps mit geteiltem Design-System sind mir das wert, der ursprüngliche Monolith ist dafür weg.',
-        en: 'Plugins, modules and roles inside a monolith carry their own overhead. Six lean apps on a shared design system are cheaper in the long run than one shared data model that gets in every domain\'s way; the original monolith was deliberately given up for it.',
+        de: 'Im Sommer 2026 habe ich mich für sechs getrennte Apps entschieden, damit jeder Bereich sein eigenes Tempo hat. Das hat sich nicht getragen. Jede Abhängigkeits-Runde und jede Sprachkorrektur lief sechsmal. Deshalb habe ich die Entscheidung im November zurückgenommen.',
+        en: 'In summer 2026 I chose six separate apps so each area could move at its own pace. That did not hold up. Every dependency round and every language fix ran six times. So I reversed the decision in November.',
       },
     },
     {
-      title: {
-        de: 'Prüfungssimulator aus Fragen-Pools',
-        en: 'An exam simulator from pools, not a fixed list',
-      },
+      title: { de: 'Parallel aufbauen, dann umschalten', en: 'Build in parallel, then switch' },
       body: {
-        de: 'Eine echte Prüfungssimulation braucht wechselnde Fragen, nach Themengebiet gewichtet. Die Fragen liegen in domänen-spezifischen Pools, aus denen pro Durchlauf eine frische Auswahl gezogen und am Ende nach Gebieten ausgewertet wird.',
-        en: 'A real exam simulation needs rotating questions weighted by topic. The questions sit in domain-specific pools; each run draws a fresh selection and grades it by topic at the end.',
+        de: 'Lernstufe lief zuerst neben den alten Apps. Erst nach Probe-Import und Zahlenabgleich habe ich die Adressen umgestellt. Danach habe ich die alten Apps gestoppt. Ihre Daten liegen als Rückweg bereit.',
+        en: 'Lernstufe first ran next to the old apps. Only after a trial import and a count check did I switch the addresses. After that I stopped the old apps. Their data stays in place as a way back.',
       },
     },
     {
-      title: { de: 'Freischaltung als geprüfter Anspruch', en: 'Entitlement as a verified claim' },
+      title: { de: 'Prüfungssimulator aus Fragen-Pools', en: 'Exam simulator from question pools' },
       body: {
-        de: 'Premium wird nicht als Flag gesetzt, sondern als überprüfter Anspruch mit Ablauf und Schutz gegen doppelte oder fremde Freischaltung modelliert, damit der Zugang sauber bleibt, auch wenn ein Abo endet.',
-        en: 'Premium is not a flag but a verified claim with an expiry and protection against double or foreign redemption, so access stays clean even after a subscription ends.',
+        de: 'Eine Probeprüfung zieht bei jedem Durchlauf eine neue Auswahl aus Pools je Themengebiet und wertet am Ende nach Gebiet aus. Eine feste Fragenliste lernt man auswendig.',
+        en: 'A mock exam draws a fresh selection from per-topic pools on every run and grades by topic at the end. A fixed list of questions gets memorised.',
       },
     },
   ],
   metrics: [
     {
-      label: { de: 'Web-Apps', en: 'Web apps' },
-      value: { de: '6 live auf einem Kern', en: '6 live on one core' },
+      label: { de: 'Bereiche', en: 'Areas' },
+      value: { de: '6 in einer App', en: '6 in one app' },
     },
     {
-      label: { de: 'Android', en: 'Android' },
-      value: { de: 'native Builds mit Passwort-Login', en: 'native builds with password login' },
+      label: { de: 'Zugänge', en: 'Entry points' },
+      value: { de: 'Browser und Android, ein Konto', en: 'browser and Android, one account' },
     },
     {
       label: { de: 'Prüfungssimulator', en: 'Exam simulator' },
@@ -173,23 +139,20 @@ const lernen: Fallstudie = {
   timeline: [
     {
       when: { de: '2025', en: '2025' },
-      what: {
-        de: 'Erste Web-Apps, Design-System aufgesetzt',
-        en: 'First web apps, design system set up',
-      },
+      what: { de: 'Erste Lern-Apps im Browser', en: 'First learning apps in the browser' },
     },
     {
       when: { de: '2026 H1', en: '2026 H1' },
       what: {
-        de: 'Sechs Apps live, Monolith abgelöst, native Android-Builds',
-        en: 'Six apps live, monolith retired, native Android builds',
+        de: 'Sechs getrennte Apps auf einem geteilten Kern, native Android-Builds',
+        en: 'Six separate apps on a shared core, native Android builds',
       },
     },
     {
-      when: { de: '2026 H1', en: '2026 H1' },
+      when: { de: 'Nov. 2026', en: 'Nov 2026' },
       what: {
-        de: 'Prüfungssimulator und Abo-/Freischalt-Logik über die Apps gezogen',
-        en: 'Exam simulator and subscription logic pulled across the apps',
+        de: 'Zusammengeführt zu Lernstufe, alte Apps gestoppt',
+        en: 'Merged into Lernstufe, old apps stopped',
       },
     },
   ],

@@ -7,9 +7,9 @@
  *
  * Die drei Modi:
  *
- * - **`bewerbung`** (heute): die Seite nennt die gesuchte Rolle, zeigt den
+ * - **`bewerbung`**: die Seite nennt die gesuchte Rolle, zeigt den
  *   Lebenslauf und fordert zum Schreiben auf.
- * - **`schaufenster`**: dieselbe Seite ohne jedes Bewerbungssignal. Weg sind
+ * - **`schaufenster`** (aktiv seit 2026-11-13, Suche pausiert): dieselbe Seite ohne jedes Bewerbungssignal. Weg sind
  *   die Rolle, die Bereitschaft, die Aufforderungen zum Schreiben, der
  *   Lebenslauf samt PDF und das maschinenlesbare `seeks` der strukturierten
  *   Daten. Das Werk bleibt vollständig, die Kontaktseite bleibt erreichbar.
@@ -55,7 +55,7 @@ export type Modus = 'bewerbung' | 'schaufenster' | 'wartung';
  * umformuliert, zieht das Muster dort mit nach. Der Smoke bricht bei einem
  * unlesbaren Modus ab, statt eine Vorgabe zu raten, sagt es also deutlich.
  */
-export const MODUS = 'bewerbung' as Modus;
+export const MODUS = 'schaufenster' as Modus;
 
 /** Die Seite wirbt um eine Stelle. */
 export const istBewerbung = MODUS === 'bewerbung';

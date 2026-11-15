@@ -118,16 +118,16 @@ const homelabSentinel: Fallstudie = {
   },
   result: [
     {
-      de: 'Acht Cogs decken Monitoring, Backups, Updates, Sicherheit und Verbindungs-Status ab, jede Sorge ein eigenes, einzeln pausierbares Modul.',
-      en: 'Eight cogs cover monitoring, backups, updates, security and connection status, each concern its own, individually pausable module.',
+      de: 'Zwölf Cogs decken Monitoring, Backups, Updates, Sicherheit und Verbindungs-Status ab, jede Sorge ein eigenes, einzeln pausierbares Modul.',
+      en: 'Twelve cogs cover monitoring, backups, updates, security and connection status, each concern its own, individually pausable module.',
     },
     {
-      de: 'Push-pflichtige Ereignisse von der Neustart-Schleife über das ablaufende Zertifikat bis zum Speicherdruck erreichen mich im Sekunden-Bereich, alles Wartbare bleibt leise im Hintergrund.',
-      en: 'Push-worthy events (a restart loop, an expiring certificate, storage pressure) reach me within seconds, while everything maintainable stays quiet in the background.',
+      de: 'Push-pflichtige Ereignisse von der Neustart-Schleife über das ablaufende Zertifikat bis zum Speicherdruck erreichen mich innerhalb weniger Minuten, alles Wartbare bleibt leise im Hintergrund.',
+      en: 'Push-worthy events (a restart loop, an expiring certificate, storage pressure) reach me within a few minutes, while everything maintainable stays quiet in the background.',
     },
     {
-      de: 'Ein Freigabe-Knopf ersetzt die stille Automatik: Vorübergehendes fährt bis zu einem Limit von selbst nach, eine abgelaufene Freigabe führt bei echtem Klick trotzdem noch aus und läuft nicht in eine Sackgasse.',
-      en: 'A release button replaces silent automation: transient things retry on their own up to a limit, and an expired release still executes on a real click without dead-ending.',
+      de: 'Ein Freigabe-Knopf ersetzt die stille Automatik. Nur Vorübergehendes fährt bis zu einem Limit von selbst nach. Eine abgelaufene Freigabe führt nichts mehr aus, der Bot meldet das im Chat.',
+      en: 'A release button replaces silent automation. Only transient things retry on their own, up to a limit. An expired release executes nothing, and the bot says so in the chat.',
     },
     {
       de: 'Knöpfe überstehen einen Bot-Neustart, ohne tot zu werden, was vorher angezeigt wurde bleibt klickbar.',
@@ -185,7 +185,7 @@ const homelabSentinel: Fallstudie = {
     },
     {
       label: { de: 'Alert-Latenz', en: 'Alert latency' },
-      value: { de: 'Sekunden, nicht Minuten', en: 'seconds, not minutes' },
+      value: { de: 'Minuten, Freigaben sofort', en: 'minutes, releases at once' },
     },
     {
       label: { de: 'Eingriff', en: 'Intervention' },

@@ -117,6 +117,9 @@ const de: Dict = {
   // an der einen Stelle, an der sie keine Entscheidung mehr beeinflusst.
   'kontakt.lead':
     'Ein Stellenangebot, eine Frage zu einem Projekt oder Feedback: Eine kurze Nachricht reicht. Sie landet direkt bei mir, nicht in einem Ticketsystem, und ich lese jede selbst. Antwort in der Regel innerhalb von 24 Stunden.',
+  // Schaufenster (lib/modus.ts): dieselbe Einladung ohne Stellenangebot.
+  'kontakt.leadNeutral':
+    'Eine Frage zu einem Projekt oder Feedback: Eine kurze Nachricht reicht. Sie landet direkt bei mir, nicht in einem Ticketsystem, und ich lese jede selbst.',
   'kontakt.ways': 'cat kontaktwege.txt',
   'kontakt.mailDirect': 'Mail direkt',
   'kontakt.cvView': 'Lebenslauf ansehen',
@@ -271,6 +274,8 @@ const en: Dict = {
   'kontakt.title': 'Contact.',
   'kontakt.lead':
     'A job offer, a question about a project, or feedback. A short message is enough. It comes straight to me, not into a ticket system, and I read every one myself. A reply usually follows within 24 hours.',
+  'kontakt.leadNeutral':
+    'A question about a project, or feedback. A short message is enough. It comes straight to me, not into a ticket system, and I read every one myself.',
   'kontakt.ways': 'cat contact-ways.txt',
   'kontakt.mailDirect': 'mail directly',
   'kontakt.cvView': 'view résumé',

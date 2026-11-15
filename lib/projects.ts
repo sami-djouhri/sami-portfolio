@@ -224,14 +224,14 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 'lernen',
-    title: 'Coach-Familie',
-    tagline: 'Sechs Lern-Apps auf einem geteilten Kern, je eine Prüfung.',
+    title: 'Lernstufe',
+    tagline: 'Eine Lern-App für alle Bereiche, vom IT-Zertifikat bis zum Führerschein.',
     description:
-      'Mehrere eigenständige Lern-Apps auf einem geteilten Kern, jede für eine andere Prüfung. Lernlogik, Design-System und die Android-Module liegen einmal vor und werden in die Apps synchronisiert. Datenbank, Auth und Theme sind dagegen pro App getrennt, damit eine Änderung an einer Prüfung die anderen fünf nicht anfasst. Eine Lern-Session führt vom Lesen direkt ins Üben und schlägt danach den nächsten Schritt vor. Eine neue Prüfung kommt als weitere App auf demselben Fundament dazu, ohne dass ich den Kern anfassen muss.',
+      'Eine Lern-App für mehrere Bereiche: IT-Zertifikate, Ausbildung, Führerschein, Schulstoff. Bis November 2026 waren das sechs getrennte Apps mit je eigener Datenbank und eigenem Konto. Jetzt gibt es einen Server, eine Datenbank und ein Konto, Konten und Fortschritt der alten Apps sind zusammengeführt. Die Startseite zeigt fällige Wiederholungen über alle Kurse, Probeprüfungen ziehen ihre Fragen aus Pools je Themengebiet. Die App läuft im Browser und auf Android.',
     role: 'Konzept, Aufbau, Betrieb',
     year: 'seit 2025',
-    highlight: 'Ein geteilter Kern, sechs eigenständige Apps, Web und native Android',
-    stack: ['Next.js', 'SQLite', 'Compose Multiplatform', 'Hilt'],
+    highlight: 'Sechs Apps zu einer zusammengeführt, ohne Konto- oder Fragenverlust',
+    stack: ['Next.js', 'SQLite', 'Kotlin', 'Jetpack Compose'],
     domain: 'Suite',
     status: 'live',
     href: 'https://lernen.meisterminze.de',
@@ -241,7 +241,7 @@ export const PROJECTS: Project[] = [
     title: 'Tardis',
     tagline: 'Android-App, die Dienste startet und stoppt, erreichbar nur übers eigene VPN.',
     description:
-      'Ein nativer Android-Begleiter für mein Homelab: Host-Metriken, Dienste starten, stoppen und neu starten samt Logs, dazu eine Inbox für offene Punkte. Die App spricht ausschließlich ein privates Gateway über mein eigenes VPN an. Gekoppelt wird per QR-Scan, der einen gerätegebundenen Schlüssel im Android-KeyStore erzeugt und gegen ein Client-Zertifikat für mTLS eintauscht; der Schlüssel verlässt das Gerät nie. Wer die App ohne Gateway ansehen will, kann einen Demo-Modus starten.',
+      'Ein nativer Android-Begleiter für mein Homelab: Host-Metriken, Dienste starten, stoppen und neu starten samt Logs, dazu eine Inbox für offene Punkte. Die App spricht ausschließlich ein privates Gateway über mein eigenes VPN an. Gekoppelt wird per QR-Scan, der einen gerätegebundenen Schlüssel im Android-KeyStore erzeugt und gegen ein Client-Zertifikat für mTLS eintauscht; der Schlüssel verlässt das Gerät nie. Wer die App ohne Gateway ansehen will, kann einen Demo-Modus starten. Dieselbe Steuerung gibt es im internen Web-Portal, beide gehen über einen Proxy ohne Container-Exec, und eine Host-Shell gibt es nirgends.',
     role: 'Konzept, Aufbau, Sicherheitsmodell',
     year: 'seit 2026',
     highlight: 'Container-Steuerung und Host-Metriken vom Handy, gerätegebundenes mTLS-Pairing, Zugang nur übers eigene VPN',
@@ -277,27 +277,6 @@ export const PROJECTS: Project[] = [
     status: 'live',
   },
   {
-    id: 'ai-vision',
-    title: 'AI-Vision · Edge-Inferenz',
-    tagline: 'Bilderkennung auf Edge-Hardware im Heimnetz.',
-    description:
-      'Bilderkennung läuft auf einer GPU im Heimnetz, ohne dass ein Bild einen Cloud-Dienst sieht. Die Edge-Hardware ist erste Generation: knapper Speicher, alte Toolchain, kaum ein Paket installiert sich von der Stange. Ich habe jeden Stolperstein einmal gelöst und aufgeschrieben, bis der Aufbau reproduzierbar war. Eine API kapselt die Hardware-Bindung, andere Dienste holen sich die Inferenz, ohne die GPU dahinter zu kennen. Nach einem Umbau der Verkabelung war die Hardware eine Weile nicht erreichbar; dass der abnehmende Dienst das als Ausfall meldete statt Platzhalter zu liefern, hat sich in genau diesem Fall bezahlt gemacht. Seit dem Wiederanlauf läuft die Pipeline wieder.',
-    role: 'Plattform-Bring-up, Integration, Hardening',
-    year: 'seit 2026',
-    highlight: 'Lokale GPU-Inferenz im Heimnetz, unabhängig von der Cloud. Nach dem Umbau der Verkabelung aus gesichertem Stand wieder angelaufen.',
-    stack: ['PyTorch', 'YOLOv5', 'FastAPI'],
-    domain: 'AI',
-    status: 'live',
-    repos: [
-      {
-        url: 'https://github.com/sami-djouhri/perception-orchestrator',
-        label: 'Perception-Orchestrator',
-        note: 'Die Steuerzentrale der Perzeptions-Pipeline: macht aus eingehenden Dateien idempotente Jobs, verteilt sie an den GPU-Edge-Worker und meldet den Status über MQTT.',
-        noteEn: 'The control center of the perception pipeline: turns incoming files into idempotent jobs, dispatches them to the GPU edge worker and reports status over MQTT.',
-      },
-    ],
-  },
-  {
     id: 'wissens-foederation',
     title: 'Wissens-Föderation',
     tagline: 'Eine Such-API über mehrere Wissensquellen im Haus, erreichbar unter einer Adresse.',
@@ -315,11 +294,11 @@ export const PROJECTS: Project[] = [
     title: 'Offline-Wissen',
     tagline: 'Nachschlagen, Karte und Navigation funktionieren auch ohne Leitung nach draußen.',
     description:
-      'Nachschlagewerk, Karte und Routenplanung liegen vollständig im Haus und funktionieren, wenn die Leitung nach draußen weg ist. Das Nachschlagewerk hält Wikipedia, Fachbücher und Kursmaterial in Archivform vor. Die Karte ist eine Vektorkarte aus offenen Daten, dazu kommen Luftbilder und eine Satellitenansicht als eigene Ebenen. Adressen mit Hausnummern stecken in einem selbstgebauten Index, den ich gegen die verbreitete Standardlösung getauscht habe, weil die auf dieser Hardware nicht läuft. Ein eigener Gast auf dem Virtualisierungs-Cluster rechnet die Routen. Nebenbei sieht kein Anbieter mehr, wonach hier gesucht wird.',
+      'Nachschlagewerk, Karte und Routenplanung liegen vollständig im Haus und funktionieren, wenn die Leitung nach draußen weg ist. Das Nachschlagewerk hält Wikipedia, Fachbücher und Kursmaterial in Archivform vor. Die Karte ist eine Vektorkarte aus offenen Daten, dazu kommen Luftbilder und eine Satellitenansicht als eigene Ebenen. Adressen mit Hausnummern und gut zwei Millionen Einträge mit Gattung stecken in einem selbstgebauten Index, den ich gegen die verbreitete Standardlösung getauscht habe, weil die auf dieser Hardware nicht läuft. Ein eigener Gast auf dem Virtualisierungs-Cluster rechnet die Routen, ein weiterer die Verbindungen mit Bus und Bahn. Eine App nimmt die Karte für ganz Deutschland aufs Telefon mit. Nebenbei sieht kein Anbieter mehr, wonach hier gesucht wird.',
     role: 'Konzeption, Datenaufbereitung, Betrieb',
     year: 'seit 2026',
     highlight: 'Über 19 Millionen Adressen in einem eigenen Index, gebaut mit unter 500 MB Arbeitsspeicher',
-    stack: ['Python', 'SQLite', 'nginx', 'MapLibre', 'Valhalla', 'LXC'],
+    stack: ['Python', 'SQLite', 'nginx', 'MapLibre', 'Valhalla', 'OpenTripPlanner', 'LXC'],
     domain: 'Infra',
     status: 'live',
     // Beleg statt `href`: das Portal steht nur im Haus, eine oeffentliche
@@ -412,35 +391,14 @@ export const PROJECTS: Project[] = [
     status: 'live',
   },
   {
-    id: 'postfach',
-    title: 'Postfach',
-    tagline: 'Papierpost wird zum Handy-Foto, das Foto zum durchsuchbaren Datensatz.',
-    description: 'Ein Brief wird zum schnellen Handy-Foto und kommt als durchsuchbarer Datensatz zurück. Vor dem Auslesen geht das Foto durch eine eigene Bildaufbereitung, die das Dokument im Bild findet und begradigt; auf einem schief fotografierten Brief liefert OCR sonst deutlich schlechtere Ergebnisse. Dann liest OCR den Text und ein Sprachmodell zieht Titel und Absender heraus. Jeder fertige Scan löst ein Ereignis auf meinem Event-Bus aus, sodass andere Dienste mitbekommen, dass Post da ist. Über eine abgesicherte interne Schnittstelle findet die hausweite Suche den Bestand.',
-    role: 'Konzeption, Service, Integration',
-    year: 'seit 2026',
-    highlight: 'Klassische Bildaufbereitung und LLM-Extraktion in einer produktiven Pipeline, vollständig auf eigener Hardware',
-    stack: ['FastAPI', 'Tesseract OCR', 'Claude API', 'SQLite', 'Event-Bus'],
-    domain: 'AI',
-    status: 'live',
-    repos: [
-      {
-        url: 'https://github.com/sami-djouhri/postfach',
-        label: 'Postfach',
-        labelEn: 'Paper Mail',
-        note: 'Papierpost digitalisiert: Brief scannen, OCR darüber laufen lassen, einsortieren, wiederfinden, als PDF ausgeben. Teil der Suite, läuft auch allein.',
-        noteEn: 'Paper mail, digitised: scan a letter, run OCR over it, file it under a category, find it again, export it as PDF. Part of the suite, usable on its own.',
-      },
-    ],
-  },
-  {
     id: 'news-engine',
     title: 'News-Engine',
-    tagline: 'Clustert Artikel aus vielen Feeds zu Storys, fast vollständig lokal.',
-    description: 'Eine Nachrichten-Engine, die zusammengehörende Berichte erkennt. Beiträge aus vielen Feeds werden über eigene Embeddings geclustert, sodass Meldungen zur selben Sache auch über Sprachgrenzen hinweg zusammenfinden, und dann nach Quellenzahl, Trend und Quellenqualität sortiert. Embedding, Clustering und Bewertung laufen lokal. Ein Cloud-Modell kommt nur bei einzelnen Schritten zum Einsatz, bei denen das lokale Modell nicht ausreicht. Dadurch steigen die API-Kosten nicht einfach mit jedem zusätzlich verarbeiteten Artikel.',
+    tagline: 'Clustert Artikel aus vielen Feeds zu Storys, lokal betrieben.',
+    description: 'Eine Nachrichten-Engine, die zusammengehörende Berichte erkennt. Beiträge aus vielen Feeds werden über eigene Embeddings geclustert, sodass Meldungen zur selben Sache auch über Sprachgrenzen hinweg zusammenfinden, und dann nach Quellenzahl, Trend und Quellenqualität sortiert. Embedding, Clustering und Bewertung laufen lokal, Texte schreibt ein lokales Modell im Haus. Ein Cloud-Modell ist eingebaut, aber abgeschaltet, und das Aufrufbuch zeigt seit Mitte September keinen einzigen Aufruf.',
     role: 'Architektur, Verarbeitungskette, Kostensteuerung',
     year: 'seit 2026',
-    highlight: 'Im Standardbetrieb keine externen Kosten, Cloud nur hinter einem Monatsdeckel',
-    stack: ['FastAPI', 'PostgreSQL', 'Vektor-Embeddings', 'Claude API', 'Hybrid-LLM-Routing'],
+    highlight: 'Sechs Abnehmer auf einer Engine, alle Modellaufrufe lokal',
+    stack: ['FastAPI', 'SQLite', 'Vektor-Embeddings', 'llama.cpp'],
     domain: 'AI',
     status: 'live',
     // Kein `href` seit dem 2026-10-30: news.saganta.de lief ueber den
@@ -478,7 +436,7 @@ export const PROJECTS: Project[] = [
     id: 'defense-in-depth',
     title: 'Defense in Depth',
     tagline: 'Sicherheit steckt in jeder Schicht, von der Container-Härtung bis zum geprüften Restore.',
-    description: 'Jeder Dienst läuft ohne Root, mit read-only Dateisystem und gedroppten Capabilities. Docker-Zugriff gibt es nur über eingeschränkte Proxies; die Ausnahmen davon stehen in einem eigenen Inventar, damit keine still dazukommt. Das Netz ist in Zonen geschnitten, mit einer Regel pro Container, und ein Wächter meldet jeden Verbindungsaufbau, der nicht vorgesehen ist. Die Anmeldung läuft zentral über SSO; hinter dem Edge wird die echte Client-IP mitgeloggt, nicht die des Proxys. Darunter liegt verschlüsseltes Off-Site-Backup. Den Restore-Drill fahre ich regelmäßig gegen echte Stichproben, weil ein Backup ohne geprüfte Rückspielung nichts wert ist.',
+    description: 'Sicherheit in mehreren Schichten, dazu eine tägliche Prüfung, ob sie noch stehen. Container laufen ohne die Möglichkeit, sich mehr Rechte zu verschaffen, die meisten schreibgeschützt und ohne root. Kein Anwendungs-Container hängt direkt am Docker-Socket. Das Netz ist in Zonen geteilt, und ein Wächter meldet jeden Beitritt, der nicht freigegeben ist. Dienste ohne eigene Anmeldung stehen hinter SSO, am öffentlichen Rand liest ein IDS mit. Darunter liegt eine verschlüsselte Sicherung außer Haus, aus der jede Woche Stichproben zurückgeholt werden.',
     role: 'Sicherheits-Architektur, Härtung, Betrieb',
     year: 'seit 2025',
     highlight: 'Verteidigung über Container, Netz, Edge, Identität und Wiederanlauf',
@@ -500,37 +458,6 @@ export const PROJECTS: Project[] = [
         noteEn: 'A lightweight, RAM-bounded Trivy CVE scanner for a self-hosted Docker fleet, run as a systemd timer and exported as a Prometheus textfile metric.',
       },
     ],
-  },
-  {
-    id: 'ops-cockpit',
-    title: 'Ops-Fläche',
-    tagline: 'Eine Oberfläche für alle Hosts, ohne Shell und ohne Container-Exec.',
-    description: 'Früher habe ich mich auf jeden Host einzeln eingeloggt. Heute läuft das über eine Fläche im internen Portal: Last, Temperatur, Speicher und Plattenbelegung aller Hosts, Dienste starten und stoppen, Container-Logs auf Abruf, dazu eine Topologie-Ansicht der Abhängigkeiten und das Alter des letzten Backups je Host. Der Zugriff geht nie direkt auf den Docker-Socket, sondern über einen eingeschränkten Proxy ohne Container-Exec, per Firewall auf genau eine Steuerebene begrenzt und so verankert, dass die Sperre einen Reboot übersteht. Jeder Konsument hat einen eigenen Schlüssel. Dienste, die ich absichtlich stillgelegt habe, sind als solche hinterlegt und tauchen nicht als Fehlalarm auf. Eine Host-Shell oder ein Remote-Terminal gibt es nicht: das wäre der eine Weg, über den ein übernommenes Frontend alles andere aushebeln könnte. Eine zweite, eigenständige Oberfläche für dieselben Daten habe ich gebaut und im Oktober 2026 wieder abgeschaltet. Sie stand neben dem Portal und der Android-App, und gepflegt werden mussten trotzdem alle drei.',
-    role: 'Architektur, Härtung, Betrieb',
-    year: 'seit 2026',
-    highlight: 'Multi-Host-Steuerung ohne Container-Exec, Lockdown übersteht Reboot',
-    stack: ['Svelte', 'Python', 'Docker', 'Socket-Proxy', 'Prometheus'],
-    domain: 'Infra',
-    status: 'live',
-  },
-  {
-    id: 'windows-ad-lab',
-    title: 'Windows- & AD-Lab',
-    titleEn: 'Windows & AD Lab',
-    tagline: 'Ein Lernlabor für Windows Server und Active Directory, gerade im Aufbau.',
-    description:
-      'Windows Server und Active Directory kann man erst, wenn man sie betrieben hat. Also läuft auf meinem Cluster ein abgeschottetes Lab: Domänencontroller und Windows-Client als virtuelle Maschinen, on-demand gestartet, mit UEFI und Secure Boot. Der Domänencontroller steht, die Domäne läuft mit integriertem DNS, erste Organisationseinheiten, Benutzer und Gruppen sind angelegt. Als Nächstes kommen die Gruppenrichtlinien in der Tiefe und der Domänen-Beitritt des Clients. Der Rest meiner Infrastruktur ist durchgehend Linux, deshalb dieses Lab.',
-    role: 'Aufbau, Virtualisierung, Lernpfad',
-    year: 'seit 2026',
-    highlight: 'Domänencontroller und Client als VMs auf dem eigenen Cluster, on-demand, sauber dokumentiert.',
-    stack: ['Proxmox VE', 'Windows Server', 'Active Directory', 'GPO', 'UEFI'],
-    domain: 'Infra',
-    status: 'im-aufbau',
-    taglineEn: 'A lab for Windows Server and Active Directory on my own virtualization, currently taking shape.',
-    descriptionEn:
-      'You do not really know Windows Server and Active Directory until you have run them. So an isolated lab is coming up on my own cluster: a domain controller and a Windows client as virtual machines, started on demand, with UEFI and Secure Boot. The goal is fluent handling of domains, group policy, DNS and user management, plus a clean documented build. The state is honest: the domain controller is up, the domain stands with its own integrated DNS, and the first organizational units, users and groups exist; next come group policy in depth and joining the client to the domain. A deliberate step toward classic administration work, next to the otherwise Linux-heavy stack.',
-    highlightEn: 'Domain controller and client as VMs on my own cluster, on demand, cleanly documented.',
-    roleEn: 'Build, virtualization, learning path',
   },
   {
     id: 'modell-vermittlung',
@@ -565,38 +492,6 @@ export const PROJECTS: Project[] = [
         noteEn: 'Signed Home Assistant webhook (HMAC) that only sends selected climate readings, no access token ever leaves the home.',
       },
     ],
-  },
-  {
-    id: 'rackforge',
-    title: 'RackForge',
-    tagline: 'Ein Shop für 3D-gedruckte Teile, ohne Baukasten-System.',
-    description:
-      'Ein 3D-Druck-Shop, der ohne Shop-Framework auskommt. Der Warenkorb behandelt dieselbe Form in zwei Farben als zwei Positionen, sonst stimmt die Kommissionierung nicht. Die Bestands-Engine führt Filament-Rollen und fertig gedruckte Teile getrennt: was nicht auf Lager liegt, läuft als „auf Bestellung“, ein erledigter Druck wird gegen den Bestand verbucht. Kunden laden eigene Druckdateien hoch, durch einen eigenen Upload-Pfad mit Format- und Größen-Grenzen.',
-    role: 'Konzept, Aufbau, Shop-Regeln, Betrieb',
-    year: 'seit 2026',
-    highlight: 'Vollständiger Webshop ohne Framework: eigene Kasse, Bestands-Engine und geprüfter Datei-Upload.',
-    stack: ['Python', 'FastAPI', 'Vanilla JS', 'SQLite', 'Docker'],
-    domain: 'Web',
-    status: 'im-aufbau',
-    // Beleg statt `href`, und das ist eine Entscheidung. Der Shop IST
-    // oeffentlich erreichbar, laeuft aber bedarfsgesteuert: der erste Aufruf
-    // trifft eine sich selbst neu ladende Warteseite und wartet rund eine
-    // halbe Minute auf den Start. Als Verweis von einer Bewerberseite auf
-    // eine Arbeit im Aufbau waere das der schlechteste erste Eindruck, den
-    // die Seite zu vergeben hat. Das Bild zeigt den Shop trotzdem, es ist am
-    // 2026-10-17 am laufenden Dienst aufgenommen.
-    beleg: {
-      bild: '/previews/rackforge.webp',
-      breite: 1120,
-      hoehe: 700,
-      alt: 'Die Startseite des Shops mit einem Foto des bestückten 10-Zoll-Racks, darunter vier Angaben zu Druck auf Bestellung, Material, Schraubensatz und Sonderanfertigung.',
-      altEn:
-        'The shop landing page with a photo of a populated 10-inch rack, below it four notes on print-to-order, material, included screws and custom fits.',
-      unterschrift:
-        'Die Startseite. Das Foto zeigt eigene Teile im eigenen Rack, kein Rendering und kein Fremdbild.',
-      unterschriftEn:
-        'The landing page. The photo shows my own parts in my own rack, not a rendering and not stock imagery.',
-    },
   },
   {
     id: 'cms-baukasten',
@@ -641,11 +536,11 @@ export const PROJECTS: Project[] = [
     title: 'Ressourcen-Arbiter',
     tagline: 'Erst ein knapper Knoten, der selbst entscheidet, wer laufen darf. Inzwischen ein Muster über den ganzen Verbund.',
     description:
-      'Neun schwere Rollen teilen sich einen Wirt, dessen Arbeitsspeicher bei weitem nicht für alle reicht. Überbuchen wäre der bequeme Weg, überlässt aber im Ernstfall dem Kernel die Entscheidung, welcher Prozess stirbt. Also plant ein eigener Regler den Speicher. Die Rollen stehen als Einträge in einer Registrierdatei, er fragt jede laufende Rolle nach ihrer tatsächlichen Auslastung, entscheidet über jeden Start am gemessenen freien Platz und schaltet ab, was zwanzig Minuten leer läuft. Erzwungen verdrängt wird nie: ist es zu eng, weicht zuerst, was leer und ungeschützt ist, sonst kommt eine Absage im Klartext. Anfangs hing daran eine zweite, aufwendige Hälfte, die nur die Anschluss-Adresse verbergen sollte, ein Tunnel und eine Weiterleitungsregel je Rolle. Mit dem Umzug der Rollen auf einen eigenen Server fiel sie ersatzlos weg. Dasselbe Prinzip trägt inzwischen auch die gewöhnlichen Web-Dienste: sechs selten benutzte Anwendungen auf zwei weiteren Rechnern starten beim ersten Aufruf und schlafen nach einer halben Stunde ohne Zugriff wieder ein.',
+      'Neun schwere Rollen teilen sich einen Wirt, dessen Arbeitsspeicher bei weitem nicht für alle reicht. Überbuchen wäre der bequeme Weg, überlässt aber im Ernstfall dem Kernel die Entscheidung, welcher Prozess stirbt. Also plant ein eigener Regler den Speicher. Die Rollen stehen als Einträge in einer Registrierdatei, er fragt jede laufende Rolle nach ihrer tatsächlichen Auslastung, entscheidet über jeden Start am gemessenen freien Platz und schaltet ab, was zwanzig Minuten leer läuft. Erzwungen verdrängt wird nie: ist es zu eng, weicht zuerst, was leer und ungeschützt ist, sonst kommt eine Absage im Klartext. Anfangs hing daran eine zweite, aufwendige Hälfte, die nur die Anschluss-Adresse verbergen sollte, ein Tunnel und eine Weiterleitungsregel je Rolle. Mit dem Umzug der Rollen auf einen eigenen Server fiel sie ersatzlos weg. Dasselbe Prinzip trägt inzwischen auch die gewöhnlichen Web-Dienste: 17 selten benutzte Anwendungen auf zwei Rechnern im Haus starten beim ersten Aufruf und schlafen nach einer halben Stunde ohne Zugriff wieder ein.',
     role: 'Konzept, Netz-Design, Aufbau, Betrieb',
     year: 'seit 2026',
     highlight: 'Neun schwere Rollen auf knappem Speicher, gestartet nach gemessenem Platz statt nach festem Slot, und wer gerade arbeitet, wird nicht verdrängt.',
-    stack: ['Python', 'Proxmox · LXC', 'systemd', 'nginx', 'VPN', 'Paketfilter'],
+    stack: ['Python', 'systemd', 'Docker', 'nginx', 'SSH-Tunnel', 'Paketfilter'],
     domain: 'Infra',
     status: 'live',
     repos: [
@@ -654,7 +549,7 @@ export const PROJECTS: Project[] = [
         label: 'Rollen-Arbiter (schwere Rollen)',
         labelEn: 'Role arbiter (heavy roles)',
         note: 'Regler für speicherknappe Wirte: entscheidet über jeden Start am gemessenen freien Platz, räumt belegte Rollen nie erzwungen, sichert den Zustand weichender Rollen und schaltet bei Leerlauf ab.',
-        noteEn: 'Priority-based resource controller for a memory-constrained hypervisor node: keeps heavy on-demand roles to one at a time, driven by real occupancy probes, with graceful save-and-stop and idle auto-off.',
+        noteEn: 'Controller for memory-constrained hosts: decides every start against measured free memory, never evicts occupied roles by force, saves the state of roles that give way and switches off when idle.',
       },
       {
         url: 'https://github.com/sami-djouhri/wake-gateway',
@@ -720,18 +615,17 @@ const PROJECTS_TEXT_EN: Record<
     role: 'Build, design, operations, on-call',
   },
   lernen: {
-    title: 'Coach Family',
-    tagline: 'Standalone learning apps on a shared core, built for the next discipline.',
+    tagline: 'One learning app for every area, from IT certification to driving licence.',
     description:
-      "Several standalone learning apps on a shared core, each for a different exam, but with the same learning logic, design system and Android modules underneath. What's shared is built once and synced into the apps. What belongs apart stays apart: database, auth and theme are fully isolated per app, so each domain keeps its own pace and face. The old tile menu has become a continuous product. A session leads straight from reading into practice and suggests the next sensible step itself. A new learning domain arrives as another app on the same foundation, without me touching the core.",
-    highlight: 'One shared core, six standalone apps, web and native Android',
-    role: 'Concept, build-out, operations',
+      'One learning app for several areas: IT certifications, vocational training, driving licence, school subjects. Until November 2026 these were six separate apps, each with its own database and account. Now there is one server, one database and one account; accounts and progress from the old apps are merged. The start page shows due reviews across all courses, mock exams draw their questions from per-topic pools. The app runs in the browser and on Android.',
+    highlight: 'Six apps merged into one, without losing an account or a question',
+    role: 'Concept, build-out, operations'
   },
   'homelab-app': {
     title: 'Tardis',
     tagline: 'Android app that starts and stops my homelab services, reachable only over my own VPN.',
     description:
-      'A native Android companion that makes my homelab operable from the phone: host metrics at a glance, services to start, stop and restart with their logs, and an inbox to triage open items. The app only ever talks to a private gateway over my own VPN; pairing happens by scanning a QR code that generates a device-bound key in the Android KeyStore and exchanges it for a client certificate and mTLS, so the key never leaves the device. A public demo mode shows the app entirely without a gateway.',
+      'A native Android companion that makes my homelab operable from the phone: host metrics at a glance, services to start, stop and restart with their logs, and an inbox to triage open items. The app only ever talks to a private gateway over my own VPN; pairing happens by scanning a QR code that generates a device-bound key in the Android KeyStore and exchanges it for a client certificate and mTLS, so the key never leaves the device. A public demo mode shows the app entirely without a gateway. The same controls exist in the internal web portal; both go through a proxy without container exec, and there is no host shell anywhere.',
     highlight: 'Container control and host metrics from the phone, device-bound mTLS pairing, access only over my own VPN',
     role: 'Concept, build-out, security model',
   },
@@ -749,14 +643,6 @@ const PROJECTS_TEXT_EN: Record<
     highlight: 'Flags only when even the bad case still leaves a profit',
     role: 'Concept, data path, scoring rules, operations',
   },
-  'ai-vision': {
-    title: 'AI Vision · Edge Inference',
-    tagline: 'Image recognition on edge hardware, inside the home network.',
-    description:
-      "Image recognition runs on a GPU in my home network, without a single image ever reaching a cloud service. The first-generation edge hardware is stubborn: tight memory, an old toolchain, almost nothing installs off the shelf. So I solved every platform stumbling block once and wrote it down until a dependable path stood. An API encapsulates the hardware binding in a single place. Other self-run services consume the inference without ever knowing the GPU behind it, and further models sit on the same foundation without a rebuild. After a re-cabling the hardware sat off the network for a while, and having the consuming service report an outage rather than invent results paid off in exactly that case. The pipeline has been running again since it came back.",
-    highlight: 'Local GPU inference inside the home network, independent of any cloud. Back up and running from a secured state after the re-cabling.',
-    role: 'Platform bring-up, integration, hardening',
-  },
   'wissens-foederation': {
     title: 'Knowledge Federation',
     tagline: 'One search API over several knowledge sources of my own. The frontend knows none of them.',
@@ -770,7 +656,7 @@ const PROJECTS_TEXT_EN: Record<
     title: 'Offline Knowledge',
     tagline: 'Looking things up, the map and turn-by-turn routing all work with the uplink gone.',
     description:
-      'A reference library, a map and route planning that live entirely at home and keep working when the uplink is gone. The library holds Wikipedia, technical books and course material in archive form. The map is a vector map built from open data, with aerial imagery and a satellite view as separate layers on top. Addresses down to house numbers sit in an index of its own, after the common off-the-shelf option turned out not to fit the hardware. A dedicated guest on the virtualization cluster computes the routes. As a side effect, no provider gets to see what is being looked up here.',
+      'A reference library, a map and route planning that live entirely at home and keep working when the uplink is gone. The library holds Wikipedia, technical books and course material in archive form. The map is a vector map built from open data, with aerial imagery and a satellite view as separate layers on top. Addresses down to house numbers and a good two million entries with a category sit in an index of its own, after the common off-the-shelf option turned out not to fit the hardware. A dedicated guest on the virtualization cluster computes the routes, another one the journeys by bus and rail. An app carries the map for all of Germany onto the phone. As a side effect, no provider gets to see what is being looked up here.',
     highlight: 'More than 19 million addresses in an index of its own, assembled in under 500 MB of memory',
     role: 'Concept, data pipeline, operations',
   },
@@ -782,19 +668,11 @@ const PROJECTS_TEXT_EN: Record<
     highlight: 'Reading works with calibre-web stopped, a book is there in 0.18 seconds.',
     role: 'Concept, architecture, operations',
   },
-  postfach: {
-    title: 'Paper Mail',
-    tagline: 'Paper mail becomes a phone photo, the photo a searchable record.',
-    description:
-      'A letter becomes a quick phone photo and comes back as a cleanly filed, searchable record. Before it is read, the photo goes through a custom image pipeline that finds the document in the frame and straightens it; then OCR reads the text and a language model pulls out title and sender. Every finished scan raises an event on my event bus so other services can follow along, and a secured internal search interface makes the archive discoverable for the knowledge layer. Processing and filing run entirely on my own hardware. Paperwork becomes data, without a cloud DMS.',
-    highlight: 'Classic image processing and LLM extraction in a production pipeline, fully on my own hardware',
-    role: 'Concept, service, integration',
-  },
   'news-engine': {
-    tagline: 'Many sources become one story: semantic clustering with hard cost discipline.',
+    tagline: 'Clusters articles from many feeds into stories, running locally.',
     description:
-      'A news engine that recognizes stories. Posts from many feeds are semantically clustered via my own embeddings, so reports on the same matter converge even across language borders, and are then condensed by source count, trend and source quality. The interesting part is the cost architecture. The bulk runs locally and deterministically, and a cloud model steps in only as editor-in-chief for the few hard steps, behind a router, a budget guard and a call log. In standard operation there is zero external cost.',
-    highlight: 'Zero external cost in standard operation, cloud only behind hard caps',
+      'A news engine that recognizes stories. Posts from many feeds are semantically clustered via my own embeddings, so reports on the same matter converge even across language borders, and are then condensed by source count, trend and source quality. Embedding, clustering and scoring run locally, and a local model in the house writes the texts. A cloud model is built in but switched off, and the call log has not shown a single call since mid-September.',
+    highlight: 'Six consumers on one engine, every model call local',
     role: 'Architecture, processing chain, cost control',
   },
   concierge: {
@@ -808,17 +686,9 @@ const PROJECTS_TEXT_EN: Record<
   'defense-in-depth': {
     tagline: 'Security sits in every layer, from container hardening to a tested restore.',
     description:
-      'Security here spreads across every layer. Every service runs least-privileged with a read-only filesystem, dropped capabilities and no root; Docker access only through restricted proxies with a documented exception inventory. The network is cut into zones with one rule per container, an own watcher reports every unsanctioned connection attempt in real time, identity runs centrally via SSO with login protection and real client-IP logging behind the edge. Underneath lies encrypted off-site backup. The restore drill runs regularly, so I know the recovery path actually works.',
+      'Security in several layers, plus a daily check whether they are still standing. Containers run without the ability to gain further privileges, most of them read-only and without root. No application container is attached to the Docker socket directly. The network is split into zones, and a watcher reports every join that is not approved. Services without their own login sit behind SSO, and an IDS reads along at the public edge. Underneath lies an encrypted off-site backup, from which samples are restored every week.',
     highlight: 'Defense across container, network, edge, identity and recovery',
     role: 'Security architecture, hardening, operations',
-  },
-  'ops-cockpit': {
-    title: 'Ops Console',
-    tagline: 'My own control plane over the whole host fleet, deliberately locked down hard.',
-    description:
-      'I used to log into every host separately. Today it runs through one area of the internal portal: live metrics of all hosts (load, temperature, memory, disk), starting and stopping services from a distance, container logs on demand, a self-drawn topology view of the services and their dependencies, plus backup freshness across all hosts. Access never runs directly, but through a hardened intermediate layer without container exec, firewall-locked to exactly one control plane and anchored so the lock survives a reboot. Each consumer gets its own tightly scoped key rather than a master key. It spots divergence between expected and actual state itself, without treating deliberate shutdowns as false alarms. A deliberate decision: no host shell, no remote terminal. I also built a second, standalone interface for the same data and shut it down again in October 2026. It sat next to the portal and the Android app, and all three still had to be maintained.',
-    highlight: 'Multi-host control without container exec, lockdown survives reboot',
-    role: 'Architecture, hardening, operations',
   },
   gartiko: {
     tagline: 'A public plant-care app with community connection, live on its own domain.',
@@ -826,13 +696,6 @@ const PROJECTS_TEXT_EN: Record<
       'A public care portal for plants of every kind: track inventories, follow care phases, reminders and knowledge in one place, live on its own domain on my own infrastructure. The portal shares its base with a community bot, so knowledge curation and web interface draw from the same source and nothing has to be maintained twice. The admin area is cut off hard at the public edge and reachable only from my own network, and the public part stays lean and fast.',
     highlight: 'Publicly reachable on its own domain, admin path cut off at the edge',
     role: 'Concept, build-out, operations',
-  },
-  rackforge: {
-    tagline: 'A shop for 3D-printed parts, without a shop kit.',
-    description:
-      'A 3D-printing shop built entirely without a shop framework: my own catalog with generated detail pages, a color-aware cart that keeps the same shape in different colors cleanly apart, and an inventory engine that tracks filament spools and finished prints separately. Anything not in stock is listed as “made to order”, and a completed print is booked against stock. Users upload their own print files, checked by an upload path of its own with format and size limits. The data model, the checkout and the rules are all my own code.',
-    highlight: 'A complete web shop without a framework: own checkout, inventory engine and vetted file upload.',
-    role: 'Concept, build-out, shop rules, operations',
   },
   'cms-baukasten': {
     title: 'CMS Toolkit',
@@ -854,7 +717,7 @@ const PROJECTS_TEXT_EN: Record<
     title: 'Resource Arbiter',
     tagline: 'First a tight node deciding for itself which role gets to run. By now a pattern across the whole fleet.',
     description:
-      'Nine heavy roles share a host whose memory is nowhere near enough for all of them. Overcommitting would be the comfortable route, but it hands the kernel the decision about which process dies. So a controller of my own schedules the memory. The roles live as entries in a registry file, it asks every running role for its actual occupancy, decides each start against measured headroom, and switches off whatever has been idle for twenty minutes. Nothing is ever evicted by force: when it gets tight, what is empty and unprotected gives way first, otherwise the answer is a plain refusal. Early on there was a second, elaborate half whose only job was to hide the home address, a tunnel and a forwarding rule per role. When the roles moved to a dedicated server, it fell away with nothing put in its place. The same principle now carries the ordinary web services too: six rarely used applications on two further machines start on the first request and go back to sleep after half an hour without access.',
+      'Nine heavy roles share a host whose memory is nowhere near enough for all of them. Overcommitting would be the comfortable route, but it hands the kernel the decision about which process dies. So a controller of my own schedules the memory. The roles live as entries in a registry file, it asks every running role for its actual occupancy, decides each start against measured headroom, and switches off whatever has been idle for twenty minutes. Nothing is ever evicted by force: when it gets tight, what is empty and unprotected gives way first, otherwise the answer is a plain refusal. Early on there was a second, elaborate half whose only job was to hide the home address, a tunnel and a forwarding rule per role. When the roles moved to a dedicated server, it fell away with nothing put in its place. The same principle now carries the ordinary web services too: 17 rarely used applications on two machines at home start on the first request and go back to sleep after half an hour without access.',
     highlight: 'Nine heavy roles on tight memory, started against measured headroom rather than a fixed slot, and whoever is working does not get evicted.',
     role: 'Concept, network design, build-out, operations',
   },
@@ -941,7 +804,7 @@ export const CURRENT_FOCUS: FocusItem[] = [
     title: 'Dienste laufen lassen, wenn sie gebraucht werden',
     status: 'aktiv',
     description:
-      'Ein Wirt trägt neun schwere, selten gleichzeitig gebrauchte Rollen, aber nicht genug Arbeitsspeicher für alle. Ein Regler entscheidet am gemessenen freien Speicher, wer starten darf: reicht er, weicht niemand, sonst weichen zuerst die leeren Rollen, die am längsten ungenutzt sind, sauber mit Zustandssicherung. Wer eine Rolle gerade benutzt, wird nie verdrängt; reicht der Speicher trotzdem nicht, kommt eine Absage im Klartext statt eines Abschusses. Ungenutzte Rollen schalten sich nach zwanzig Minuten Leerlauf selbst ab. Dasselbe gilt inzwischen für gewöhnliche Web-Dienste: sechs selten benutzte Anwendungen starten beim ersten Aufruf und schlafen danach wieder ein. Als Nächstes will ich wissen, welche Dienste diese Behandlung noch verdienen, ohne dass jemand es merkt.',
+      'Ein Wirt trägt neun schwere, selten gleichzeitig gebrauchte Rollen, aber nicht genug Arbeitsspeicher für alle. Ein Regler entscheidet am gemessenen freien Speicher, wer starten darf: reicht er, weicht niemand, sonst weichen zuerst die leeren Rollen, die am längsten ungenutzt sind, sauber mit Zustandssicherung. Wer eine Rolle gerade benutzt, wird nie verdrängt; reicht der Speicher trotzdem nicht, kommt eine Absage im Klartext statt eines Abschusses. Ungenutzte Rollen schalten sich nach zwanzig Minuten Leerlauf selbst ab. Dasselbe gilt inzwischen für gewöhnliche Web-Dienste: 17 selten benutzte Anwendungen starten beim ersten Aufruf und schlafen danach wieder ein. Als Nächstes will ich wissen, welche Dienste diese Behandlung noch verdienen, ohne dass jemand es merkt.',
     projectId: 'ressourcen-arbiter',
   },
   {
@@ -962,7 +825,6 @@ export const CURRENT_FOCUS: FocusItem[] = [
     status: 'aktiv',
     description:
       'Auf dem Cluster läuft ein Windows-Server- und Active-Directory-Lab: der Domänencontroller steht mit eigener Domäne und integriertem DNS, erste Benutzer, Gruppen und Organisationseinheiten sind angelegt. Als Nächstes die Gruppenrichtlinien in der Tiefe und der Domänen-Beitritt eines Clients. Dazu arbeite ich die klassischen Administrations-Themen strukturiert durch, weil mein Homelab sonst reines Linux wäre.',
-    projectId: 'windows-ad-lab',
   },
   {
     title: 'Den Wiederanlauf üben, nicht nur einrichten',
@@ -1052,7 +914,7 @@ const CURRENT_FOCUS_EN: FocusItem[] = [
     title: 'Running services when they are actually wanted',
     status: 'aktiv',
     description:
-      'One host carries nine heavy roles that are rarely needed at the same time, but not enough memory for all of them. A controller decides by measured free memory who gets to start: if there is enough, nobody has to yield, otherwise the empty roles that have been unused longest yield first, cleanly and with their state saved. Anyone actually using a role is never evicted; if memory still falls short, the answer is a plain refusal rather than a kill. Idle roles switch themselves off after twenty minutes. The same now applies to ordinary web services: six rarely used applications start on the first request and go back to sleep afterwards. Next I want to know which further services deserve the same treatment without anyone noticing.',
+      'One host carries nine heavy roles that are rarely needed at the same time, but not enough memory for all of them. A controller decides by measured free memory who gets to start: if there is enough, nobody has to yield, otherwise the empty roles that have been unused longest yield first, cleanly and with their state saved. Anyone actually using a role is never evicted; if memory still falls short, the answer is a plain refusal rather than a kill. Idle roles switch themselves off after twenty minutes. The same now applies to ordinary web services: 17 rarely used applications start on the first request and go back to sleep afterwards. Next I want to know which further services deserve the same treatment without anyone noticing.',
     projectId: 'ressourcen-arbiter',
   },
   {
@@ -1073,7 +935,6 @@ const CURRENT_FOCUS_EN: FocusItem[] = [
     status: 'aktiv',
     description:
       'A hands-on Windows Server and Active Directory lab runs on the cluster: the domain controller is up with its own domain and integrated DNS, and the first users, groups and organizational units exist. Next come group policy in depth and joining a client to the domain, deliberately alongside the Linux focus. Plus structured learning along the classic administration topics, to broaden my practice beyond the Linux homelab.',
-    projectId: 'windows-ad-lab',
   },
   {
     title: 'Making recovery antifragile',

@@ -8,20 +8,15 @@ import marktwatch from './marktwatch';
 import wissensFoederation from './wissens-foederation';
 import offlineWissen from './offline-wissen';
 import bibliothek from './bibliothek';
-import postfach from './postfach';
 import newsEngine from './news-engine';
 import concierge from './concierge';
 import defenseInDepth from './defense-in-depth';
-import opsCockpit from './ops-cockpit';
 import gartiko from './gartiko';
 import homelabApp from './homelab-app';
 import homelabSentinel from './homelab-sentinel';
-import aiVision from './ai-vision';
-import rackforge from './rackforge';
 import cmsBaukasten from './cms-baukasten';
 import edgeHosting from './edge-hosting';
 import modellVermittlung from './modell-vermittlung';
-import windowsAdLab from './windows-ad-lab';
 import ressourcenArbiter from './ressourcen-arbiter';
 import finanzen from './finanzen';
 import spielserver from './spielserver';
@@ -42,20 +37,15 @@ export const FALLSTUDIEN: Record<string, FallstudieDatei> = {
   'wissens-foederation': wissensFoederation,
   'offline-wissen': offlineWissen,
   bibliothek: bibliothek,
-  postfach: postfach,
   'news-engine': newsEngine,
   concierge: concierge,
   'defense-in-depth': defenseInDepth,
-  'ops-cockpit': opsCockpit,
   gartiko: gartiko,
   'homelab-app': homelabApp,
   'homelab-sentinel': homelabSentinel,
-  'ai-vision': aiVision,
-  rackforge: rackforge,
   'cms-baukasten': cmsBaukasten,
   'edge-hosting': edgeHosting,
   'modell-vermittlung': modellVermittlung,
-  'windows-ad-lab': windowsAdLab,
   'ressourcen-arbiter': ressourcenArbiter,
   finanzen: finanzen,
   spielserver: spielserver,

@@ -1,438 +1,325 @@
-import type { FallstudieAlt } from './typ';
+import type { Fallstudie } from './typ';
 
-// UEBERGANG (Umbau 2026-10-30): die englische Fassung beschreibt eine andere
-// Arbeit als die deutsche und laesst sich nicht Eintrag fuer Eintrag zuordnen.
-// Sie bleibt deshalb unveraendert als eigener Block stehen, bis die Arbeit neu
-// erhoben ist. Dann wird diese Datei in die gepaarte Form umgeschrieben.
-// Gemessen beim Umbau: approach 7/5; decisions 4/3; timeline 4/3; Ebenenzahl; Ebene 0: feeds/edge/true,video/edge/true <> feeds/edge/true; Ebene 2: embed/core/true,cluster/core/true,score/core/true <> embed/core/true,cluster/core/true,scorer/core/true; Ebene 3: router/core/true,guard/core/true,log/data/false,fallback/core/false <> router/core/true,guard/core/true,log/core/false,fallback/core/true; Pfeile: feeds>enrich/false,video>enrich/true,enrich>filter/false,filter>embed/true,embed>cluster/false,cluster>score/false,score>router/true,guard>fallback/true <> feeds>enrich/false,enrich>filter/true,filter>embed/false,embed>cluster/true,cluster>scorer/true,scorer>router/true,router>cloud/true,router>fallback/true,guard>router/true,scorer>store/true
-const newsEngine: FallstudieAlt = {
-  form: 'uebergang',
-  de: {
-    problem: 'Wer mehrere Nachrichtenquellen ernst nimmt, ertrinkt in Dubletten. Dasselbe Ereignis erscheint zehnfach, in mehreren Sprachen, mit unterschiedlichem Dreh. Ein Aggregator, der Artikel zählt, belohnt den lautesten Einzelbeitrag statt des am breitesten belegten Sachverhalts. Die naheliegende Abhilfe, jeden Schritt von einem starken Sprachmodell erledigen zu lassen, ist im Dauerbetrieb unbezahlbar: die Kosten wachsen mit jedem zusätzlichen Artikel, und die Zahl der Artikel wächst von selbst.',
-    approach: [
-      'Jeder Beitrag wird zuerst lokal und ohne Modell angereichert: Sprache, genannte Personen und Orte, dazu ein Signal, das überregionale Bedeutung von lokalem Rauschen trennt. Das kostet nichts und entscheidet, ob überhaupt weitergerechnet wird.',
-      'Eigene Vektoren bilden die Grundlage für eine fortlaufende Bündelung. Beiträge zur selben Sache finden auch über Sprachgrenzen hinweg zusammen, begrenzt durch Kategorie und Zeitfenster, damit nicht zwei Ereignisse verschmelzen, die nur ähnlich klingen.',
-      'Die Bewertung läuft über austauschbare Profile. Ein Thema kann anders gewichtet werden als ein anderes, ohne dass der Kern angefasst wird, und ein Profil kommt ganz ohne Modell aus.',
-      'Videos werden über ihre Transkripte zu Artikeltext und laufen danach durch dieselbe Kette wie geschriebene Beiträge.',
-      'Ein eigener Kostenteil trennt billige Masse von teurer Spitze. Eine Weiche entscheidet je Schritt zwischen lokal und Cloud. Ein Wächter setzt harte Tages- und Monatsgrenzen, ein Aufrufbuch hält jeden externen Aufruf fest. Ist das starke Modell aus oder die Grenze erreicht, übernimmt ein fester Rückfallweg.',
-      'Dieselbe Engine bedient mehrere Abnehmer mit verschiedenen Interessen. Ein Beitrag trägt mehrere Bewertungsachsen gleichzeitig, und jeder Abnehmer liest die Achse, die ihn angeht.',
-      'Die Datenebene wurde neben den laufenden Bestand gelegt und gegen eine Kopie der Echtdaten geprüft, damit der Umbau den Betrieb nicht anfasst.',
-    ],
-    architecture: {
-      summary: 'Beiträge laufen zuerst durch eine lokale Anreicherung und einen Relevanzfilter, bevor Geld ausgegeben wird. Eigene Vektoren bündeln sie fortlaufend zu Vorgängen, auch über Sprachgrenzen. Eine Bewertung mit austauschbaren Profilen verdichtet jeden Vorgang. Nur wenige Schritte gehen über eine Kostenweiche an ein Cloud-Modell, der Normalbetrieb läuft deterministisch.',
-      tiers: [
-        {
-          label: 'Eingang',
-          nodes: [
-            {
-              id: 'feeds',
-              label: 'Quellen',
-              note: 'viele Herkünfte',
-              kind: 'edge',
-            },
-            {
-              id: 'video',
-              label: 'Videos',
-              note: 'über Transkript',
-              kind: 'edge',
-            },
-          ],
-        },
-        {
-          label: 'Lokale Vorstufe',
-          nodes: [
-            {
-              id: 'enrich',
-              label: 'Anreicherung',
-              note: 'Sprache · Namen · Ort',
-              kind: 'core',
-            },
-            {
-              id: 'filter',
-              label: 'Relevanzfilter',
-              note: 'überregional oder Rauschen',
-              kind: 'core',
-            },
-          ],
-        },
-        {
-          label: 'Bündelung',
-          nodes: [
-            {
-              id: 'embed',
-              label: 'Eigene Vektoren',
-              note: 'lokal, sprachübergreifend',
-              kind: 'core',
-            },
-            {
-              id: 'cluster',
-              label: 'Fortlaufende Zuordnung',
-              note: 'Kategorie- und Zeitgrenzen',
-              kind: 'core',
-            },
-            {
-              id: 'score',
-              label: 'Bewertung',
-              note: 'austauschbare Profile',
-              kind: 'core',
-            },
-          ],
-        },
-        {
-          label: 'Kostenteil',
-          nodes: [
-            {
-              id: 'router',
-              label: 'Weiche',
-              note: 'lokal oder Cloud',
-              kind: 'core',
-            },
-            {
-              id: 'guard',
-              label: 'Wächter',
-              note: 'Tag und Monat',
-              kind: 'core',
-            },
-            {
-              id: 'log',
-              label: 'Aufrufbuch',
-              kind: 'data',
-            },
-            {
-              id: 'fallback',
-              label: 'Deterministischer Rückfall',
-              kind: 'core',
-            },
-          ],
-        },
-      ],
-      flows: [
-        {
-          from: 'feeds',
-          to: 'enrich',
-        },
-        {
-          from: 'video',
-          to: 'enrich',
-          label: 'Transkript als Text',
-        },
-        {
-          from: 'enrich',
-          to: 'filter',
-        },
-        {
-          from: 'filter',
-          to: 'embed',
-          label: 'was überregional ist',
-        },
-        {
-          from: 'embed',
-          to: 'cluster',
-        },
-        {
-          from: 'cluster',
-          to: 'score',
-        },
-        {
-          from: 'score',
-          to: 'router',
-          label: 'nur harte Fälle',
-        },
-        {
-          from: 'guard',
-          to: 'fallback',
-          label: 'Grenze erreicht',
-        },
-      ],
+// Neu erhoben und gepaart am 2026-11-13 (vorher Uebergangsform). Auch das
+// Deutsche war ueberholt: es nannte ein Cloud-Modell fuer einzelne Schritte und
+// 110 Testfunktionen, und es kannte weder die Themenachsen noch den Alarm noch
+// den Vertragstest fuer die Abnehmer.
+//
+// Messbefehle (Stand 2026-11-13, Repo docker/nachrichten, Commit ac44e2a):
+// - Cloud: Aufrufbuch der Live-Datenbank, alle Zeilen ohne model '(skipped)':
+//   64, alle mit lokalem Gateway-Alias, keine mit einem Cloud-Modell.
+//   Erste Zeile 2026-09-14. Dazu 28.808 uebersprungene Aufrufe.
+// - Tests: "def test_" unter tests/ ergab 151 (Projektdoku des Dienstes: 196
+//   gruene Faelle mit Parametrisierung).
+// - Abnehmer: Tabelle „Konsumenten" in der Projektdoku von docker/nachrichten, sechs,
+//   geschuetzt durch tests/test_vertrag_konsumenten.py.
+// - Alarm: POLITIK_BRISANZ_MIN_QUELLEN = 2 in app/config.py, Vermerk je Story.
+// - Buendelung: STORY_MERGE_THRESHOLD / _SOFT_THRESHOLD / _DUP_THRESHOLD und
+//   STORY_WINDOW_HOURS (336) in app/config.py.
+//
+// Die Themen selbst bleiben draussen (ZIELBILD Grundsatz 5e, Trennung der
+// Welten). Die Abnehmer stehen nur als Art, nie mit Namen.
+const newsEngine: Fallstudie = {
+  problem: {
+    de: 'Wer mehrere Nachrichtenquellen ernst nimmt, ertrinkt in Dubletten. Dasselbe Ereignis erscheint zehnfach, in mehreren Sprachen, mit unterschiedlichem Dreh. Ein Aggregator, der Artikel zählt, belohnt den lautesten Einzelbeitrag statt des am breitesten belegten Sachverhalts. Die naheliegende Abhilfe, jeden Schritt einem großen Sprachmodell zu geben, kostet im Dauerbetrieb bei jedem Artikel Geld oder Rechenzeit, und die Zahl der Artikel wächst von selbst.',
+    en: 'Take several news sources seriously and you drown in duplicates. The same event shows up ten times, in several languages, each with its own spin. An aggregator that counts articles rewards the loudest single piece rather than the most widely reported fact. The obvious fix, handing every step to a large language model, costs money or compute time on every article in continuous operation, and the number of articles grows by itself.',
+  },
+  approach: [
+    {
+      de: 'Jeder Beitrag wird zuerst lokal und ohne Modell angereichert: Sprache, genannte Personen und Orte, dazu Werte für die Themenfelder. Regeln und Wortlisten entscheiden, ob überhaupt weitergerechnet wird.',
+      en: 'Every item is first enriched locally and without a model: language, people and places mentioned, plus scores for the topic areas. Rules and word lists decide whether any further work happens at all.',
     },
-    // Am 2026-10-06 nachgemessen (vorher 13.300 / 101): gewachsen durch die
-    // Verschmelzung der beiden News-Engines am 2026-09-26, der abgespaltene
-    // Zweig ist wieder in diesem Dienst aufgegangen. Abgrenzung wie bei
-    // `saganta` oben, gemessen 13.788 Zeilen und 110 Testfunktionen.
-    result: [
-      '110 Testfunktionen. Im Normalbetrieb entstehen keine externen Kosten, die Cloud liegt hinter einem Monatsdeckel.',
-      'Mehrere Abnehmer mit verschiedenen Interessen hängen an derselben Engine. Ein Beitrag trägt mehrere Bewertungsachsen, eine je Interesse.',
-      'Beiträge zur selben Sache finden über Sprachgrenzen hinweg zusammen, ohne dass dafür ein Modell je Beitrag gefragt wird.',
-      'Videos laufen über ihre Transkripte durch dieselbe Kette wie Texte.',
+    {
+      de: 'Eigene Vektoren auf eigener Hardware bündeln die Beiträge fortlaufend zu Vorgängen, auch über Sprachgrenzen hinweg. Bei mittlerer Ähnlichkeit braucht es zusätzlich eine gemeinsam genannte Person oder einen Ort, und ein Zeitfenster von zwei Wochen verhindert, dass zwei Ereignisse verschmelzen, die nur ähnlich klingen.',
+      en: 'Own vectors on my own hardware group items into stories as they arrive, across language borders too. At medium similarity a shared person or place is required as well, and a two-week window keeps two events apart that merely sound alike.',
+    },
+    {
+      de: 'Themen sind Achsen auf dem Beitrag und keine Kategorie. Eine Meldung kann für zwei Themenfelder zugleich zählen, und jeder Abnehmer liest die Achse, die ihn angeht.',
+      en: 'Topics are axes on the item rather than a category. One report can count for two topic areas at once, and each consumer reads the axis that concerns it.',
+    },
+    {
+      de: 'Videos werden über ihre Untertitel zu Artikeltext. Bekannte Verhörer werden vorher richtiggestellt, der Videotitel dient als Richtschnur für Eigennamen, und ein lokales Modell verdichtet die Sendung abschnittsweise.',
+      en: 'Videos become article text through their subtitles. Known mishearings are corrected first, the video title serves as a reference for proper names, and a local model condenses the broadcast section by section.',
+    },
+    {
+      de: 'Ein eigener Kostenteil steht vor jedem Modellaufruf. Eine Weiche wählt das Modell, ein Wächter setzt Tages- und Monatsgrenzen, ein Aufrufbuch hält jeden Aufruf fest. Wo Text entstehen muss, schreibt ein lokales Modell über das hauseigene Gateway, und die Zusammenfassung eines Vorgangs entsteht über eine feste Regelstrecke.',
+      en: 'A dedicated cost layer sits in front of every model call. A router picks the model, a guard sets daily and monthly limits, a call log records every call. Where text has to be written, a local model does it through the in-house gateway, and a story summary comes from a fixed rule-based path.',
+    },
+    {
+      de: 'Für ein Themenfeld gibt es einen Alarm aufs Handy. Er geht nur los, wenn mindestens zwei unabhängige Häuser über dieselbe Sache berichten, und je Vorgang höchstens einmal.',
+      en: 'One topic area has an alert to the phone. It fires only when at least two independent outlets report the same thing, and at most once per story.',
+    },
+  ],
+  architecture: {
+    summary: {
+      de: 'Beiträge laufen zuerst durch eine lokale Anreicherung und einen Relevanzfilter. Eigene Vektoren bündeln sie fortlaufend zu Vorgängen, auch über Sprachgrenzen. Die Bewertung verdichtet jeden Vorgang und trägt mehrere Themenachsen, aus denen die Abnehmer lesen. Ein Alarm braucht zwei unabhängige Häuser. Jeder Modellaufruf geht durch Weiche und Wächter, und ohne Modell übernimmt die Regelstrecke.',
+      en: 'Items first pass through local enrichment and a relevance filter. Own vectors keep grouping them into stories, across language borders too. Scoring condenses each story and carries several topic axes that the consumers read from. An alert needs two independent outlets. Every model call goes through router and guard, and without a model the rule-based path takes over.',
+    },
+    tiers: [
+      {
+        label: { de: 'Eingang', en: 'Intake' },
+        nodes: [
+          {
+            id: 'feeds',
+            kind: 'edge',
+            label: { de: 'Quellen', en: 'Sources' },
+            note: { de: 'viele Herkünfte', en: 'many outlets' },
+          },
+          {
+            id: 'video',
+            kind: 'edge',
+            label: { de: 'Videos', en: 'Videos' },
+            note: { de: 'über Untertitel', en: 'via subtitles' },
+          },
+        ],
+      },
+      {
+        label: { de: 'Lokale Vorstufe', en: 'Local pre-stage' },
+        nodes: [
+          {
+            id: 'enrich',
+            kind: 'core',
+            label: { de: 'Anreicherung', en: 'Enrichment' },
+            note: { de: 'Sprache · Namen · Ort · Themen', en: 'language · names · place · topics' },
+          },
+          {
+            id: 'filter',
+            kind: 'core',
+            label: { de: 'Relevanzfilter', en: 'Relevance filter' },
+            note: { de: 'Regeln, kein Modell', en: 'rules, no model' },
+          },
+        ],
+      },
+      {
+        label: { de: 'Bündelung', en: 'Clustering' },
+        nodes: [
+          {
+            id: 'embed',
+            kind: 'core',
+            label: { de: 'Eigene Vektoren', en: 'Own vectors' },
+            note: { de: 'lokal, sprachübergreifend', en: 'local, cross-language' },
+          },
+          {
+            id: 'cluster',
+            kind: 'core',
+            label: { de: 'Fortlaufende Zuordnung', en: 'Running assignment' },
+            note: { de: 'zweites Signal, zwei Wochen', en: 'second signal, two weeks' },
+          },
+          {
+            id: 'score',
+            kind: 'core',
+            label: { de: 'Bewertung', en: 'Scoring' },
+            note: { de: 'eine Achse je Thema', en: 'one axis per topic' },
+          },
+        ],
+      },
+      {
+        label: { de: 'Ausgabe', en: 'Output' },
+        nodes: [
+          {
+            id: 'abnehmer',
+            kind: 'consumer',
+            label: { de: 'Sechs Abnehmer', en: 'Six consumers' },
+            note: { de: 'durch Vertragstest geschützt', en: 'guarded by a contract test' },
+          },
+          {
+            id: 'alarm',
+            kind: 'consumer',
+            label: { de: 'Alarm', en: 'Alert' },
+            note: { de: 'zwei unabhängige Häuser', en: 'two independent outlets' },
+          },
+        ],
+      },
+      {
+        label: { de: 'Kostenteil', en: 'Cost layer' },
+        nodes: [
+          {
+            id: 'router',
+            kind: 'core',
+            label: { de: 'Weiche', en: 'Router' },
+            note: { de: 'lokal zuerst', en: 'local first' },
+          },
+          {
+            id: 'guard',
+            kind: 'core',
+            label: { de: 'Wächter', en: 'Guard' },
+            note: { de: 'Tag und Monat', en: 'day and month' },
+          },
+          {
+            id: 'log',
+            kind: 'data',
+            label: { de: 'Aufrufbuch', en: 'Call log' },
+          },
+          {
+            id: 'fallback',
+            kind: 'core',
+            label: { de: 'Regelstrecke', en: 'Rule-based path' },
+          },
+        ],
+      },
     ],
-    decisions: [
+    flows: [
+      { from: 'feeds', to: 'enrich' },
       {
-        title: 'Erst filtern, dann rechnen',
-        body: 'Die teure Stufe darf nicht am Anfang stehen. Sprache, Namen, Ort und eine Relevanzeinschätzung entstehen lokal und ohne Modell. An das Modell geht nur, was diese Stufe übersteht.',
+        from: 'video',
+        to: 'enrich',
+        label: { de: 'abschnittsweise verdichtet', en: 'condensed by section' },
+      },
+      { from: 'enrich', to: 'filter' },
+      {
+        from: 'filter',
+        to: 'embed',
+        label: { de: 'was relevant ist', en: 'what is relevant' },
+      },
+      { from: 'embed', to: 'cluster' },
+      { from: 'cluster', to: 'score' },
+      {
+        from: 'score',
+        to: 'abnehmer',
+        label: { de: 'Achse je Abnehmer', en: 'axis per consumer' },
       },
       {
-        title: 'Eigene Vektoren statt Modellaufrufe je Beitrag',
-        body: 'Die Zuordnung zu einem Vorgang ist der Schritt, der bei jedem Beitrag anfällt. Genau dort wäre ein Modellaufruf am teuersten. Eigene Vektoren auf eigener Hardware machen den Schritt beliebig oft bezahlbar, und sie tragen auch über Sprachgrenzen.',
+        from: 'score',
+        to: 'alarm',
+        label: { de: 'einmal je Vorgang', en: 'once per story' },
       },
       {
-        title: 'Eine Engine, mehrere Interessen',
-        body: 'Ein zweiter Abnehmer mit anderem Schwerpunkt war zeitweise ein eigener Zweig derselben Software. Zwei Kopien laufen auseinander, und zwar in beide Richtungen: beide verlieren Verbesserungen, die die andere Seite bekommt. Jetzt trägt ein Beitrag mehrere Bewertungsachsen, und jeder Abnehmer liest die für ihn passende.',
+        from: 'score',
+        to: 'router',
+        label: { de: 'nur wo Text entsteht', en: 'only where text is written' },
       },
       {
-        title: 'Der Rückfall ist deterministisch, nicht ausgeschaltet',
-        body: 'Wenn das starke Modell aus ist oder die Monatsgrenze erreicht, übernimmt eine feste Regelstrecke. Das Ergebnis ist schlechter und es ist vorhanden. Ein Dienst, der bei erreichtem Budget nichts mehr liefert, ist im Betrieb wertlos.',
+        from: 'guard',
+        to: 'fallback',
+        label: { de: 'Grenze erreicht', en: 'limit reached' },
       },
-    ],
-    metrics: [
-      {
-        label: 'Tests',
-        value: '110 Testfunktionen',
-      },
-      {
-        label: 'Externe Kosten',
-        value: 'im Normalbetrieb keine',
-      },
-      {
-        label: 'Bündelung',
-        value: 'eigene Vektoren, sprachübergreifend',
-      },
-      {
-        label: 'Abnehmer',
-        value: 'mehrere, auf einer Engine',
-      },
-    ],
-    timeline: [
-      {
-        when: '2026 H1',
-        what: 'Lokale Anreicherung, Relevanzfilter, erste Quellen',
-      },
-      {
-        when: '2026 H1',
-        what: 'Eigene Vektoren, fortlaufende Bündelung zu Vorgängen',
-      },
-      {
-        when: '2026 H2',
-        what: 'Kostenteil mit Weiche, Wächter, Aufrufbuch und deterministischem Rückfall',
-      },
-      {
-        when: '2026 H2',
-        what: 'Videos über Transkripte, zweiter Abnehmer auf derselben Engine statt eigener Kopie',
-      },
-    ],
-    limits: [
-      'Die Bündelung arbeitet mit Ähnlichkeit. Zwei getrennte Ereignisse, die sich sehr ähnlich lesen, können zusammenfallen, und die Zeitfenster-Grenze mildert das nur.',
-      'Die Relevanzeinschätzung ist auf meine Interessen kalibriert. Für ein anderes Themenfeld müsste sie neu eingestellt werden.',
-      'Transkripte sind so gut wie ihre Spracherkennung. Bei schlechtem Ton steht Unsinn im Artikeltext, und die Kette merkt das nicht.',
     ],
   },
-  enAlt: {
-    problem: 'Take several news sources seriously and you drown in duplicates: the same event shows up tenfold, in several languages, with different spin. An aggregator that only counts articles rewards the loudest single post and not the most broadly corroborated fact. The obvious fix, letting a strong language model handle every step, is unaffordable for continuous operation and makes running costs impossible to predict. I wanted the opposite: an engine that understands stories, not articles, with a cloud bill that sits at zero in normal operation.',
-    approach: [
-      'Every item is first enriched locally and deterministically (language, entities, location, and a relevance signal that separates supra-regional significance from purely local noise), all before any money is spent.',
-      'Own embeddings give incremental clustering its semantic basis: similar items land in the same story across language boundaries, with category and time-window bounds to guard against false merges.',
-      'A multi-signal story scorer weights by source count, trend and source quality, so broad corroboration beats a single high score.',
-      'An explicit cost layer separates cheap volume from expensive top-end: a router picks local or cloud per step, a budget guard enforces hard daily and monthly caps, a call log records every external call, and a deterministic fallback takes over the moment the strong model is off or capped.',
-      'The data layer was laid down additively beside the existing one and tested against a live copy, so the rebuild to the story layer never touched the running operation.',
-    ],
-    architecture: {
-      summary: 'Incoming items pass first through a local enrichment and filter stage, then via own embeddings into incremental clustering that bundles them into stories across language and source; a multi-signal scorer condenses each story, and only the few demanding steps take the cost layer of router, budget guard and call log out to a cloud model, while a deterministic fallback carries standard operation at no external cost.',
-      tiers: [
-        {
-          label: 'Intake',
-          nodes: [
-            {
-              id: 'feeds',
-              label: 'Source feeds',
-              note: 'many origins',
-              kind: 'edge',
-            },
-          ],
-        },
-        {
-          label: 'Local pre-stage',
-          nodes: [
-            {
-              id: 'enrich',
-              label: 'Enrichment',
-              note: 'language · entities · location',
-              kind: 'core',
-            },
-            {
-              id: 'filter',
-              label: 'Relevance filter',
-              note: 'supra-regional vs. noise',
-              kind: 'core',
-            },
-          ],
-        },
-        {
-          label: 'Story formation',
-          nodes: [
-            {
-              id: 'embed',
-              label: 'Own embeddings',
-              note: 'local · cross-lingual',
-              kind: 'core',
-            },
-            {
-              id: 'cluster',
-              label: 'Incremental clustering',
-              note: 'story assignment',
-              kind: 'core',
-            },
-            {
-              id: 'scorer',
-              label: 'Story scorer',
-              note: 'multi-source beats single',
-              kind: 'core',
-            },
-          ],
-        },
-        {
-          label: 'Cost layer',
-          nodes: [
-            {
-              id: 'router',
-              label: 'Model router',
-              note: 'local or cloud',
-              kind: 'core',
-            },
-            {
-              id: 'guard',
-              label: 'Budget guard',
-              note: 'hard caps',
-              kind: 'core',
-            },
-            {
-              id: 'log',
-              label: 'Call log',
-              kind: 'core',
-            },
-            {
-              id: 'fallback',
-              label: 'Local fallback',
-              note: 'deterministic',
-              kind: 'core',
-            },
-          ],
-        },
-        {
-          label: 'Models & storage',
-          nodes: [
-            {
-              id: 'cloud',
-              label: 'Cloud editor-in-chief',
-              note: 'top-end only',
-              kind: 'data',
-            },
-            {
-              id: 'store',
-              label: 'Story store',
-              note: 'provenance · cost per story',
-              kind: 'data',
-            },
-          ],
-        },
-      ],
-      flows: [
-        {
-          from: 'feeds',
-          to: 'enrich',
-        },
-        {
-          from: 'enrich',
-          to: 'filter',
-          label: 'before cloud cost',
-        },
-        {
-          from: 'filter',
-          to: 'embed',
-        },
-        {
-          from: 'embed',
-          to: 'cluster',
-          label: 'semantic',
-        },
-        {
-          from: 'cluster',
-          to: 'scorer',
-          label: 'per story',
-        },
-        {
-          from: 'scorer',
-          to: 'router',
-          label: 'only demanding steps',
-        },
-        {
-          from: 'router',
-          to: 'cloud',
-          label: 'under budget',
-        },
-        {
-          from: 'router',
-          to: 'fallback',
-          label: 'standard · 0 cost',
-        },
-        {
-          from: 'guard',
-          to: 'router',
-          label: 'cap reached',
-        },
-        {
-          from: 'scorer',
-          to: 'store',
-          label: 'with provenance',
-        },
-      ],
+  result: [
+    {
+      de: 'Seit Mitte September steht im Aufrufbuch kein einziger Aufruf eines Cloud-Modells. Alle Modellaufrufe liefen über lokale Modelle im Haus.',
+      en: 'Since mid-September the call log shows not a single call to a cloud model. Every model call ran on local models in the house.',
     },
-    result: [
-      'The story layer is live as the first build-out stage: similar items from different sources come together in one story, while locally trivial material stays apart.',
-      'Standard operation costs nothing externally, because the deterministic fallback carries the volume and the cloud model only switches in behind hard caps.',
-      'Every story carries its provenance and its cost: you can trace which sources back it and whether it was condensed externally at all.',
-      'The data layer was laid down additively beside the existing one; the running operation stayed untouched through the rebuild.',
-    ],
-    decisions: [
-      {
-        title: 'Local as default, cloud as exception',
-        body: 'The expensive cloud is the last resort, not the default: behind router, budget guard and call log. Quality stays available where it counts, without the running bill scaling with the article count.',
+    {
+      de: 'Sechs Abnehmer mit verschiedenen Interessen hängen an derselben Engine. Ein Vertragstest ruft jeden Endpunkt so auf, wie der jeweilige Abnehmer es tut, und schlägt fehl, sobald ein Feld fehlt, das einer von ihnen liest.',
+      en: 'Six consumers with different interests hang off the same engine. A contract test calls every endpoint the way each consumer does and fails as soon as a field is missing that one of them reads.',
+    },
+    {
+      de: 'Beiträge zur selben Sache finden über Sprachgrenzen hinweg zusammen, ohne dass dafür je Beitrag ein Modell gefragt wird.',
+      en: 'Items about the same matter come together across language borders without asking a model per item.',
+    },
+    {
+      de: 'Videos laufen über ihre Untertitel durch dieselbe Kette wie Texte. Vorher kamen sie nur mit ihrem Titel herein und bündelten sich mit nichts.',
+      en: 'Videos run through the same chain as text via their subtitles. Before, they came in with their title only and grouped with nothing.',
+    },
+    {
+      de: '151 Testfunktionen.',
+      en: '151 test functions.',
+    },
+  ],
+  decisions: [
+    {
+      title: { de: 'Erst filtern, dann rechnen', en: 'Filter first, compute second' },
+      body: {
+        de: 'Die teure Stufe darf nicht am Anfang stehen. Sprache, Namen, Ort und die Themenwerte entstehen lokal und ohne Modell. An ein Modell geht nur, was diese Stufe übersteht und wofür Text geschrieben werden muss.',
+        en: 'The expensive stage must not come first. Language, names, place and the topic scores are produced locally and without a model. A model only gets what survives that stage and needs text written for it.',
       },
-      {
-        title: 'Relevance filter before any spend',
-        body: 'A local stage first separates supra-regional significance from noise, then the engine decides how much effort to spend. No money goes to items that get sorted out anyway.',
+    },
+    {
+      title: { de: 'Eigene Vektoren statt Modellaufrufe je Beitrag', en: 'Own vectors instead of a model call per item' },
+      body: {
+        de: 'Die Zuordnung zu einem Vorgang fällt bei jedem Beitrag an. Genau dort wäre ein Modellaufruf am teuersten. Eigene Vektoren auf eigener Hardware machen den Schritt beliebig oft bezahlbar, und sie tragen auch über Sprachgrenzen.',
+        en: 'Assigning an item to a story happens for every single item. That is exactly where a model call would cost the most. Own vectors on my own hardware make the step affordable as often as needed, and they work across language borders too.',
       },
-      {
-        title: 'Stories, not articles, as the unit',
-        body: 'The condensation weights by source count, trend and source quality, so a broadly corroborated fact stands ahead of a single high score. That is what separates an engine from an aggregator.',
+    },
+    {
+      title: { de: 'Eine Engine, Themen als Achsen', en: 'One engine, topics as axes' },
+      body: {
+        de: 'Ein zweiter Abnehmer mit anderem Schwerpunkt lief eine Zeit lang auf einer Kopie derselben Software. Die beiden Kopien liefen in beide Richtungen auseinander, und jede verlor Verbesserungen der anderen. Beim Zusammenführen wurde das Thema zur Achse auf dem Beitrag. Mit einer Kategorie hätte sich eine Meldung für ein Thema entscheiden müssen und wäre für die andere Seite falsch gewesen.',
+        en: 'A second consumer with a different focus ran for a while on a copy of the same software. The two copies drifted apart in both directions, and each lost improvements the other gained. When they were merged, the topic became an axis on the item. With a category a report would have had to pick one topic and would have been wrong for the other side.',
       },
-    ],
-    metrics: [
-      {
-        label: 'External cost in standard operation',
-        value: '0 €',
+    },
+    {
+      title: { de: 'Ein Alarm braucht zwei Häuser', en: 'An alert needs two outlets' },
+      body: {
+        de: 'Eine Meldung, die nur ein Haus bringt, ist im Zweifel eine Zuspitzung. Ein Melder, der oft falsch liegt, wird genauso überlesen wie einer, der schweigt. Deshalb braucht der Alarm zwei unabhängige Häuser, und der Vermerk je Vorgang wird auch gesetzt, wenn die Zustellung scheitert, damit eine Störung nicht zur stündlichen Wiederholung wird.',
+        en: 'A report carried by a single outlet is, when in doubt, an exaggeration. An alert that is often wrong gets ignored just like one that stays silent. So the alert needs two independent outlets, and the per-story marker is set even when delivery fails, so that an outage does not turn into an hourly repeat.',
       },
-      {
-        label: 'Cloud calls',
-        value: 'behind hard daily and monthly caps',
+    },
+    {
+      title: { de: 'Die Regelstrecke liefert immer', en: 'The rule-based path always delivers' },
+      body: {
+        de: 'Ist kein Modell erreichbar oder eine Grenze erreicht, übernimmt eine feste Regelstrecke. Ihr Ergebnis ist schlichter, und es ist da. Ein Dienst, der bei erreichtem Budget nichts mehr liefert, ist im Betrieb wertlos.',
+        en: 'If no model is reachable or a limit is reached, a fixed rule-based path takes over. Its result is plainer, and it is there. A service that stops delivering once the budget is used up is worthless in operation.',
       },
-      {
-        label: 'Clustering',
-        value: 'cross-lingual via own embeddings',
+    },
+  ],
+  metrics: [
+    {
+      label: { de: 'Cloud-Aufrufe', en: 'Cloud calls' },
+      value: { de: 'keine seit Mitte September', en: 'none since mid-September' },
+    },
+    {
+      label: { de: 'Abnehmer', en: 'Consumers' },
+      value: { de: 'sechs, auf einer Engine', en: 'six, on one engine' },
+    },
+    {
+      label: { de: 'Bündelung', en: 'Clustering' },
+      value: { de: 'eigene Vektoren, sprachübergreifend', en: 'own vectors, cross-language' },
+    },
+    {
+      label: { de: 'Tests', en: 'Tests' },
+      value: { de: '151 Testfunktionen', en: '151 test functions' },
+    },
+  ],
+  timeline: [
+    {
+      when: { de: '2026 H1', en: '2026 H1' },
+      what: {
+        de: 'Lokale Anreicherung, Relevanzfilter, eigene Vektoren und fortlaufende Bündelung',
+        en: 'Local enrichment, relevance filter, own vectors and running clustering',
       },
-      {
-        label: 'Build-out stage',
-        value: 'story layer live, more to follow',
+    },
+    {
+      when: { de: 'August 2026', en: 'August 2026' },
+      what: {
+        de: 'Kostenteil mit Weiche, Wächter und Aufrufbuch; Texte schreibt seither ein lokales Modell',
+        en: 'Cost layer with router, guard and call log; since then a local model writes the texts',
       },
-    ],
-    timeline: [
-      {
-        when: '2026 H1',
-        what: 'Story layer live: local enrichment, clustering, multi-signal scorer, cost layer',
+    },
+    {
+      when: { de: 'September 2026', en: 'September 2026' },
+      what: {
+        de: 'Videos über Untertitel, die Kopie wieder zusammengeführt, Themen als Achsen, Alarm erst bei zwei Häusern',
+        en: 'Videos via subtitles, the copy merged back, topics as axes, alert only with two outlets',
       },
-      {
-        when: '2026 H1',
-        what: 'Additive data layer tested against a live copy, deterministic fallback as default',
+    },
+    {
+      when: { de: 'November 2026', en: 'November 2026' },
+      what: {
+        de: 'Vertragstest für die sechs Abnehmer',
+        en: 'Contract test for the six consumers',
       },
-      {
-        when: '2026 H2',
-        what: 'Sharper story scoring, batch processing of condensations, connecting further consumers',
-      },
-    ],
-    limits: [
-      'Clustering works on similarity. Two separate events that read very much alike can collapse into one, and the time-window limit only softens that.',
-      'The relevance scoring is calibrated to my own interests. For a different subject area it would have to be set up again.',
-      'Transcripts are only as good as their speech recognition. With poor audio the article text carries nonsense, and the chain does not notice.',
-    ],
-  },
+    },
+  ],
+  limits: [
+    {
+      de: 'Die Bündelung arbeitet mit Ähnlichkeit. Zwei getrennte Ereignisse, die sich sehr ähnlich lesen, können zusammenfallen. Das zweite Signal und das Zeitfenster machen das seltener, verhindern es aber nicht.',
+      en: 'Clustering works on similarity. Two separate events that read very much alike can merge. The second signal and the time window make that rarer but do not prevent it.',
+    },
+    {
+      de: 'Die Themenwerte kommen aus Regeln und Wortlisten, die auf meine Themen eingestellt sind. Für ein anderes Themenfeld müssten sie neu geschrieben werden.',
+      en: 'The topic scores come from rules and word lists tuned to my topics. For a different topic area they would have to be rewritten.',
+    },
+    {
+      de: 'Untertitel sind maschinell gehört und bei Eigennamen unzuverlässig. Die Liste der Verhörer und der Videotitel fangen bekannte Fälle ab, einen neuen Verhörer gibt das Modell treu wieder.',
+      en: 'Subtitles are machine-transcribed and unreliable with proper names. The list of mishearings and the video title catch known cases; the model faithfully repeats a new mishearing.',
+    },
+    {
+      de: 'Eine Änderung an der Engine trifft alle sechs Abnehmer zugleich. Das ist der Preis dafür, dass es nur eine Engine gibt, und der Grund für den Vertragstest.',
+      en: 'A change to the engine hits all six consumers at once. That is the price of having only one engine, and the reason for the contract test.',
+    },
+  ],
 };
 
 export default newsEngine;

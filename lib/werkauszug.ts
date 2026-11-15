@@ -61,8 +61,8 @@ export const WERKAUSZUEGE: Record<string, Werkauszug> = {
     en: 'A home lab grows to thirty containers, each with its own compose file and no shared map.',
   },
   lernen: {
-    de: 'Lernplattformen am Markt sind generisch, entweder schwere Lern-Systeme oder Karteikarten-Apps.',
-    en: 'Learning platforms on the market are generic, either heavyweight systems or flashcard apps.',
+    de: 'Sechs Lern-Apps mit je eigenem Konto sind seit November 2026 eine App mit einem Konto.',
+    en: 'Since November 2026, six learning apps with separate accounts are one app with one account.',
   },
   marktwatch: {
     de: 'Der Bot durchsucht Kleinanzeigen und eBay nach Hardware unter Wert. Fehlalarme waren das eigentliche Problem.',
@@ -82,10 +82,6 @@ export const WERKAUSZUEGE: Record<string, Werkauszug> = {
     de: 'Der Leser von calibre-web ist eine Vorlage von 2015, und ein Lesestand ohne Anmeldung landet auf einem geteilten Konto.',
     en: 'The reader in calibre-web is a 2015 template, and reading progress without a login lands on a shared account.',
   },
-  postfach: {
-    de: 'Briefe stapeln sich, und man findet sie nicht wieder.',
-    en: 'Letters pile up, and you cannot find them again.',
-  },
   'news-engine': {
     de: 'Wer mehrere Nachrichtenquellen ernst nimmt, ertrinkt in Dubletten.',
     en: 'Take several news sources seriously and you drown in duplicates.',
@@ -95,12 +91,8 @@ export const WERKAUSZUEGE: Record<string, Werkauszug> = {
     en: 'An off-the-shelf assistant sends every request to the cloud, including the trivial ones.',
   },
   'defense-in-depth': {
-    de: 'Eine selbst betriebene Infrastruktur ist nur so sicher wie ihre schwächste Schicht.',
-    en: 'A self-operated infrastructure is only as secure as its weakest layer.',
-  },
-  'ops-cockpit': {
-    de: 'Eine wachsende Flotte aus mehreren Wirten steuert man irgendwann nicht mehr über einzelne Anmeldungen.',
-    en: 'A growing fleet of several hosts eventually outgrows logging into each one.',
+    de: 'Ein Heimnetz mit öffentlichen Diensten hat keine Sicherheitsabteilung.',
+    en: 'A home network with public services has no security department.',
   },
   gartiko: {
     de: 'Pflanzen-Pflege-Wissen lebte verstreut, im Community-Bot, in Notizen und in Köpfen.',
@@ -114,14 +106,6 @@ export const WERKAUSZUEGE: Record<string, Werkauszug> = {
     de: 'Ein Homelab im Dauerbetrieb braucht eine Bereitschaft, und das bin ausschließlich ich.',
     en: 'A home lab running around the clock needs an on-call person, and that is me alone.',
   },
-  'ai-vision': {
-    de: 'Edge-Hardware der ersten Generation ist eigensinnig, mit knappem Speicher und alter Werkzeugkette.',
-    en: 'First-generation edge hardware is stubborn, with tight memory and an old toolchain.',
-  },
-  rackforge: {
-    de: 'Für einen Shop mit 3D-gedruckten Teilen passt kein Standard-System, weil dieselbe Form in vielen Farben existiert.',
-    en: 'No standard shop system fits a 3D-printing shop, because the same shape comes in many colors.',
-  },
   'cms-baukasten': {
     de: 'Kleine Websites brauchen ein Content-Management, aber ein schweres Fremd-CMS ist dafür überdimensioniert.',
     en: 'Small websites need content management, but a heavyweight third-party CMS is oversized for them.',
@@ -134,16 +118,12 @@ export const WERKAUSZUEGE: Record<string, Werkauszug> = {
     de: 'Jeder Dienst trug seinen eigenen Schlüssel und sein fest verdrahtetes Modell, und niemand hatte ein Kostenbild.',
     en: 'Each service carried its own key and its own hard-wired model, and nobody had a cost picture.',
   },
-  'windows-ad-lab': {
-    de: 'Linux betreibe ich täglich. Windows Server und Active Directory kannte ich aus der Theorie.',
-    en: 'I run Linux every day. Windows Server and Active Directory I knew mostly from theory.',
-  },
   'ressourcen-arbiter': {
-    // Neun, nicht sieben. Am 2026-10-17 an der Registrierdatei des Reglers
-    // nachgezaehlt. Der Fliesstext der Seite sagte an sieben Stellen „sieben"
-    // und stammt aus der Zeit, als es sieben waren.
-    de: 'Ein Knoten soll neun schwere Rollen tragen, deren Speicherbedarf zusammen nicht hineinpasst.',
-    en: 'One node is meant to carry nine heavy roles whose memory does not fit together.',
+    // Neun, nicht sieben (nachgezaehlt 2026-10-17). Seit 2026-11-14 ein
+    // gemieteter Server statt eines Knotens: die Spielserver liegen seit dem
+    // 22.08. nicht mehr im Heim-Cluster.
+    de: 'Ein gemieteter Server soll neun Spielserver tragen, deren Speicherbedarf zusammen nicht hineinpasst.',
+    en: 'One rented server is meant to carry nine game servers whose memory does not fit together.',
   },
   finanzen: {
     de: 'Ein fertiges Finanzprogramm blieb leer, weil es zurückschaut. Meine Frage war, wie lange das Geld reicht.',

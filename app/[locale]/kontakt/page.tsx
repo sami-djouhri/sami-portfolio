@@ -50,7 +50,7 @@ export default async function KontaktPage(props: { params: Promise<{ locale: str
         <PageHeader
           eyebrow={'mail -s "Hallo" sami'}
           title={t(locale, 'kontakt.title')}
-          lead={t(locale, 'kontakt.lead')}
+          lead={t(locale, istBewerbung ? 'kontakt.lead' : 'kontakt.leadNeutral')}
           command
         />
 

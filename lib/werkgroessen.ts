@@ -120,10 +120,10 @@ export const WERKGROESSEN: Record<string, Werkgroesse> = {
   },
   lernen: {
     zahl: '6',
-    einheit_de: 'Lern-Apps auf einem Kern',
-    einheit_en: 'learning apps on one core',
-    gemessen: '2026-11-08',
-    wie: 'Fach-Repositories neben dem geteilten Kern gezaehlt.',
+    einheit_de: 'Lernbereiche in einer App',
+    einheit_en: 'learning areas in one app',
+    gemessen: '2026-11-13',
+    wie: 'Bereiche der obersten Ebene in Lernstufe (Umstieg 07.11.: sechs Apps zu einer).',
   },
   'homelab-app': {
     // Eine App fuehrt keine Menge, deshalb zaehlt hier, was sie sicher macht.
@@ -139,8 +139,8 @@ export const WERKGROESSEN: Record<string, Werkgroesse> = {
     zahl: '12',
     einheit_de: 'Module im Dienst',
     einheit_en: 'modules in production',
-    gemessen: '2026-10-17',
-    wie: 'Modulverzeichnis des Bots gezaehlt, ohne die Sammeldatei.',
+    gemessen: '2026-11-13',
+    wie: 'Modulverzeichnis des Bots gezaehlt, ohne die Sammeldatei; alle zwoelf laut Startlog geladen.',
   },
   marktwatch: {
     zahl: '14',
@@ -148,14 +148,6 @@ export const WERKGROESSEN: Record<string, Werkgroesse> = {
     einheit_en: 'fault patterns on file',
     gemessen: '2026-10-17',
     wie: 'Zwei Tabellen im Quelltext (Fehlerprofile und Grundkosten), beide 14 Eintraege, Schluessel deckungsgleich.',
-  },
-  'ai-vision': {
-    zahl: '0,13 s',
-    zahl_en: '0.13 s',
-    einheit_de: 'je Bild auf der Edge-GPU',
-    einheit_en: 'per image on the edge GPU',
-    gemessen: '2026-10-17',
-    wie: 'Sechs Laeufe gegen den laufenden Dienst, Median ohne den ersten (der laedt das Modell): 145 ms, warm 129 ms, inklusive Uebertragung.',
   },
   'offline-wissen': {
     // Hier lag die Fallstudie daneben: sie sagte „20 Mio. mit Hausnummer".
@@ -177,21 +169,13 @@ export const WERKGROESSEN: Record<string, Werkgroesse> = {
     gemessen: '2026-10-17',
     wie: 'Gesundheitsabfrage des laufenden Dienstes, Feld „aktive Ausgaben".',
   },
-  postfach: {
-    // Loest die Zeilen Code ab, die hier vorher die Schaugroesse waren.
-    zahl: '5',
-    einheit_de: 'Stationen vom Foto zum Datensatz',
-    einheit_en: 'stations from photo to record',
-    gemessen: '2026-10-17',
-    wie: 'Im Quelltext nachgezaehlt: Entzerren, Texterkennung, Auswertung, Bedeutungs-Index, Fristen in den Kalender.',
-  },
   'news-engine': {
     // Ebenfalls statt Zeilen Code.
-    zahl: '53',
+    zahl: '56',
     einheit_de: 'Quellen in einer Engine',
     einheit_en: 'feeds in one engine',
-    gemessen: '2026-10-17',
-    wie: 'Feed-Liste des laufenden Dienstes: 53 aktive von 57 eingetragenen.',
+    gemessen: '2026-11-13',
+    wie: 'Tabelle feed der Live-Datenbank: 56 aktive von 62 eingetragenen.',
   },
   concierge: {
     zahl: '0,33 s',
@@ -205,22 +189,8 @@ export const WERKGROESSEN: Record<string, Werkgroesse> = {
     zahl: '10',
     einheit_de: 'Prüfbereiche je Lauf',
     einheit_en: 'audit areas per run',
-    gemessen: '2026-11-08',
+    gemessen: '2026-11-14',
     wie: 'Pruefmodule des Audit-Werkzeugs gezaehlt, ohne die Sammeldatei.',
-  },
-  'ops-cockpit': {
-    zahl: '20',
-    einheit_de: 'Bereiche in einer Oberfläche',
-    einheit_en: 'areas in one interface',
-    gemessen: '2026-11-08',
-    wie: 'Bereichsmodule der Oberflaeche gezaehlt, ohne die Sammeldatei (am 17.10. 19, am 03.11. kam die Dienst-Detailansicht dazu).',
-  },
-  'windows-ad-lab': {
-    zahl: '2',
-    einheit_de: 'Rechner, eine Gesamtstruktur',
-    einheit_en: 'machines, one forest',
-    gemessen: '2026-10-17',
-    wie: 'Gaesteliste des Verbunds: ein Domaenen-Controller und ein Arbeitsplatz, beide auf Abruf.',
   },
   'modell-vermittlung': {
     zahl: '12',
@@ -235,13 +205,6 @@ export const WERKGROESSEN: Record<string, Werkgroesse> = {
     einheit_en: 'diagnoses in the plant doctor',
     gemessen: '2026-11-08',
     wie: 'Diagnose-Datei des Dienstes gezaehlt, dazu ein Entscheidungsbaum darueber.',
-  },
-  rackforge: {
-    zahl: '13',
-    einheit_de: 'Teile im Programm',
-    einheit_en: 'parts in the catalogue',
-    gemessen: '2026-10-17',
-    wie: 'Produktseiten im Quellbaum gezaehlt. Bestellungen sind null, der Laden steht vor dem Start.',
   },
   'cms-baukasten': {
     zahl: '2',
@@ -263,10 +226,10 @@ export const WERKGROESSEN: Record<string, Werkgroesse> = {
     // Spiels mit verschiedenen Erweiterungssaetzen. Die Zahl war nicht falsch
     // geraten, sie ist nachgewachsen.
     zahl: '9',
-    einheit_de: 'schwere Rollen im Regler',
-    einheit_en: 'heavy roles under the governor',
-    gemessen: '2026-11-08',
-    wie: 'Registry des Reglers gezaehlt: 9 Rollen, dazu das Windows-Lab auf einem zweiten Wirt.',
+    einheit_de: 'Spielserver im Regler',
+    einheit_en: 'game servers in the controller',
+    gemessen: '2026-11-14',
+    wie: 'Registry des Reglers gezaehlt: 9 Rollen, angemeldeter Bedarf zusammen 23.800 MB auf 16 GB; dazu eine Windows-Testumgebung auf einem zweiten Wirt.',
   },
   finanzen: {
     // Bewusst keine Groesse aus dem Buch (Zahl der Konten, Buchungen, Betraege):

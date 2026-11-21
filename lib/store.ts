@@ -117,6 +117,13 @@ export interface Message {
    * tragen ihn nicht mehr (Begruendung in app/api/contact/route.dienst.ts).
    */
   ip_hash?: string;
+  /**
+   * Der Absender hat im Formular „Lebenslauf anfordern“ angekreuzt (seit
+   * 2026-11-21). Steht bewusst im Klartext neben dem Chiffrat: es ist eine
+   * Markierung für den Posteingang, kein Inhalt der Anfrage, und ohne sie
+   * liesse sich die Anfrage erst nach dem Entschlüsseln einordnen.
+   */
+  lebenslauf?: boolean;
   received_at: string;
   status: MessageStatus;
 }

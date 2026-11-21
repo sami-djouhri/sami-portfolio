@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { ADMIN_COOKIE, safeEqual, sessionSecret, signSession } from '@/lib/admin-session';
+import { ADMIN_COOKIE, SESSION_TTL_S, safeEqual, sessionSecret, signSession } from '@/lib/admin-session';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -104,7 +104,7 @@ export async function POST(req: Request) {
     // KEIN Secure: der Admin läuft über einen Klartext-HTTP-WireGuard-Tunnel;
     // ein Secure-Cookie würde dort nie gesendet. Öffentlich ist /admin ohnehin 404.
     path: '/',
-    maxAge: 7 * 24 * 3600,
+    maxAge: SESSION_TTL_S,
   });
   return res;
 }

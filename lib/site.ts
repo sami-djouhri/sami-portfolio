@@ -72,28 +72,6 @@ export const CV_OEFFENTLICH = CV_FREIGEGEBEN && istBewerbung;
  */
 export const PORTFOLIO_REPO_URL = 'https://github.com/sami-djouhri/sami-portfolio';
 
-/**
- * Öffentlich verlinkte Live-Ziele im Beweis-Streifen der Startseite.
- *
- * BEWUSSTE ALLOWLIST, KEINE Ableitung aus PROJECTS. Wer alle live erreichbaren
- * Eigen-Domains nebeneinander stellt, liefert eine fertige Landkarte der eigenen
- * Angriffsfläche und zieht nebenbei Marken in den Bewerbungskontext, die dort nichts
- * zu suchen haben. Der Beweis steckt in den extern gemessenen Zahlen daneben, nicht
- * in der Anzahl der Links.
- *
- * Neue Einträge nur einzeln und bewusst.
- *
- * `status.djouhri.de` gehört hier NICHT hinein: der Block „extern gemessen“
- * direkt darüber verlinkt dieselbe Adresse bereits, und dort mit ihrer
- * Begründung (7/7 erreichbar, Uptime). Stand sie zusätzlich hier, nannte das
- * schmale Panel eine Domain zweimal untereinander, wovon die zweite Nennung
- * nichts hinzufügte. Diese Zeile zeigt PRODUKTE, nicht den Messpunkt.
- */
-// Seit dem 2026-10-30 leer, die Zeile im Panel faellt damit weg: saganta.de
-// ist seit dem 21.10. privat und antwortet gewollt mit 404. Ein Produkt-Link,
-// der ins Leere fuehrt, wiegt schwerer als einer, der fehlt.
-export const PROOF_PUBLIC_LINKS: readonly string[] = [];
-
 export type SocialLink = { label: string; href?: string };
 export const SOCIAL_LINKS: SocialLink[] = [
   { label: 'GitHub', href: 'https://github.com/sami-djouhri' },

@@ -43,8 +43,11 @@ export function safeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-/** Erzeugt ein signiertes Token `<expiry>.<hmac>` (Default-TTL 7 Tage). */
-export async function signSession(secret: string, ttlMs = 7 * 24 * 3600 * 1000): Promise<string> {
+/** Lebensdauer einer Admin-Sitzung in Sekunden: 24 Stunden (Entscheid 27.10.). Gilt für Token und Cookie. */
+export const SESSION_TTL_S = 24 * 3600;
+
+/** Erzeugt ein signiertes Token `<expiry>.<hmac>` (Default-TTL 24 Stunden). */
+export async function signSession(secret: string, ttlMs = SESSION_TTL_S * 1000): Promise<string> {
   const exp = String(Date.now() + ttlMs);
   return `${exp}.${await hmacHex(secret, exp)}`;
 }

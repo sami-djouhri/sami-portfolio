@@ -12,8 +12,6 @@ type Dict = Record<string, string>;
 const de: Dict = {
   // Navigation
   'nav.projekte': 'Projekte',
-  'nav.uber': 'Über mich',
-  'nav.uberShort': 'Über',
   'nav.toolbox': 'Toolbox',
   'nav.kontakt': 'Kontakt',
   'nav.cv': 'Lebenslauf',
@@ -50,19 +48,6 @@ const de: Dict = {
   'home.featured.title': 'Drei Projekte, drei Anker',
   'home.featured.lead':
     'Alle drei laufen seit Jahren im Alltagsbetrieb. Wenn eins davon nachts ausfällt, repariere ich es. Drei als Anker, der Rest in der vollen Liste.',
-  // Bewusst OHNE Rollenaufschlüsselung: welcher Host welche Aufgabe trägt, ist
-  // Aufklärungsmaterial und trägt zum Beweis nichts bei.
-  'home.proof.hostRoles': 'eigene Hardware im Verbund',
-  'home.proof.since': 'Seit',
-  'home.proof.sinceNote': 'durchgehend im Eigenbetrieb',
-  'home.proof.selfRun': 'selbst betrieben und überwacht',
-  'home.proof.lastDeploy': 'letzter Deploy',
-  'home.proof.online': 'online',
-  'home.proof.snapshot': 'Momentaufnahme',
-  'home.proof.measured': 'extern gemessen',
-  'home.proof.reachableLive': 'Endpunkte erreichbar',
-  'home.proof.availability': 'Verfügbarkeit',
-  'home.proof.publicReachable': 'öffentlich erreichbar:',
   // Hier lagen bis zum 2026-10-25 drei Bausteine des Schlussabsatzes der
   // Startseite (`home.cta.headline`, `.bodyZiel`, `.body`). Sie waren seit dem
   // Seitenumbau vom 2026-10-21 UNBENUTZT, die neue Startseite traegt ihren
@@ -156,7 +141,7 @@ const de: Dict = {
   'notfound.body':
     'Wenn ein Link hierher zeigt, ist das ein Bug, und Bugs interessieren mich. Eine kurze Mail reicht. Ansonsten geht es hier weiter:',
   'notfound.home': 'Zur Startseite',
-  'notfound.homeSub': 'Pitch, Live-Beweis, Auswahl-Projekte.',
+  'notfound.homeSub': 'Alle Arbeiten, nach Bereich geordnet.',
   'notfound.projectsSub': 'Übersicht mit Stack-Filter.',
   'notfound.contactSub': 'Formular oder direkte Mail.',
   'notfound.toolboxSub': 'Stack, Setup und Zahlen.',
@@ -189,8 +174,6 @@ const de: Dict = {
 const en: Dict = {
   // Navigation
   'nav.projekte': 'Projects',
-  'nav.uber': 'About',
-  'nav.uberShort': 'About',
   'nav.toolbox': 'Toolbox',
   'nav.kontakt': 'Contact',
   'nav.cv': 'Résumé',
@@ -225,17 +208,6 @@ const en: Dict = {
   'home.featured.title': 'Three projects, three anchors',
   'home.featured.lead':
     'All three have been in everyday use for years, with responsibility for operations and security. Three as anchors, the rest in the full list.',
-  'home.proof.hostRoles': 'own hardware, one cluster',
-  'home.proof.since': 'Since',
-  'home.proof.sinceNote': 'self-run without interruption',
-  'home.proof.selfRun': 'self-run and self-monitored',
-  'home.proof.lastDeploy': 'last deploy',
-  'home.proof.online': 'online',
-  'home.proof.snapshot': 'snapshot',
-  'home.proof.measured': 'measured externally',
-  'home.proof.reachableLive': 'endpoints reachable',
-  'home.proof.availability': 'availability',
-  'home.proof.publicReachable': 'publicly reachable:',
   // (Die drei `home.cta.*`-Bausteine sind am 2026-10-25 entfallen, Begruendung
   // in der deutschen Haelfte oben.)
 
@@ -312,7 +284,7 @@ const en: Dict = {
   'notfound.body':
     'If a link led you here, that is a bug, and bugs interest me. A short mail is enough. Otherwise, continue here:',
   'notfound.home': 'To the home page',
-  'notfound.homeSub': 'Pitch, live proof, selected projects.',
+  'notfound.homeSub': 'All works, grouped by area.',
   'notfound.projectsSub': 'Overview with stack filter.',
   'notfound.contactSub': 'Form or direct mail.',
   'notfound.toolboxSub': 'Stack, setup and numbers.',

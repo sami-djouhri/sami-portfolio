@@ -101,7 +101,7 @@ export default async function LocaleLayout(
   const about = getAbout(locale);
 
   // Eine kanonische Person-Entität (@id), auf die WebSite und die ProfilePage
-  // (uber-mich) verweisen, ein zusammenhängender Knowledge-Graph statt drei
+  // (Kontaktseite, seit 2026-11-21 mit „Wer das hier betreibt“) verweisen, ein zusammenhängender Knowledge-Graph statt drei
   // lose Person-Kopien. Bild = stabiler generateImageMetadata-Pfad (…/main).
   const personId = `${SITE_URL}/#person`;
   // Nur bestätigte Profile ins sameAs, „pending“-Einträge (ohne href) fließen

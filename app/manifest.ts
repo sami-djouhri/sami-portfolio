@@ -17,7 +17,7 @@ import { ABOUT } from '@/lib/projects';
  * Die Beschreibung ist bewusst ein eigener, kurzer Satz und nicht mehr
  * `ABOUT.bio`: der Biografie-Absatz laeuft ueber mehrere Zeilen und wird in der
  * Installationsansicht hart abgeschnitten, mitten im Satz. Die Bio hat ihren
- * Platz auf /uber-mich, wo sie ganz gelesen wird.
+ * Platz auf /kontakt, wo sie ganz gelesen wird.
  *
  * Icon-Groessen: 64 (app/icon.tsx), 180 (apple-icon), 192 (icon1) und 512
  * (icon2, maskierbar). 192 ist die Mindestgroesse, unter der eine Seite als

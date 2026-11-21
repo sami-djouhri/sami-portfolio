@@ -31,7 +31,6 @@ type Command = {
 const NAV: { key: string; href: string; hint: string; keywords: string }[] = [
   { key: 'nav.start', href: '/', hint: 'cd ~', keywords: 'home landing start startseite' },
   { key: 'nav.projekte', href: '/projekte', hint: 'ls projekte', keywords: 'projects arbeiten case studies portfolio' },
-  { key: 'nav.uber', href: '/uber-mich', hint: 'cat about', keywords: 'about über wer haltung werdegang' },
   { key: 'nav.toolbox', href: '/toolbox', hint: 'ls toolbox', keywords: 'stack technology tools sprachen infra hardware software setup zahlen stats uses' },
   // 'nav.jetzt' ist am 2026-10-15 mit seiner Seite entfallen. Eine Palette,
   // die einen Treffer anbietet und dann auf eine Weiterleitung springt, führt

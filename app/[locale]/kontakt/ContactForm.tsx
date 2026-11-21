@@ -15,8 +15,20 @@ type State = 'idle' | 'sending' | 'ok' | 'error';
  * `email` kommt als Prop und nicht per Import aus `lib/projects.ts`: diese Datei ist
  * eine Client-Komponente, und der Import zog bis zum 2026-10-30 sämtliche Projekttexte
  * beider Sprachen (56 KB) in ein Paket, das jede Seite lud.
+ *
+ * `lebenslaufFeld` zeigt das Kästchen „Lebenslauf anfordern“. Die Seite setzt es
+ * nur im Bewerbungsmodus (lib/modus.ts): ein Schaufenster nimmt jedes
+ * Bewerbungssignal weg, und dieses Kästchen ist eins.
  */
-export function ContactForm({ locale, email }: { locale: Locale; email: string }) {
+export function ContactForm({
+  locale,
+  email,
+  lebenslaufFeld = false,
+}: {
+  locale: Locale;
+  email: string;
+  lebenslaufFeld?: boolean;
+}) {
   const en = locale === 'en';
   const [state, setState] = useState<State>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +61,7 @@ export function ContactForm({ locale, email }: { locale: Locale; email: string }
       subject: String(formData.get('subject') ?? '').trim(),
       message: String(formData.get('message') ?? '').trim(),
       website: String(formData.get('website') ?? ''),
+      lebenslauf: lebenslaufFeld && formData.get('lebenslauf') === 'ja',
       captchaToken,
       // Nur fuer die Sprache der Empfangsbestaetigung. Serverseitig durch
       // asLocale() gefiltert, ein manipulierter Wert faellt auf 'de' zurueck.
@@ -195,6 +208,25 @@ export function ContactForm({ locale, email }: { locale: Locale; email: string }
           required
           invalid={missing.includes('message')}
         />
+
+        {lebenslaufFeld ? (
+          <label className="flex items-start gap-3 text-sm text-text/90">
+            <input
+              type="checkbox"
+              name="lebenslauf"
+              value="ja"
+              className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
+            />
+            <span>
+              {en ? 'Request my résumé' : 'Lebenslauf anfordern'}
+              <span className="mt-0.5 block font-mono text-xs text-muted-dim">
+                {en
+                  ? 'I will send it to the address above.'
+                  : 'Ich schicke ihn an die Adresse oben.'}
+              </span>
+            </span>
+          </label>
+        ) : null}
 
         <div aria-hidden className="absolute -left-[9999px] opacity-0">
           <label>

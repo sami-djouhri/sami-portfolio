@@ -127,7 +127,9 @@ export default async function DatenschutzPage(props: { params: Promise<{ locale:
                 When the contact form at{' '}
                 <a href={localePath(locale, '/kontakt')}>/kontakt</a> is used, your name, email
                 address, the optional subject and the message text are stored in an internal mailbox
-                to process the enquiry, and I am notified by email.
+                to process the enquiry, and I am notified by email. If the form offers a résumé
+                request and it is ticked, that note is stored alongside, unencrypted, so that the
+                enquiry can be sorted without decrypting it.
                 Legal basis: Art. 6 (1) (b) GDPR (pre-contractual measures) or Art. 6 (1) (f) GDPR
                 (answering general enquiries).
               </>
@@ -137,7 +139,9 @@ export default async function DatenschutzPage(props: { params: Promise<{ locale:
                 <a href={localePath(locale, '/kontakt')}>/kontakt</a> genutzt wird, werden Name,
                 E-Mail-Adresse, der freiwillige Betreff und der Nachrichtentext zur Bearbeitung der
                 Anfrage in einem internen Postfach gespeichert, und ich werde per E-Mail
-                benachrichtigt. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche
+                benachrichtigt. Bietet das Formular an, den Lebenslauf anzufordern, und ist das
+                angekreuzt, wird dieser Vermerk daneben unverschlüsselt gespeichert, damit sich die
+                Anfrage ohne Entschlüsseln einordnen lässt. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche
                 Maßnahmen) bzw. Art. 6 Abs. 1 lit. f DSGVO (Beantwortung allgemeiner Anfragen).
               </>
             )}

@@ -23,13 +23,12 @@ import { Prompt } from './Terminal';
  * (Entscheid): er zeigt den Technikbestand und ist für genau die Leser
  * interessant, die die Seite erreichen soll.
  *
- * `nav.uberShort` statt `nav.uber` auf Desktop: „Über" verliert nichts und die
- * Zeile bleibt auf mittleren Breiten ruhig.
+ * „Über“ ist am 2026-11-21 entfallen: die Seite ist in `/kontakt`
+ * aufgegangen (Abschnitt „Wer das hier betreibt“).
  */
 const NAV = [
   { href: '/projekte', key: 'nav.projekte' },
   { href: '/toolbox', key: 'nav.toolbox' },
-  { href: '/uber-mich', key: 'nav.uberShort' },
   { href: '/kontakt', key: 'nav.kontakt' },
 ] as const;
 

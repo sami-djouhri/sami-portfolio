@@ -1,88 +1,91 @@
 import type { Fallstudie } from './typ';
 
+// Neu erhoben am 2026-11-20: der Discord-Bot, den diese Arbeit bis dahin
+// beschrieb, ist abgeloest. Beschrieben ist der Nachfolger, die Vorgeschichte
+// steht in der Zeitleiste und in der ersten Entscheidung.
+//
+// Messbefehle (Stand 2026-11-20):
+// - Regeln: docker/brain-bus/config/rules.yaml per yaml.safe_load, Liste `rules`, 96.
+//   Jede traegt cooldown_seconds, triage und eine ntfy-Zuordnung.
+// - Eingriffe: Regeln mit `action`, 4; davon 3 mit risk medium (Backup wiederholen,
+//   Container neu starten bei Flattern und bei Neustartschleife), die vierte ist die
+//   lesende Testregel des Meldewegs. risk medium heisst Freigabe, high wird nie
+//   ausgefuehrt (docker/brain-bus/app/actions.py).
+// - Diagnose: 34 Regeln mit `diagnose`; das lokale Modell schaetzt, ob der Eingriff
+//   sinnvoll ist (app/decide.py), unter der Schwelle der Regel geschieht nichts.
+// - Freigabe-TTL 24 h: CONFIRM_TTL_SECONDS in app/confirmations.py.
+// - Kanaele: critical/warn/info in app/notify.py (NtfyClient).
+// - Sammler: docker/tardis/docker-api/bereiche/sammler.py (Chronik 2 min, Updates 6 h,
+//   Sicherheit 30 min, Tagesbericht 08:00).
+// - Zweiter Ausgang: Regel NtfyAufJarvisStumm im Repo homelab/monitoring2.
 const homelabSentinel: Fallstudie = {
   problem: {
-    de: 'Ein Homelab im Dauerbetrieb braucht eine On-Call-Person, und das bin ausschließlich ich. Ohne Push-Kanal heißt das, ständig in Dashboards zu schauen und trotzdem das eine Ereignis zu verpassen, das zählt. Ich wollte einen Wächter, der sich von selbst meldet, wenn etwas wackelt, der mir die Entscheidung überlässt und der einen Neustart übersteht, ohne dass danach tote Knöpfe im Chat zurückbleiben.',
-    en: 'A home lab running around the clock needs an on-call person, and that is me alone. Without a push channel, that means staring at dashboards constantly and still missing the one event that matters. I wanted the opposite: a sentinel that speaks up on its own when something wobbles, that leaves the decision to me, and that survives a restart without leaving dead buttons behind in the chat.',
+    de: 'Ein Homelab im Dauerbetrieb braucht eine Bereitschaft, und das bin ausschließlich ich. Ohne Push heißt das, ständig in Dashboards zu schauen und trotzdem das eine Ereignis zu verpassen, das zählt. Das Haus soll sich deshalb selbst melden. Eingriffe sollen erst nach meiner Freigabe laufen. Fällt der Meldeweg selbst aus, soll auch das auffallen.',
+    en: 'A home lab running around the clock needs an on-call person, and that is me alone. Without push, that means looking at dashboards all the time and still missing the one event that matters. So the house should report on its own. Interventions should only run after I approve them. If the alert path itself fails, that should be noticed too.',
   },
   approach: [
     {
-      de: 'Push als Grundsatz: der Bot meldet sich von selbst, ich frage ihn nicht ab. Als Pager dient der mobile Push des Chat-Kanals, den ich ohnehin auf dem Handy habe, also braucht es keine zweite Benachrichtigungs-Infrastruktur.',
-      en: 'Push as a principle: the bot reports on its own and I never poll it. The pager is the chat channel\'s existing mobile push, which is already on my phone, so there is no second notification stack.',
+      de: 'Alle Signale laufen über einen eigenen Event-Bus auf MQTT. Prometheus-Alarme, Timer und Skripte melden dorthin. Kein Dienst braucht einen eigenen Push-Weg.',
+      en: 'All signals go through an own event bus on MQTT. Prometheus alerts, timers and scripts report there. No service needs its own push path.',
     },
     {
-      de: 'Cog-Architektur: jede Sorge bekommt ihr eigenes Modul, von Container-Gesundheit über Backups, Updates und Sicherheits-Audits bis zum VPN-Peer-Status, einzeln pausierbar und neu schreibbar, ohne den Kern anzufassen.',
-      en: 'A cog architecture: each concern gets its own module (from container health through backups, updates and security audits to VPN peer status), pausable and rewritable one at a time, without touching the core.',
+      de: 'Jede Meldung trifft eine Regel. Die Regel legt Dringlichkeit, Kanal und eine Ruhezeit fest. Eine Wiederholung innerhalb der Ruhezeit wird nur mitgezählt.',
+      en: 'Every message hits a rule. The rule sets urgency, channel and a quiet period. A repeat within the quiet period is only counted.',
     },
     {
-      de: 'Der Bot ist Abnehmer des eigenen Event-Bus, keine zweite Mess-Schicht. Signale werden zentral dedupliziert, mit Cooldown triagiert und gebündelt zugestellt. Kein Dienst muss seinen eigenen Push-Weg lernen.',
-      en: 'The bot is a consumer of the own event bus, not a second measurement layer. Signals get deduplicated centrally, triaged with cooldown and delivered bundled. No service has to learn its own push path.',
+      de: 'Zugestellt wird über ntfy auf eigener Hardware, auf drei Kanälen nach Dringlichkeit. Das Handy hängt über das eigene VPN daran.',
+      en: 'Delivery goes through ntfy on my own hardware, on three channels by urgency. The phone is connected over my own VPN.',
     },
     {
-      de: 'Jeder Eingriff läuft über einen Bestätigungs-Flow: Vorübergehendes fährt der Bus innerhalb eines Limits selbst nach, Folgenreiches landet als Freigabe-Knopf mit Diagnose bei mir.',
-      en: 'Every intervention runs through a confirmation flow: transient things the bus retries itself within a limit, consequential ones land as a release button with a diagnosis on me.',
+      de: 'Für einen Teil der Regeln sammelt der Bus vor der Meldung Diagnose ein: Dienststatus und frühere Vorfälle. Ein lokales Sprachmodell schätzt daraus, ob der hinterlegte Eingriff sinnvoll ist. Der Eingriff selbst wartet als Freigabe in Tardis, meinem Betriebsportal.',
+      en: 'For some rules the bus collects a diagnosis before reporting: service state and earlier incidents. A local language model uses it to judge whether the stored intervention makes sense. The intervention itself waits as an approval in Tardis, my operations portal.',
     },
     {
-      de: 'Knöpfe sind neustart-fest gebaut: ihre Bedeutung steckt in der Aktion selbst und wird über einen globalen Interaktions-Listener aufgelöst, nicht aus flüchtigem Speicher. Nach einem Neustart bleibt kein toter Knopf zurück.',
-      en: 'Buttons are built restart-proof: their meaning sits in the action itself and resolves over a global interaction listener, not out of volatile memory. After a restart, no dead button remains.',
+      de: 'Was nicht als Ereignis ankommt, erhebt ein Sammler in Tardis: den Verlauf der Container, verfügbare Image-Updates, Sicherheitsbefunde und morgens einen Tagesbericht. Ein gestoppter Container wird nur gemeldet, wenn er laut Dienstkatalog laufen soll.',
+      en: 'What does not arrive as an event is collected by a gatherer in Tardis: the container history, available image updates, security findings and a daily report in the morning. A stopped container is only reported if the service catalogue says it should run.',
     },
   ],
   architecture: {
     summary: {
-      de: 'Der Bot ist Abnehmer des Event-Bus, nicht eine eigene Mess-Schicht. Signale laufen vom zentralen Bus in den Bot-Kern, der sie auf themenscharfe Cogs verteilt, für eingreifende Schritte einen Freigabe-Knopf erzeugt und das Ergebnis als Push in den Chat schickt, mobil inklusive. Folgenreiches wird erst nach meiner Freigabe ausgeführt.',
-      en: 'The bot consumes the event bus and measures nothing itself. Signals run from the central bus into the bot core, which routes them to topic-scoped cogs, raises a release button for any intervening step, and sends the result as a chat push, mobile included. Consequential steps run only after my release.',
+      de: 'Quellen melden an den Event-Bus. Der Bus gleicht jede Meldung mit seinen Regeln ab und stellt über ntfy zu. Eingriffe legt er als Freigabe in Tardis ab und führt sie erst nach meinem Entscheid aus. Ein zweiter Beobachter auf einem eigenen Gast prüft ntfy und meldet einen Ausfall über ntfy.sh außerhalb des Hauses.',
+      en: 'Sources report to the event bus. The bus matches every message against its rules and delivers through ntfy. It files interventions as approvals in Tardis and runs them only after my decision. A second observer on its own guest checks ntfy and reports an outage through ntfy.sh outside the house.',
     },
     tiers: [
       {
-        label: { de: 'Quelle', en: 'Source' },
+        label: { de: 'Quellen', en: 'Sources' },
         nodes: [
           {
-            id: 'spine',
+            id: 'prom',
             kind: 'edge',
+            label: { de: 'Prometheus-Alarme', en: 'Prometheus alerts' },
+          },
+          {
+            id: 'jobs',
+            kind: 'edge',
+            label: { de: 'Timer und Skripte', en: 'Timers and scripts' },
+          },
+        ],
+      },
+      {
+        label: { de: 'Verarbeitung', en: 'Processing' },
+        nodes: [
+          {
+            id: 'bus',
+            kind: 'core',
             label: { de: 'Event-Bus', en: 'Event bus' },
-            note: { de: 'dedupliziert', en: 'deduplicated' },
+            note: { de: 'Regeln mit Ruhezeit', en: 'rules with quiet period' },
           },
-        ],
-      },
-      {
-        label: { de: 'Bot-Kern', en: 'Bot core' },
-        nodes: [
           {
-            id: 'loader',
+            id: 'freigabe',
             kind: 'core',
-            label: { de: 'Cog-Loader', en: 'Cog loader' },
-            note: { de: 'neustart-fest', en: 'restart-proof' },
+            label: { de: 'Freigaben in Tardis', en: 'Approvals in Tardis' },
+            note: { de: 'verfallen nach 24 h', en: 'expire after 24 h' },
           },
           {
-            id: 'confirm',
+            id: 'sammler',
             kind: 'core',
-            label: { de: 'Bestätigungs-Flow', en: 'Confirmation flow' },
-            note: { de: 'Freigabe-Knopf', en: 'release button' },
-          },
-          {
-            id: 'dispatch',
-            kind: 'core',
-            label: { de: 'Action-Dispatch', en: 'Action dispatch' },
-          },
-        ],
-      },
-      {
-        label: { de: 'Cogs', en: 'Cogs' },
-        nodes: [
-          {
-            id: 'health',
-            kind: 'consumer',
-            label: { de: 'Health und Updates', en: 'Health and updates' },
-          },
-          {
-            id: 'backup',
-            kind: 'consumer',
-            label: { de: 'Backups', en: 'Backups' },
-          },
-          {
-            id: 'sec',
-            kind: 'consumer',
-            label: { de: 'Security und VPN-Peers', en: 'Security and VPN peers' },
+            label: { de: 'Sammler in Tardis', en: 'Gatherer in Tardis' },
+            note: { de: 'Verlauf, Updates, Befunde', en: 'history, updates, findings' },
           },
         ],
       },
@@ -90,135 +93,156 @@ const homelabSentinel: Fallstudie = {
         label: { de: 'Ausgabe', en: 'Output' },
         nodes: [
           {
-            id: 'push',
+            id: 'ntfy',
             kind: 'data',
-            label: { de: 'Chat-Push', en: 'Chat push' },
-            note: { de: 'mobil', en: 'mobile' },
+            label: { de: 'ntfy', en: 'ntfy' },
+            note: { de: 'drei Kanäle', en: 'three channels' },
+          },
+        ],
+      },
+      {
+        label: { de: 'Wächter', en: 'Watcher' },
+        nodes: [
+          {
+            id: 'beobachter',
+            kind: 'consumer',
+            label: { de: 'Zweiter Beobachter', en: 'Second observer' },
+            note: { de: 'meldet über ntfy.sh', en: 'reports via ntfy.sh' },
           },
         ],
       },
     ],
     flows: [
       {
-        from: 'spine',
-        to: 'loader',
-        label: { de: 'Alert', en: 'alert' },
+        from: 'prom',
+        to: 'bus',
+        label: { de: 'Alarm', en: 'alert' },
       },
       {
-        from: 'health',
-        to: 'confirm',
-        label: { de: 'Freigabe', en: 'release' },
+        from: 'jobs',
+        to: 'bus',
+        label: { de: 'Ereignis', en: 'event' },
       },
       {
-        from: 'dispatch',
-        to: 'spine',
-        label: { de: 'Aktion aus dem Chat', en: 'action from the chat' },
+        from: 'bus',
+        to: 'freigabe',
+        label: { de: 'Eingriff', en: 'intervention' },
+      },
+      {
+        from: 'freigabe',
+        to: 'bus',
+        label: { de: 'Entscheid', en: 'decision' },
+      },
+      {
+        from: 'bus',
+        to: 'ntfy',
+        label: { de: 'Meldung', en: 'message' },
+      },
+      {
+        from: 'sammler',
+        to: 'ntfy',
+        label: { de: 'Stopp, Befund, Tagesbericht', en: 'stop, finding, daily report' },
+      },
+      {
+        from: 'beobachter',
+        to: 'ntfy',
+        label: { de: 'Probe', en: 'probe' },
       },
     ],
   },
   result: [
     {
-      de: 'Zwölf Cogs decken Monitoring, Backups, Updates, Sicherheit und Verbindungs-Status ab, jede Sorge ein eigenes, einzeln pausierbares Modul.',
-      en: 'Twelve cogs cover monitoring, backups, updates, security and connection status, each concern its own, individually pausable module.',
+      de: '96 Regeln ordnen jede Meldung einem der drei Kanäle zu, jede mit eigener Ruhezeit.',
+      en: '96 rules assign every message to one of the three channels, each with its own quiet period.',
     },
     {
-      de: 'Push-pflichtige Ereignisse von der Neustart-Schleife über das ablaufende Zertifikat bis zum Speicherdruck erreichen mich innerhalb weniger Minuten, alles Wartbare bleibt leise im Hintergrund.',
-      en: 'Push-worthy events (a restart loop, an expiring certificate, storage pressure) reach me within a few minutes, while everything maintainable stays quiet in the background.',
+      de: 'Drei Eingriffe sind hinterlegt: ein fehlgeschlagenes Backup wiederholen und einen Container neu starten, wenn er flattert oder in einer Neustartschleife hängt. Keiner läuft ohne Freigabe. Eine Freigabe verfällt nach 24 Stunden.',
+      en: 'Three interventions are on file: retry a failed backup, and restart a container when it flaps or is stuck in a restart loop. None runs without approval. An approval expires after 24 hours.',
     },
     {
-      de: 'Ein Freigabe-Knopf ersetzt die stille Automatik. Nur Vorübergehendes fährt bis zu einem Limit von selbst nach. Eine abgelaufene Freigabe führt nichts mehr aus, der Bot meldet das im Chat.',
-      en: 'A release button replaces silent automation. Only transient things retry on their own, up to a limit. An expired release executes nothing, and the bot says so in the chat.',
+      de: 'Offene Freigaben liegen in einer Warteschlange und nicht an einem Knopf im Chat. Nach einem Neustart sind sie weiter entscheidbar.',
+      en: 'Open approvals sit in a queue and not on a button in a chat. After a restart they can still be decided.',
     },
     {
-      de: 'Knöpfe überstehen einen Bot-Neustart, ohne tot zu werden, was vorher angezeigt wurde bleibt klickbar.',
-      en: 'Buttons survive a bot restart without going dead; whatever was shown before stays clickable.',
-    },
-    {
-      de: 'On-Call wird leise: der Wächter meldet sich, wenn etwas zu tun ist, sonst nicht.',
-      en: 'On-call goes quiet: the sentinel speaks up when there is something to do, and stays silent otherwise.',
+      de: 'Fällt ntfy aus, meldet das der zweite Beobachter über einen Weg, der nicht durch das Heimnetz führt.',
+      en: 'If ntfy fails, the second observer reports it over a path that does not run through the home network.',
     },
   ],
   decisions: [
     {
-      title: { de: 'Warum ein eigener Bot', en: 'An own bot, not an off-the-shelf tool' },
+      title: { de: 'Warum Discord rausflog', en: 'Why Discord went' },
       body: {
-        de: 'Ein reines Push-Werkzeug wäre schneller aufgesetzt. Ein eigener Bot bringt aber Befehlsschnittstelle, Action-Dispatch und integrierte Logik unter ein Dach, was sich lohnt, sobald der Wächter auf Zuruf auch handeln soll.',
-        en: 'A pure push tool would be quicker to stand up. But an own bot brings command interface, action dispatch and integrated logic under one roof, which pays off the moment the sentinel has to act on demand.',
+        de: 'Bis November 2026 war diese Arbeit ein Discord-Bot. Discord ist ein fremder Dienst im Internet, und Meldungen aus dem Haus sollen auch ohne Internet ankommen. ntfy läuft im Haus und reicht dafür. Discord bleibt für die Community-Bots in Gebrauch.',
+        en: 'Until November 2026 this work was a Discord bot. Discord is a third-party service on the internet, and messages from the house should arrive without internet too. ntfy runs in the house and is enough for that. Discord stays in use for the community bots.',
       },
     },
     {
-      title: {
-        de: 'Bus als Alert-Quelle, Bot als Abnehmer',
-        en: 'Bus as alert source, bot as consumer',
-      },
+      title: { de: 'Bus als Quelle, Push nur als Ausgang', en: 'Bus as source, push only as output' },
       body: {
-        de: 'Kein Dienst muss eigenen Bot-Push lernen. Alles läuft zuerst über den Event-Bus mit Dedup und Cooldown, und der Bot ist nur einer von mehreren Abnehmern. Das verhindert die Alert-Flut, an der Solo-On-Call sonst abstumpft.',
-        en: 'No service has to learn its own bot push. Everything runs first through the event bus with dedup and cooldown, and the bot is just one of several consumers. That heads off the alert flood that solo on-call otherwise goes numb to.',
+        de: 'Kein Dienst lernt einen eigenen Push-Weg. Alles läuft zuerst durch die Regeln mit ihrer Ruhezeit. Das hält die Menge der Meldungen klein, und an einer Flut stumpft eine Ein-Personen-Bereitschaft schnell ab.',
+        en: 'No service learns its own push path. Everything runs through the rules and their quiet period first. That keeps the number of messages small, and a one-person on-call goes numb to a flood quickly.',
       },
     },
     {
-      title: {
-        de: 'Freigabe vor Eingriff, nicht stille Automatik',
-        en: 'Release before intervention, not silent automation',
-      },
+      title: { de: 'Freigabe vor Eingriff', en: 'Approval before intervention' },
       body: {
-        de: 'Selbstheilung ist verführerisch, aber ein falscher Eingriff ohne Rückfrage ist schlimmer als ein verpasster. Vorübergehendes darf der Bus innerhalb eines harten Limits selbst nachfahren, Folgenreiches landet als Knopf bei mir, ein Versuchszähler schützt gegen Endlos-Schleifen.',
-        en: 'Self-healing is tempting, but a wrong intervention with no query is worse than a missed one. Transient things the bus may retry itself within a hard limit; consequential ones land as a button on me, with an attempt counter guarding against endless loops.',
+        de: 'Ein falscher Eingriff ohne Rückfrage ist schlimmer als ein verpasster. Deshalb entscheidet das Sprachmodell nur, ob ein Eingriff überhaupt vorgeschlagen wird. Ausgeführt wird er erst nach meiner Freigabe.',
+        en: 'A wrong intervention without asking is worse than a missed one. That is why the language model only decides whether an intervention is proposed at all. It runs only after my approval.',
       },
     },
     {
-      title: { de: 'Knöpfe ohne flüchtigen Zustand', en: 'Buttons with no volatile state' },
+      title: { de: 'Ein Ausgang braucht einen Wächter von außen', en: 'One output needs an outside watcher' },
       body: {
-        de: 'Knöpfe, deren Bedeutung nur im Arbeitsspeicher lebt, sind nach jedem Neustart tot. Stattdessen tragen sie ihre Bedeutung in der Aktion selbst, aufgelöst über einen globalen Interaktions-Listener, so überlebt jeder Knopf einen Neustart ohne erneut ausgelöste Alerts.',
-        en: 'Buttons whose meaning lives only in memory are dead after every restart. Instead they carry their meaning in the action itself, resolved over a global interaction listener, so every button survives a restart without re-firing alerts.',
+        de: 'Mit Discord gab es zwei Ausgänge, die sich gegenseitig abdeckten. Jetzt ist ntfy der einzige. Fällt er aus, melden alle Wächter im Haus ins Leere. Deshalb prüft ihn ein Beobachter, der über einen eigenen Weg nach draußen meldet.',
+        en: 'With Discord there were two outputs that covered for each other. Now ntfy is the only one. If it fails, every watcher in the house reports into nothing. That is why an observer checks it and reports over its own path to the outside.',
       },
     },
   ],
   metrics: [
     {
-      label: { de: 'Cogs', en: 'Cogs' },
-      value: { de: '12 produktiv', en: '12 in production' },
+      label: { de: 'Regeln', en: 'Rules' },
+      value: { de: '96 im Event-Bus', en: '96 in the event bus' },
     },
     {
-      label: { de: 'Push-Kanal', en: 'Push channel' },
-      value: { de: 'Chat, mobil inklusive', en: 'chat, mobile included' },
-    },
-    {
-      label: { de: 'Alert-Latenz', en: 'Alert latency' },
-      value: { de: 'Minuten, Freigaben sofort', en: 'minutes, releases at once' },
+      label: { de: 'Kanäle', en: 'Channels' },
+      value: { de: '3, nach Dringlichkeit', en: '3, by urgency' },
     },
     {
       label: { de: 'Eingriff', en: 'Intervention' },
-      value: { de: 'nur nach Freigabe', en: 'only after release' },
+      value: { de: 'nur nach Freigabe, 24 h gültig', en: 'only after approval, valid 24 h' },
+    },
+    {
+      label: { de: 'Zustellung', en: 'Delivery' },
+      value: { de: 'ntfy auf eigener Hardware', en: 'ntfy on own hardware' },
     },
   ],
   timeline: [
     {
       when: { de: '2026 H1', en: '2026 H1' },
       what: {
-        de: 'Bot-Basis mit Cog-Architektur, Anbindung an den Event-Bus',
-        en: 'Bot base with cog architecture, binding to the event bus',
+        de: 'Discord-Bot mit einem Modul je Prüfung, angebunden an den Event-Bus',
+        en: 'Discord bot with one module per check, connected to the event bus',
       },
     },
     {
       when: { de: '2026 H1', en: '2026 H1' },
       what: {
-        de: 'Cogs für Health, Backups, Updates, Security und VPN-Peers',
-        en: 'Cogs for health, backups, updates, security and VPN peers',
+        de: 'Freigaben als Knöpfe im Chat, Wiederholung mit Versuchsgrenze',
+        en: 'Approvals as buttons in the chat, retries with an attempt limit',
       },
     },
     {
-      when: { de: '2026 H1', en: '2026 H1' },
+      when: { de: 'August 2026', en: 'August 2026' },
       what: {
-        de: 'Bestätigungs-Flow mit Freigabe-Knopf, neustart-feste Knöpfe, Auto-Nachfahren mit Versuchs-Limit',
-        en: 'Confirmation flow with release button, restart-proof buttons, auto-retry with an attempt limit',
+        de: 'ntfy als zweiter Ausgang neben Discord',
+        en: 'ntfy as a second output next to Discord',
       },
     },
     {
-      when: { de: '2026 H2', en: '2026 H2' },
+      when: { de: 'November 2026', en: 'November 2026' },
       what: {
-        de: 'Action-Dispatch für Chat-Trigger, weitere Cogs nach Bedarf',
-        en: 'Action dispatch for chat triggers, more cogs as needed',
+        de: 'Discord abgelöst: ntfy als einziger Ausgang, Freigaben und Sammler in Tardis, zweiter Beobachter prüft ntfy',
+        en: 'Discord replaced: ntfy as the only output, approvals and gatherer in Tardis, second observer checks ntfy',
       },
     },
   ],

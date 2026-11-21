@@ -137,6 +137,15 @@ const nextConfig = {
       { source: '/de/entwurf', destination: '/de', permanent: true },
       { source: '/en/entwurf', destination: '/en', permanent: true },
       { source: '/entwurf', destination: '/de', permanent: true },
+
+      // ── Zusammenlegung vom 2026-11-21: Über mich ist in Kontakt aufgegangen ─
+      // Entscheid aus dem Interview vom 09.11. Ziel ist der Abschnitt
+      // „Wer das hier betreibt“ auf der Kontaktseite. `/en/about` stand bis
+      // hierher als englischer Slug in `EN_SLUGS` und braucht deshalb eine
+      // eigene Regel, ebenso die alte Form `/en/uber-mich`.
+      { source: '/de/uber-mich', destination: '/de/kontakt', permanent: true },
+      { source: '/en/about', destination: '/en/contact', permanent: true },
+      { source: '/en/uber-mich', destination: '/en/contact', permanent: true },
     ];
   },
 };

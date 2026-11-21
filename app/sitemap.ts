@@ -13,7 +13,6 @@ import { CV_OEFFENTLICH, SITE_URL as BASE } from '@/lib/site';
 const STATIC_ROUTES: { path: string; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']; priority: number }[] = [
   { path: '', changeFrequency: 'monthly', priority: 1.0 },
   { path: '/projekte', changeFrequency: 'monthly', priority: 0.9 },
-  { path: '/uber-mich', changeFrequency: 'yearly', priority: 0.7 },
   { path: '/toolbox', changeFrequency: 'monthly', priority: 0.7 },
   // '/jetzt' und '/notizen' sind am 2026-10-15 entfallen. Beide Adressen
   // antworten jetzt mit 301 auf die Werkliste; eine Sitemap, die eine

@@ -53,8 +53,7 @@ export function GET() {
   z.push(`- [Startseite (Deutsch)](${SITE_URL}/de)`);
   z.push(`- [All works](${SITE_URL}${localePath('en', '/projekte')})`);
   z.push(`- [Toolbox](${SITE_URL}${localePath('en', '/toolbox')})`);
-  z.push(`- [About](${SITE_URL}${localePath('en', '/uber-mich')})`);
-  z.push(`- [Contact](${SITE_URL}${localePath('en', '/kontakt')})`);
+  z.push(`- [About and contact](${SITE_URL}${localePath('en', '/kontakt')})`);
   z.push('');
   z.push('## Contact');
   z.push('');

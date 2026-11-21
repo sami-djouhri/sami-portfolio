@@ -1187,23 +1187,6 @@
   .kennwert-zahl[data-stufe='klein'] { font-size: clamp(1.3rem, 1.8vw, 1.6rem); }
 }
 
-/* ══ DAS PANEL ALS FELDZELLE ═══════════════════════════════════════════════
-   `live --watch` sitzt am Fuss des Feldes und ueber die volle Breite. Es
-   bringt deshalb weder Rundung noch eigenen Rahmen mit: die Haarlinien
-   entstehen aus dem 1px-Abstand des Rasters, ein eigener Rahmen waere an
-   jeder Kante doppelt. Dieselbe Begruendung wie bei `.werkzelle`.
-
-   `order: 999` ist kein Schoenheitswert. Die Konsole sortiert das Feld,
-   indem sie `style.order` auf alle `[data-arbeit]` setzt (0 bis 24). Das
-   Panel traegt kein `data-arbeit`, bliebe also auf dem Vorgabewert 0 und
-   spraenge beim ersten `ordne jahr` an den ANFANG des Feldes. */
-.feldpanel {
-  grid-column: 1 / -1;
-  order: 999;
-  overflow: hidden;
-  background: theme('colors.surface' / 90%);
-}
-
 /* Der lebende Grund. Liegt fest im Fenster, nicht im Fluss: dadurch wandert das
    Werkfeld beim Scrollen ueber ein ruhendes Feld, und es entsteht Tiefe, ohne
    dass irgendetwas mitgerechnet werden muss.
@@ -1298,29 +1281,10 @@
   to   { background-color: rgb(38 40 47 / 100%); border-color: rgb(38 40 47 / 100%); }
 }
 
-/* ⚠️ Das Panel ist eine Zelle des Feldes, aber KEINE `.werkzelle`. Ohne diese
-   Zeile bliebe es waehrend des ganzen Auftritts auf seinem Endzustand stehen,
-   waehrend ringsum alles erst kommt, und zoege damit den Blick genau dorthin,
-   wo er zuletzt hin soll. Es kommt als Letztes, nach der letzten Arbeit.
-
-   ⚠️⚠️ Es bekommt eigene Bilder und NICHT `zelle-deckend`. Jene endet auf dem
-   Seitengrund `#0b0c0e`; das Panel steht auf `surface` `#15171c`, und mit
-   `both` haette die Animation seinen Grund nach 2,25 s still auf den falschen
-   Wert gesetzt. Genau die Falle, vor der der Kommentar bei `raster-ein` schon
-   einmal warnt: ein Endbild, das eine Regel ueberschreibt, und zwar erst nach
-   Ablauf der Animation, also lange nachdem jemand hingesehen hat. */
-.feldpanel {
-  animation: panel-ein 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.35s both;
-}
-@keyframes panel-ein {
-  from { background-color: rgb(21 23 28 / 0%); }
-  to   { background-color: rgb(21 23 28 / 90%); }
-}
-
 /* Die Fuellzelle hinter der letzten Arbeit (Begruendung in der Seite). Sie
-   steht im Grund der Zellen und kommt mit ihnen, als letzte vor dem Panel.
+   steht im Grund der Zellen und kommt mit ihnen, als letzte.
    `order: 998`: die Konsole setzt beim Sortieren 0 bis 24 auf die Arbeiten,
-   das Panel steht auf 999, die Fuellung muss dazwischen bleiben.
+   die Fuellung muss dahinter bleiben.
    ⚠️ Jede Stufe schaltet die vorige erst aus (`[data-r2]` usw. mit gleicher
    Spezifitaet, spaeter notiert), sonst bliebe die Handy-Fuellung bei drei
    Spalten stehen und erzeugte eine eigene Reihe. */
@@ -1345,10 +1309,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .werkzelle, .werkfeld, .feldpanel, .kennwert-zahl, .werkrest { animation: none; }
+  .werkzelle, .werkfeld, .kennwert-zahl, .werkrest { animation: none; }
 }
 @media print {
-  .werkzelle, .werkfeld, .feldpanel, .kennwert-zahl, .werkrest { animation: none; }
+  .werkzelle, .werkfeld, .kennwert-zahl, .werkrest { animation: none; }
 }
 
 /* ══ LEITSTAND ═════════════════════════════════════════════════════════════

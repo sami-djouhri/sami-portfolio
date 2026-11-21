@@ -7,7 +7,10 @@
  * (`proof-collect.py` + `proof-push.sh`) ins Datenvolume legte. Entscheid
  * aus der Fragerunde vom 2026-10-27, geteilt nach der Frage, WER gemessen hat:
  * was ich selbst messe, fällt; was ein Dritter misst (die Verfügbarkeit von der
- * Status-Seite, `lib/live-status.ts`), bleibt.
+ * Status-Seite), bleibt. Seit dem 2026-11-21 ist auch das weg: die Status-Seite
+ * ist nicht mehr öffentlich, der externe Wächter alarmiert nur noch (Owner-Aufgabe
+ * „status.djouhri.de nicht mehr öffentlich“). Mit ihr fielen das Panel
+ * `live --watch`, `/api/status` und die Zeile „x/y Endpunkte“ im Statusband.
  *
  * Anlass war ein Fund: die Seite nannte als Dienstzahl „über 190", der eigene
  * Messfühler zählte 179. Kein Rückbau, sondern 13 Apps, die auf Abruf gingen.

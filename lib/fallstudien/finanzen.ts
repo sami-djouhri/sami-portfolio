@@ -11,9 +11,9 @@ import type { Fallstudie } from './typ';
 //
 // Messbefehle im Projekt `docker/finanzen`:
 // - Reiter: `grep -c 'role="tab"' app/static/index.html`, 11.
-// - Tests: `grep -rhoE "^\s*(async )?def test_" tests | wc -l`, 703 (2026-11-08).
+// - Tests: `grep -rhoE "^\s*(async )?def test_" tests | wc -l`, 792 (2026-11-21).
 // - Schema-Stufen: `SCHEMA_STAND` in `app/migration.py`, 12.
-// - Offener Ausbau des Depots: `NAECHSTE_SESSION.md`, Abschnitt „Phase L".
+// - Offener Ausbau des Depots: Phase L, Aufgabe im Projekt finanzen.
 const finanzen: Fallstudie = {
   problem: {
     de: 'Ein fertiges Finanzprogramm stand bereit und wurde nie befüllt. Es rechnet in doppelter Buchführung und schaut zurück. Meine Frage war eine andere: Wie lange reicht mein Geld, wenn ich so weitermache? Daraus wurde ein eigener Dienst für Konten, Buchungen, Verträge, Budgets, Depot und eine Rechnung über Jahrzehnte. Er ist nur im eigenen Netz erreichbar und liegt hinter einer Anmeldung.',

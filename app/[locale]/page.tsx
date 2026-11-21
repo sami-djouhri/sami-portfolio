@@ -10,13 +10,11 @@ import {
   type Project,
 } from '@/lib/projects';
 import { getZiel } from '@/lib/cv';
-import { getProof } from '@/lib/proof';
 import { getOhneGroesse, getWerkgroesse } from '@/lib/werkgroessen';
 import { getWerkauszug } from '@/lib/werkauszug';
 import { istBewerbung } from '@/lib/modus';
 import { previewIds } from '@/lib/previews';
 import { vorschauSrcSet, WERKZELLE_SIZES } from '@/lib/vorschau-bild';
-import { PROOF_PUBLIC_LINKS } from '@/lib/site';
 import {
   asLocale,
   localeAlternates,
@@ -29,7 +27,6 @@ import { Anlagenfeld } from '../components/Anlagenfeld';
 import { DomainMark } from '../components/DomainMark';
 import { Eigenmessung } from '../components/Eigenmessung';
 import { Leitstand } from '../components/Leitstand';
-import { EndpunkteZeile, LivePanel } from '../components/LivePanel';
 import { Footer } from '../components/Footer';
 import { TopBar } from '../components/TopBar';
 
@@ -190,10 +187,6 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     if (ra !== rb) return (ra < 0 ? 99 : ra) - (rb < 0 ? 99 : rb);
     return 0; // innerhalb eines Bereichs die Quellreihenfolge, die ist kuratiert
   });
-  const proof = getProof();
-  // Das Datum, nicht das Alter (seit 2026-10-30): die Seite ist statisch, ein
-  // „vor 3 h" bliebe beim Bau stehen und hiesse fuer immer „vor wenigen Minuten".
-  const deployed = proof.deployed ? proof.deployed.iso.slice(0, 10) : null;
   const vorschauen = new Set(previewIds(alle));
   const ziel = getZiel(locale);
   const en = locale === 'en';
@@ -233,12 +226,6 @@ export default async function HomePage(props: { params: Promise<{ locale: string
           <span className="text-text/90">
             {alle.length} {en ? 'works' : 'Arbeiten'}
           </span>
-          {/* Nur anzeigen, wenn die Messung tatsaechlich stattgefunden hat
-              (`reachable`). Eine gruene Zeile aus einem Ausfall der Messkette
-              heraus waere genau die Sorte Behauptung, die diese Seite nicht
-              macht; dann steht hier lieber nichts. Und genannt wird, was
-              gemessen wurde (x von y), nicht ein zusammenfassendes „alles". */}
-          <EndpunkteZeile en={en} />
           {/* Die einzige Zahl auf dieser Seite, die im Browser des Lesers
               entsteht statt hier zu stehen. Wer ihr nicht traut, oeffnet die
               Netzwerkansicht und sieht denselben Aufruf. */}
@@ -319,31 +306,6 @@ export default async function HomePage(props: { params: Promise<{ locale: string
             style={{ animationDelay: `${auftrittTakt(alle.length)}s` }}
           />
 
-          {/* Das Panel `live --watch` steht am Fuss des Feldes und ist
-              selbst eine Zelle, keine Kiste darueber.
-
-              Es fehlte im Entwurf vollstaendig, und von allem, was er
-              gegenueber der laufenden Startseite verlor, war es der groesste
-              Posten: der Zeitstempel der Messung, der Nachpruef-Befehl, die
-              extern gemessene Verfuegbarkeit, „seit 2024", das Alter des
-              letzten Deploys und der Weg zur oeffentlichen Status-Seite. Im
-              Entwurf war davon eine graue Zeile uebrig. Die Zahlen waren aber
-              nie das Argument, ihre Herkunft war es.
-
-              Warum am FUSS und nicht oben: der erste Blick bleibt die
-              Werkliste (Entscheid). Das Feld endet jetzt mit dem Beleg
-              statt mit einer leeren Rasterzelle.
-
-              Es ist dieselbe Komponente, die die vorherige Startseite in
-              ihrer rechten Hero-Spalte trug, nicht eine zweite Fassung davon.
-              Ein Nachbau waere binnen einer Sitzung auseinandergelaufen. */}
-          <LivePanel
-            locale={locale}
-            deployedLabel={deployed}
-            liveUrls={PROOF_PUBLIC_LINKS}
-            huelle="feldpanel"
-            huelleStil={{}}
-          />
         </section>
 
         {/* Der Abschluss des Feldes. Ein Satz zur Sache, danach im

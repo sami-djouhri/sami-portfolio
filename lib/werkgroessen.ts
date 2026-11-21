@@ -104,8 +104,8 @@ export const WERKGROESSEN: Record<string, Werkgroesse> = {
     zahl: '13',
     einheit_de: 'Apps in einer Suite',
     einheit_en: 'apps in one suite',
-    gemessen: '2026-11-08',
-    wie: 'App-Registry der Startflaeche (services/shell-api/app/registry.py) ohne die Startflaeche selbst und ohne die vier Hausdienste medien, wissen, bibliothek und karten. Am 01.11. waren es 10; seither kamen Kontakte, Einkaufsliste und Finanzen dazu.',
+    gemessen: '2026-11-21',
+    wie: 'App-Registry der Startflaeche (services/shell-api/app/registry.py) ohne die Startflaeche selbst und ohne die vier Hausdienste medien, wissen, bibliothek und karten. Am 01.11. waren es 10; seither kamen Kontakte, Einkaufsliste und Finanzen dazu. Eine private App aus derselben Registry zaehlt bewusst nicht mit.',
   },
   homelab: {
     // Bewusst NICHT die Dienstzahl: sie steht seit dem 2026-10-30 nirgends mehr
@@ -136,11 +136,11 @@ export const WERKGROESSEN: Record<string, Werkgroesse> = {
     wie: 'Im Quelltext nachgesehen: nur ueber das eigene VPN erreichbar, Geraete-Paarung mit beidseitigem Zertifikat, Bestaetigung am Geraet vor der Aktion.',
   },
   'homelab-sentinel': {
-    zahl: '12',
-    einheit_de: 'Module im Dienst',
-    einheit_en: 'modules in production',
-    gemessen: '2026-11-13',
-    wie: 'Modulverzeichnis des Bots gezaehlt, ohne die Sammeldatei; alle zwoelf laut Startlog geladen.',
+    zahl: '96',
+    einheit_de: 'Regeln im Event-Bus',
+    einheit_en: 'rules in the event bus',
+    gemessen: '2026-11-20',
+    wie: 'Regeldatei des Event-Bus per YAML geladen und die Liste der Regeln gezaehlt; jede traegt Ruhezeit und Kanal. Vorher 12 Module des Discord-Bots, der am 2026-11-20 abgeloest wurde.',
   },
   marktwatch: {
     zahl: '14',
@@ -193,11 +193,11 @@ export const WERKGROESSEN: Record<string, Werkgroesse> = {
     wie: 'Pruefmodule des Audit-Werkzeugs gezaehlt, ohne die Sammeldatei.',
   },
   'modell-vermittlung': {
-    zahl: '12',
+    zahl: '15',
     einheit_de: 'Modelle unter einer Adresse',
     einheit_en: 'models behind one address',
-    gemessen: '2026-10-17',
-    wie: 'Modell-Liste der Vermittlung gezaehlt, 12 Eintraege mit 12 verschiedenen Namen.',
+    gemessen: '2026-11-15',
+    wie: 'Modell-Liste der Vermittlung gezaehlt, 15 verschiedene Namen; gegen die laufende Konfiguration auf dem Vermittlungs-Wirt gegengeprueft.',
   },
   gartiko: {
     zahl: '101',
@@ -214,11 +214,11 @@ export const WERKGROESSEN: Record<string, Werkgroesse> = {
     wie: 'Zwei Auslieferungen desselben Images, eine davon oeffentlich erreichbar.',
   },
   'edge-hosting': {
-    zahl: '23',
+    zahl: '22',
     einheit_de: 'Container am Netz-Rand',
     einheit_en: 'containers at the edge',
-    gemessen: '2026-11-08',
-    wie: 'Containerliste des oeffentlichen Wirts: 23 laufend, dazu zwei Mail-Domaenen und drei Postfaecher.',
+    gemessen: '2026-11-21',
+    wie: 'Containerliste des oeffentlichen Wirts: 22 laufend (die oeffentliche Statusseite ist am 21.11. entfallen), dazu zwei Mail-Domaenen und drei Postfaecher.',
   },
   'ressourcen-arbiter': {
     // Die Fallstudie sagte „sieben, dazu ein Windows-Lab". Gemessen sind es
@@ -234,10 +234,10 @@ export const WERKGROESSEN: Record<string, Werkgroesse> = {
   finanzen: {
     // Bewusst keine Groesse aus dem Buch (Zahl der Konten, Buchungen, Betraege):
     // jede waere eine Aussage ueber den Haushalt. Gemessen wird der Dienst.
-    zahl: '703',
+    zahl: '792',
     einheit_de: 'Testfunktionen',
     einheit_en: 'test functions',
-    gemessen: '2026-11-08',
+    gemessen: '2026-11-21',
     wie: 'Im Projekt finanzen gezaehlt: grep -rhoE "^\\s*(async )?def test_" tests | wc -l.',
   },
   spielserver: {

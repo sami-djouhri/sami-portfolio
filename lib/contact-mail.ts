@@ -24,6 +24,8 @@ export interface ContactMail {
   email: string;
   subject: string;
   message: string;
+  /** „Lebenslauf anfordern“ angekreuzt: steht im Betreff, damit die Mail ohne Entschlüsseln einzuordnen ist. */
+  lebenslauf?: boolean;
   /**
    * Gesetzt: der Mail-Body trägt NUR diesen PGP-Armor (kein Klartext von
    * Betreff/Name/Nachricht landet im Postfach). Entschlüsselt wird offline mit
@@ -105,7 +107,9 @@ export async function sendContactMail(m: ContactMail): Promise<boolean> {
     await transporter.sendMail({
       from: `djouhri.de <${from}>`,
       to,
-      subject: 'Portfolio-Anfrage (verschlüsselt)',
+      subject: m.lebenslauf
+        ? 'Portfolio-Anfrage, Lebenslauf angefordert (verschlüsselt)'
+        : 'Portfolio-Anfrage (verschlüsselt)',
       text: body,
     });
     return true;
@@ -118,6 +122,7 @@ export async function sendContactMail(m: ContactMail): Promise<boolean> {
     `Name:    ${m.name}`,
     `E-Mail:  ${m.email}`,
     m.subject ? `Betreff: ${m.subject}` : null,
+    m.lebenslauf ? 'Lebenslauf: angefordert' : null,
     '',
     m.message,
   ]
@@ -129,7 +134,7 @@ export async function sendContactMail(m: ContactMail): Promise<boolean> {
     from: `djouhri.de <${from}>`,
     to,
     replyTo: `${safeName} <${m.email}>`,
-    subject: `Portfolio-Anfrage: ${headerSafe(m.subject) || safeName}`,
+    subject: `Portfolio-Anfrage${m.lebenslauf ? ', Lebenslauf angefordert' : ''}: ${headerSafe(m.subject) || safeName}`,
     text,
   });
   return true;

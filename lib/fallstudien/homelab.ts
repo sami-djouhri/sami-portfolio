@@ -1,383 +1,261 @@
-import type { FallstudieAlt } from './typ';
+import type { Fallstudie } from './typ';
 
-// UEBERGANG (Umbau 2026-10-30): die englische Fassung beschreibt eine andere
-// Arbeit als die deutsche und laesst sich nicht Eintrag fuer Eintrag zuordnen.
-// Sie bleibt deshalb unveraendert als eigener Block stehen, bis die Arbeit neu
-// erhoben ist. Dann wird diese Datei in die gepaarte Form umgeschrieben.
-// Gemessen beim Umbau: approach 5/4; Ebene 0: map/core/true,drift/core/true <> tunnel/edge/true,vpn/edge/true; Ebene 1: proxy/edge/false,core/core/false,apps/consumer/false,mgmt/core/true <> map/core/true,spine/core/true,kg/core/true,rules/core/true; Ebene 2: spine/core/true,rules/core/true <> apps/consumer/false,ai/consumer/true,edge/consumer/false; Ebene 3: backup/data/false,drill/data/true <> mon/data/true,backup/data/true,vault/data/false; Pfeile: map>drift/true,drift>core/true,proxy>apps/true,core>spine/false,spine>rules/true,backup>drill/true <> tunnel>apps/true,map>apps/true,spine>rules/true,ai>mon/true
-const homelab: FallstudieAlt = {
-  form: 'uebergang',
-  de: {
-    problem: 'In einem Heimlabor sammeln sich schnell dreißig Container an, jeder mit eigener Compose-Datei, ohne gemeinsame Liste, ohne Härtung, ohne Sicherung. Danach kann niemand mehr sagen, was gerade läuft. Hier ist deshalb eine Dienst-Liste die einzige Quelle, dazu kommen getrennte Netze, Härtung in Etappen und eine Sicherung, die regelmässig zurückgespielt wird.',
-    approach: [
-      'Eine Dienst-Liste ist die einzige Quelle. Jeder neue Dienst geht zuerst dort hinein. Stündlich wird geprüft, ob die Wirte noch dazu passen.',
-      'Härtung in Etappen, jede dokumentiert. Dateisystem nur lesbar, Rechte entzogen, keine Rechteerhöhung, eigene Benutzer je Dienst. Ausnahmen stehen mit Begründung in der Liste.',
-      'Vier Netzzonen mit klaren Regeln, wer wen sieht. Kein Dienst greift direkt auf den Docker-Socket zu, dazwischen steht immer ein Vermittler.',
-      'Meldungen laufen alle über denselben Weg. Mehrere Dienste schreiben auf einen gemeinsamen Nachrichtenbus, ein Regelwerk entscheidet, was mich erreicht, und unterdrückt Wiederholungen.',
-      'Gesichert wird verschlüsselt ausser Haus. Zehn Wirte spielen jede Woche eine Sicherung testweise zurück, an verteilten Tagen, damit sich die Läufe nicht in die Quere kommen.',
-    ],
-    architecture: {
-      summary: 'Eine versionierte Dienst-Liste ist die Quelle für alles: daraus werden Wirte, Zonen und Erwartungen abgeleitet und stündlich gegengeprüft. Die Dienste liegen in vier Netzzonen und erreichen den Docker-Socket nur über Vermittler. Meldungen laufen über einen gemeinsamen Nachrichtenbus an ein Regelwerk, das entscheidet, was ans Telefon geht. Gesichert wird verschlüsselt ausser Haus, mit wöchentlicher Rückspielprobe.',
-      tiers: [
-        {
-          label: 'Quelle',
-          nodes: [
-            {
-              id: 'map',
-              label: 'Dienst-Liste',
-              note: 'versioniert, einzige Quelle',
-              kind: 'core',
-            },
-            {
-              id: 'drift',
-              label: 'Abgleich',
-              note: 'stündlich gegen die Wirte',
-              kind: 'core',
-            },
-          ],
-        },
-        {
-          label: 'Netzzonen',
-          nodes: [
-            {
-              id: 'proxy',
-              label: 'Eingang',
-              kind: 'edge',
-            },
-            {
-              id: 'core',
-              label: 'Kern',
-              kind: 'core',
-            },
-            {
-              id: 'apps',
-              label: 'Anwendungen & Shops',
-              kind: 'consumer',
-            },
-            {
-              id: 'mgmt',
-              label: 'Verwaltung',
-              note: 'nur über Vermittler',
-              kind: 'core',
-            },
-          ],
-        },
-        {
-          label: 'Meldewege',
-          nodes: [
-            {
-              id: 'spine',
-              label: 'Nachrichtenbus',
-              note: 'mehrere Absender',
-              kind: 'core',
-            },
-            {
-              id: 'rules',
-              label: 'Regelwerk',
-              note: 'entscheidet, was ankommt',
-              kind: 'core',
-            },
-          ],
-        },
-        {
-          label: 'Sicherung',
-          nodes: [
-            {
-              id: 'backup',
-              label: 'Verschlüsselt ausser Haus',
-              kind: 'data',
-            },
-            {
-              id: 'drill',
-              label: 'Rückspielprobe',
-              note: 'wöchentlich je Wirt',
-              kind: 'data',
-            },
-          ],
-        },
-      ],
-      flows: [
-        {
-          from: 'map',
-          to: 'drift',
-          label: 'Soll',
-        },
-        {
-          from: 'drift',
-          to: 'core',
-          label: 'gemessen',
-        },
-        {
-          from: 'proxy',
-          to: 'apps',
-          label: 'von außen',
-        },
-        {
-          from: 'core',
-          to: 'spine',
-        },
-        {
-          from: 'spine',
-          to: 'rules',
-          label: 'Absender → Regel',
-        },
-        {
-          from: 'backup',
-          to: 'drill',
-          label: 'wird zurückgespielt',
-        },
-      ],
+// Neu erhoben und gepaart am 2026-11-15 (vorher Uebergangsform). Beide alten
+// Haelften waren an mehreren Stellen ueberholt: Abgleich „stuendlich“ (laeuft
+// alle 15 min mit Alarm je Klasse), ein Edge-Wirt in den Kennzahlen (stillgelegt),
+// „alles an einem Ort“ (die oeffentliche Seite und die Spielserver laufen auf
+// gemieteten Servern), englisch „restore drilled quarterly“ (woechentlich).
+// Haertung, Zonen und Anmeldung erzaehlt `defense-in-depth`; hier steht der
+// Betrieb: Liste, Abgleich, Meldeweg, Sicherung.
+//
+// Messbefehle (Stand 2026-11-15):
+// - Abgleich: interne Notiz (Timer OnUnitActiveSec=15min),
+//   Metrik dienst-soll-ist.prom: soll_laeuft_nicht je Klasse 0, bewusst_aus mit
+//   erwartetem Zustand; Regeln CORE/OPS critical, Rest warning; Metrik
+//   abgleich_vollstaendig fuer den Fall, dass ein Wirt nicht antwortet.
+// - Meldeweg: meldeweg-probe (alle 6 h, Herzschlag 2 h alt), Gegenrichtung
+//   meldeweg2-probe; alarm-lebendtest; prometheus-totmann (5 min, healthchecks).
+// - Zweiter Beobachter: eigener Gast auf einem Cluster-Knoten, Alarm ueber
+//   ntfy.sh ausserhalb des Hauses (Host-Referenz, Abschnitt Hosts).
+// - Chaos-Probe: chaos-drill (Di 03:40, nur INTERNAL), letzter Lauf ok.
+// - Sicherung: restore-drill `ausrollen.py --pruefen`: 10 mit Probe, Laptop
+//   begruendet uebersprungen; DB-Rotation live auf 9 Wirten (Memory
+//   interne Notiz). Wiederaufbau-Probe noch nicht
+//   eingerichtet, deshalb nicht auf der Seite.
+// - Image-Spiegel: image_spiegel.prom, Herzschlag 13 h; amd64-Wirte fehlen
+//   noch (README image-spiegel, Abschnitt Grenzen).
+// - Wirte: Einplatinenrechner, x86-Cluster, zwei gemietete Server (Seite und
+//   Spiele). Bewusst ohne Zahl (ZIELBILD 3.4).
+//
+// Keine Dienst- oder Wirtezahl, keine internen Namen.
+const homelab: Fallstudie = {
+  problem: {
+    de: 'In einem Heimlabor sammeln sich schnell dreißig Container an, jeder mit eigener Compose-Datei, ohne gemeinsame Liste und ohne Sicherung. Danach kann niemand mehr sagen, was gerade laufen sollte, und ein Dienst, der still steht, fällt erst auf, wenn man ihn braucht. Hier gibt es deshalb eine Liste als einzige Quelle, einen Abgleich, der alle 15 Minuten gegen die Rechner misst, einen Meldeweg, der sich selbst prüft, und eine Sicherung, die jede Woche zurückgespielt wird.',
+    en: 'A home lab quickly collects thirty containers, each with its own compose file, no shared list and no backup. After that nobody can say what is supposed to be running, and a service that has quietly stopped only shows up when you need it. So here there is one list as the single source, a check that measures the machines against it every 15 minutes, an alert path that tests itself, and a backup that is restored every week.',
+  },
+  approach: [
+    {
+      de: 'Eine versionierte Liste sagt für jeden Dienst, auf welchem Rechner er läuft, zu welcher Klasse er gehört und ob er laufen soll. Ein neuer Dienst geht zuerst dort hinein. „Bewusst aus“ ist ein eigener Zustand, damit ein abgeschalteter Dienst nicht als Fehler gilt.',
+      en: 'A versioned list states for every service which machine it runs on, which class it belongs to and whether it should be running. A new service goes in there first. "Deliberately off" is a state of its own, so a service that was switched off does not count as a failure.',
     },
-    result: [
-      'Die Dienste laufen über mehrere Wirte und werden gegen die Liste gemessen. Die dritte Härtungs-Etappe ist durch.',
-      'Neben den kleinen Einplatinen-Rechnern steht inzwischen ein kleiner x86-Cluster. Mehrere KI-Dienste sind dorthin umgezogen, und die Liste blieb dabei die Quelle, gegen die gemessen wird.',
-      'Eine Suche greift auf mehrere Wissensquellen im Haus zu. Eine aktive Probe meldet öffentliche Adressen, die ausfallen, bevor es jemand merkt.',
-      'Die Sicherung liegt verschlüsselt ausser Haus. Zehn Wirte spielen sie jede Woche testweise zurück, der Wiederanlauf steht schriftlich mit Zeitvorgaben.',
+    {
+      de: 'Alle 15 Minuten fragt ein Abgleich jeden Rechner, was dort läuft, und vergleicht das mit der Liste. Fehlt ein Dienst aus dem Kern, etwa die Hausautomation oder der Git-Server, ist das ein dringender Alarm. Bei anderen Diensten ist es eine Warnung. Antwortet ein Rechner nicht, meldet der Abgleich das als eigenen Befund.',
+      en: 'Every 15 minutes a check asks each machine what is running there and compares it with the list. If a core service is missing, such as home automation or the Git server, that is an urgent alert. For other services it is a warning. If a machine does not answer, the check reports that as a finding of its own.',
+    },
+    {
+      de: 'Meldungen laufen alle über denselben Weg. Dienste schreiben auf einen MQTT-Bus, ein Regelwerk entscheidet, was mich erreicht, und dämpft Wiederholungen je Dienst.',
+      en: 'All alerts take the same path. Services write to an MQTT bus, a rule engine decides what reaches me and damps repeats per service.',
+    },
+    {
+      de: 'Der Meldeweg wird selbst geprüft. Alle sechs Stunden geht eine Probe-Nachricht durch die ganze Kette und wird am Ende gesucht. Steht Prometheus, schlägt ein Totmannschalter an. Ein zweiter Beobachter auf einem anderen Rechner sieht von außen zu und meldet über einen Dienst außerhalb des Hauses.',
+      en: 'The alert path is tested itself. Every six hours a probe message goes through the whole chain and is looked for at the end. If Prometheus stops, a dead man\'s switch goes off. A second observer on another machine watches from outside and alerts through a service outside the house.',
+    },
+    {
+      de: 'Einmal pro Woche bekommt ein unkritischer Dienst ein Signal zum Beenden. Gemessen wird, ob er von selbst zurückkommt und wieder gesund ist.',
+      en: 'Once a week a non-critical service gets a signal to shut down. What gets measured is whether it comes back on its own and is healthy again.',
+    },
+    {
+      de: 'Jeder Rechner sichert verschlüsselt mit restic außer Haus, und jede Woche wird je Sicherung eine Probe zurückgespielt. Auf fast allen Rechnern prüft sie seit November auch Datenbankkopien aus der Sicherung, die am längsten ungeprüfte zuerst.',
+      en: 'Every machine backs up encrypted with restic outside the house, and every week a sample is restored from each backup. On almost all machines it has also checked database copies from the backup since November, the one left unchecked the longest first.',
+    },
+    {
+      de: 'Jede Nacht kommen die Images der laufenden Container in eine Registry im Haus. Muss ein Rechner ohne Internet neu aufgesetzt werden, liegt dort das Image, das gestern lief.',
+      en: 'Every night the images of the running containers go into a registry in the house. If a machine has to be rebuilt without internet, the image that ran yesterday is there.',
+    },
+  ],
+  architecture: {
+    summary: {
+      de: 'Eine versionierte Liste ist das Soll. Der Abgleich misst alle 15 Minuten die Rechner dagegen und meldet Abweichungen über den gemeinsamen Bus an ein Regelwerk, das entscheidet, was ans Handy geht. Ein zweiter Beobachter sieht von außen zu und hat seinen eigenen Weg nach draußen. Darunter liegen die Sicherung außer Haus mit wöchentlicher Rückspielprobe und ein Image-Spiegel im Haus.',
+      en: 'A versioned list is the target state. The check measures the machines against it every 15 minutes and reports differences over the shared bus to a rule engine that decides what goes to my phone. A second observer watches from outside and has its own path out. Underneath are the off-site backup with a weekly restore drill and an image mirror inside the house.',
+    },
+    tiers: [
+      {
+        label: { de: 'Soll', en: 'Target' },
+        nodes: [
+          {
+            id: 'liste',
+            label: { de: 'Dienst-Liste', en: 'Service list' },
+            note: { de: 'versioniert, einzige Quelle', en: 'versioned, single source' },
+            kind: 'core',
+          },
+          {
+            id: 'abgleich',
+            label: { de: 'Abgleich', en: 'Check' },
+            note: { de: 'alle 15 Minuten', en: 'every 15 minutes' },
+            kind: 'core',
+          },
+        ],
+      },
+      {
+        label: { de: 'Rechner', en: 'Machines' },
+        nodes: [
+          {
+            id: 'heim',
+            label: { de: 'Rechner im Haus', en: 'Machines at home' },
+            note: { de: 'Einplatinenrechner · x86-Cluster', en: 'single-board · x86 cluster' },
+            kind: 'consumer',
+          },
+          {
+            id: 'miete',
+            label: { de: 'Gemietete Server', en: 'Rented servers' },
+            note: { de: 'öffentliche Seite · Spiele', en: 'public site · games' },
+            kind: 'edge',
+          },
+        ],
+      },
+      {
+        label: { de: 'Meldeweg', en: 'Alert path' },
+        nodes: [
+          {
+            id: 'bus',
+            label: { de: 'Nachrichtenbus', en: 'Message bus' },
+            note: { de: 'MQTT', en: 'MQTT' },
+            kind: 'core',
+          },
+          {
+            id: 'regeln',
+            label: { de: 'Regelwerk', en: 'Rule engine' },
+            note: { de: 'entscheidet, was ankommt', en: 'decides what arrives' },
+            kind: 'core',
+          },
+          {
+            id: 'zweiter',
+            label: { de: 'Zweiter Beobachter', en: 'Second observer' },
+            note: { de: 'eigener Weg nach draußen', en: 'own path out' },
+            kind: 'core',
+          },
+        ],
+      },
+      {
+        label: { de: 'Sicherung', en: 'Backup' },
+        nodes: [
+          {
+            id: 'backup',
+            label: { de: 'Verschlüsselt außer Haus', en: 'Encrypted off-site' },
+            kind: 'data',
+          },
+          {
+            id: 'probe',
+            label: { de: 'Rückspielprobe', en: 'Restore drill' },
+            note: { de: 'jede Woche', en: 'every week' },
+            kind: 'data',
+          },
+          {
+            id: 'spiegel',
+            label: { de: 'Image-Spiegel', en: 'Image mirror' },
+            note: { de: 'im Haus', en: 'in the house' },
+            kind: 'data',
+          },
+        ],
+      },
     ],
-    decisions: [
-      {
-        title: 'Kein Service-Mesh',
-        body: 'Für ein Heimnetz ist das zu viel Maschinerie. Reverse-Proxy, Tunnel, VPN und getrennte Netze reichen aus, und ich kann jedes davon einzeln erklären.',
-      },
-      {
-        title: 'Härtung in Etappen statt auf einmal',
-        body: 'Jede Etappe nimmt sich eine klar abgegrenzte Gruppe von Diensten vor. Dauerhafte Ausnahmen, etwa bei Images, die sich nicht anders betreiben lassen, stehen dokumentiert in der Liste.',
-      },
-      {
-        title: 'Ein Weg für alle Meldungen',
-        body: 'Jedem Dienst eigene Benachrichtigungen beizubringen, hätte sich nicht gelohnt. Alles läuft über denselben Bus an ein Regelwerk. Wiederholungen und Ruhezeiten sind damit an einer Stelle einstellbar.',
-      },
-    ],
-    metrics: [
-      {
-        label: 'Rückspielprobe',
-        value: '10 Wirte, jede Woche',
-      },
-      {
-        label: 'Härtungs-Etappen',
-        value: '3 abgeschlossen',
-      },
-      {
-        label: 'Wirte',
-        value: 'Steuerung · Öffentlich · KI · Edge · 3 x86',
-      },
-    ],
-    timeline: [
-      {
-        when: '2024',
-        what: 'Erste Rechner, erste Container',
-      },
-      {
-        when: '2025',
-        what: 'Dienst-Liste, Härtung Etappe 1 und 2, Netzzonen',
-      },
-      {
-        when: '2026 H1',
-        what: 'Etappe 3, gemeinsamer Meldeweg, Wissenssuche, aktive Probe von außen',
-      },
-      {
-        when: '2026 H1',
-        what: 'x86-Cluster dazu, KI-Dienste verlagert',
-      },
-      {
-        when: '2026 H2',
-        what: 'Lokale KI ausgebaut, eigener Knoten für Sprache',
-      },
-    ],
-    // „Der Betrieb hängt an einer Person …" ist am 2026-10-21 entfallen,
-    // siehe Begründung bei `saganta`.
-    limits: [
-      'Alles steht an einem Ort an einem Hausanschluss. Es gibt keinen zweiten Standort und keine automatische Umschaltung. Fällt der Anschluss aus, greift der schriftliche Wiederanlauf.',
-      'Die Last ist echt, aber überschaubar: ein Haushalt, keine hunderten gleichzeitigen Nutzer. Gebaut ist das auf Wartbarkeit und Härtung, nicht auf Lastspitzen.',
+    flows: [
+      { from: 'liste', to: 'abgleich', label: { de: 'Soll', en: 'target' } },
+      { from: 'abgleich', to: 'heim', label: { de: 'misst', en: 'measures' } },
+      { from: 'abgleich', to: 'bus', label: { de: 'Abweichung', en: 'difference' } },
+      { from: 'bus', to: 'regeln' },
+      { from: 'zweiter', to: 'heim', label: { de: 'sieht von außen zu', en: 'watches from outside' } },
+      { from: 'backup', to: 'probe', label: { de: 'wird zurückgespielt', en: 'is restored' } },
     ],
   },
-  enAlt: {
-    problem: 'Home labs drift into tinkering debt: 30 containers, each with its own compose, no shared map, no hardening, no backups. The moment someone asks "what is actually running right now", a hole opens up. I wanted the opposite: inventory, network segmentation, hardening waves and a provable DR plan.',
-    approach: [
-      'A service map as the single source of truth. Every compose definition goes in there first and nowhere else, and cross-host drift is pulled hourly against Gitea.',
-      'Container hardening in documented waves: read_only, dropped capabilities, no-new-privileges, separate user IDs. Exceptions get justified, not hidden.',
-      'Four network zones (proxy, core, apps, mgmt) with clear rules about who sees whom. No direct Docker socket access for consumers; everything goes through socket proxies.',
-      'An event spine of its own: several producers (search, alerts, deals, mail, mailbox) write into one central MQTT bus, and brain-bus rules triage the alerts with dedup and cooldown.',
-    ],
-    architecture: {
-      summary: 'Access comes in over tunnel and VPN to the control plane, which as the single source of truth drives the runtime hosts. An event spine gathers every producer, and an ops layer of monitoring, off-site backup and secret vault runs crosswise underneath.',
-      tiers: [
-        {
-          label: 'Access',
-          nodes: [
-            {
-              id: 'tunnel',
-              label: 'Reverse tunnel',
-              note: 'public ingress',
-              kind: 'edge',
-            },
-            {
-              id: 'vpn',
-              label: 'VPN',
-              note: 'admin-only',
-              kind: 'edge',
-            },
-          ],
-        },
-        {
-          label: 'Control plane',
-          nodes: [
-            {
-              id: 'map',
-              label: 'Service map',
-              note: 'single source of truth',
-              kind: 'core',
-            },
-            {
-              id: 'spine',
-              label: 'Event spine',
-              note: 'MQTT bus',
-              kind: 'core',
-            },
-            {
-              id: 'kg',
-              label: 'Knowledge gateway',
-              note: 'adapters',
-              kind: 'core',
-            },
-            {
-              id: 'rules',
-              label: 'Alert rules',
-              note: 'dedup · cooldown',
-              kind: 'core',
-            },
-          ],
-        },
-        {
-          label: 'Runtime',
-          nodes: [
-            {
-              id: 'apps',
-              label: 'Public apps & shops',
-              kind: 'consumer',
-            },
-            {
-              id: 'ai',
-              label: 'AI compute',
-              note: 'local models · 4-tier router',
-              kind: 'consumer',
-            },
-            {
-              id: 'edge',
-              label: 'Edge inference',
-              kind: 'consumer',
-            },
-          ],
-        },
-        {
-          label: 'Ops layer',
-          nodes: [
-            {
-              id: 'mon',
-              label: 'Monitoring',
-              note: 'Prometheus · Grafana · Blackbox',
-              kind: 'data',
-            },
-            {
-              id: 'backup',
-              label: 'Off-site backup',
-              note: 'encrypted, DR runbook',
-              kind: 'data',
-            },
-            {
-              id: 'vault',
-              label: 'Secret vault',
-              kind: 'data',
-            },
-          ],
-        },
-      ],
-      flows: [
-        {
-          from: 'tunnel',
-          to: 'apps',
-          label: 'public apps only',
-        },
-        {
-          from: 'map',
-          to: 'apps',
-          label: 'compose definition',
-        },
-        {
-          from: 'spine',
-          to: 'rules',
-          label: 'producer → triage',
-        },
-        {
-          from: 'ai',
-          to: 'mon',
-          label: 'scrape',
-        },
-      ],
+  result: [
+    {
+      de: 'Die Dienste laufen auf Einplatinenrechnern, einem kleinen x86-Cluster und zwei gemieteten Servern. Alle stehen in derselben Liste und werden gegen sie gemessen.',
+      en: 'The services run on single-board computers, a small x86 cluster and two rented servers. All of them are in the same list and are measured against it.',
     },
-    result: [
-      'The services run across the host fleet and are measured against the canonical source. Hardening wave 3 is complete.',
-      'The cluster now includes a small x86 virtualization cluster alongside the original single-board nodes; several AI services, among them a larger local language model as a quality lane, were relocated there, and the service map stayed the source everything is measured against.',
-      'The knowledge gateway searches several curated knowledge sources, and an active route probe flags public domains about to tip over before anyone notices.',
-      'A DR runbook with an RTO/RPO matrix, encrypted off-site backup live, and a restore drill that runs automatically on a schedule.',
-    ],
-    decisions: [
-      {
-        title: 'Why there is no service mesh',
-        body: 'Linkerd or Istio are overkill for a home setup. A reverse proxy, tunnels, VPN and segmented compose networks do exactly what is needed.',
+    {
+      de: 'Seit Oktober misst der Abgleich alle 15 Minuten statt einmal pro Stunde, und er alarmiert nach Klasse. Ein Rechner, der nicht antwortet, kann nicht mehr als „alles in Ordnung“ durchgehen.',
+      en: 'Since October the check runs every 15 minutes instead of once an hour, and it alerts by class. A machine that does not answer can no longer pass as "all fine".',
+    },
+    {
+      de: 'Kommt die Probe-Nachricht nicht an oder steht Prometheus, meldet sich ein anderer Weg.',
+      en: 'If the probe message does not arrive or Prometheus stops, a different path reports it.',
+    },
+    {
+      de: 'Jede Sicherung bis auf die des Laptops wird jede Woche zurückgespielt. Der Laptop ist meist aus, für ihn liegt ein Timer bereit, der den verpassten Lauf beim nächsten Start nachholt.',
+      en: 'Every backup except the laptop\'s is restored every week. The laptop is mostly off; a timer that catches up on the missed run at the next start is ready for it.',
+    },
+  ],
+  decisions: [
+    {
+      title: { de: 'Kein Service-Mesh', en: 'No service mesh' },
+      body: {
+        de: 'Für ein Heimnetz ist das zu viel Maschinerie. Reverse-Proxy, Tunnel, VPN und getrennte Netze reichen aus, und ich kann jedes davon einzeln erklären.',
+        en: 'For a home network that is too much machinery. Reverse proxy, tunnel, VPN and separate networks are enough, and I can explain each of them on its own.',
       },
-      {
-        title: 'Hardening in waves, not one big bang',
-        body: 'Each wave takes on one clearly bounded class of container. Exceptions like s6-overlay images or Tecnativa socket proxies are written down as permanent exceptions.',
+    },
+    {
+      title: { de: 'Die Klasse steht in der Liste, nicht in der Alarmregel', en: 'The class lives in the list, not in the alert rule' },
+      body: {
+        de: 'Ob ein fehlender Dienst mich weckt oder nur eine Warnung ist, hängt an seiner Klasse in der Liste. Die Alternative wäre eine Namensliste in der Alarmregel gewesen. Die müsste bei jedem neuen Kerndienst von Hand nachgezogen werden.',
+        en: 'Whether a missing service wakes me up or is only a warning depends on its class in the list. The alternative would have been a list of names in the alert rule. It would have to be updated by hand for every new core service.',
       },
-      {
-        title: 'Brain-bus for alerts',
-        body: 'Teaching each service its own push channel would not have paid off. Everything flows through MQTT → brain-bus rules → ntfy/Discord. Dedup and cooldown live in one place.',
+    },
+    {
+      title: { de: 'Den Meldeweg selbst prüfen', en: 'Testing the alert path itself' },
+      body: {
+        de: 'Wenn nichts kommt, heißt das entweder „alles ruhig“ oder „der Meldeweg ist tot“. Die zweite Lesart fällt niemandem auf, weil die Meldung darüber denselben Weg nehmen müsste. Deshalb geht regelmäßig eine echte Nachricht durch die Kette, und ein zweiter Weg prüft den ersten.',
+        en: 'When nothing arrives, that means either "all quiet" or "the alert path is dead". The second reading goes unnoticed, because the alert about it would have to take the same path. So a real message goes through the chain at regular intervals, and a second path checks the first.',
       },
-    ],
-    metrics: [
-      {
-        label: 'Restore',
-        value: 'drilled quarterly, compared byte for byte',
+    },
+    {
+      title: { de: 'Ein Weg für alle Meldungen', en: 'One path for all alerts' },
+      body: {
+        de: 'Jedem Dienst eigene Benachrichtigungen beizubringen, hätte sich nicht gelohnt. Alles läuft über denselben Bus an ein Regelwerk. Wiederholungen und Ruhezeiten sind damit an einer Stelle einstellbar.',
+        en: 'Teaching every service its own notifications would not have paid off. Everything goes over the same bus to one rule engine. Repeats and quiet periods can be set in one place.',
       },
-      {
-        label: 'Hardening waves',
-        value: '3 complete',
-      },
-      {
-        label: 'Hosts',
-        value: 'control plane · public · AI · edge · 3× x86',
-      },
-    ],
-    timeline: [
-      {
-        when: '2024',
-        what: 'Cluster bring-up, first containers',
-      },
-      {
-        when: '2025',
-        what: 'Service map, hardening waves 1 and 2, network zones',
-      },
-      {
-        when: '2026 H1',
-        what: 'Wave 3, event spine, knowledge gateway, active route probe',
-      },
-      {
-        when: '2026 H1',
-        what: 'x86 cluster added, AI services moved there',
-      },
-      {
-        when: '2026 H2',
-        what: 'Local AI layer deepened: larger language model as a quality lane, dedicated voice node',
-      },
-    ],
-    // „Operations rest on one person …" was dropped on 2026-10-21, see the
-    // note in the German file under `saganta`.
-    limits: [
-      'Everything sits at a single site on one home connection. There is no geo-redundancy and no automatic failover, if the line goes down the documented recovery kicks in, not a second site.',
-      'The load is real but modest: one household, not hundreds of concurrent users. The architecture is built for maintainability and hardening, not for the load spikes that would justify a cluster scheduler like Kubernetes.',
-    ],
-  },
+    },
+  ],
+  metrics: [
+    {
+      label: { de: 'Abgleich gegen die Liste', en: 'Check against the list' },
+      value: { de: 'alle 15 Minuten', en: 'every 15 minutes' },
+    },
+    {
+      label: { de: 'Probe des Meldewegs', en: 'Alert path probe' },
+      value: { de: 'alle 6 Stunden', en: 'every 6 hours' },
+    },
+    {
+      label: { de: 'Rückspielprobe', en: 'Restore drill' },
+      value: { de: 'jede Woche je Sicherung', en: 'every week per backup' },
+    },
+  ],
+  timeline: [
+    {
+      when: { de: '2024', en: '2024' },
+      what: { de: 'Erste Rechner, erste Container', en: 'First machines, first containers' },
+    },
+    {
+      when: { de: '2025', en: '2025' },
+      what: { de: 'Dienst-Liste, Härtung in Etappen, Netzzonen', en: 'Service list, hardening in stages, network zones' },
+    },
+    {
+      when: { de: '2026 H1', en: '2026 H1' },
+      what: { de: 'Gemeinsamer Meldeweg, x86-Cluster, erster gemieteter Server für die öffentliche Seite', en: 'Shared alert path, x86 cluster, first rented server for the public site' },
+    },
+    {
+      when: { de: '2026 H2', en: '2026 H2' },
+      what: { de: 'Spielserver auf eigenem Server, Rückspielprobe und Probe des Meldewegs, zweiter Beobachter', en: 'Game servers on their own server, restore drill and alert path probe, second observer' },
+    },
+    {
+      when: { de: 'Okt./Nov. 2026', en: 'Oct/Nov 2026' },
+      what: { de: 'Abgleich alle 15 Minuten, Totmannschalter für Prometheus, Image-Spiegel, Datenbanken in der Rückspielprobe', en: 'Check every 15 minutes, dead man\'s switch for Prometheus, image mirror, databases in the restore drill' },
+    },
+  ],
+  limits: [
+    {
+      de: 'Die Dienste im Haus hängen an einem Hausanschluss. Es gibt keinen zweiten Standort und keine automatische Umschaltung. Nur die öffentliche Seite und die Spielserver laufen auf gemieteten Servern.',
+      en: 'The services at home depend on one home connection. There is no second site and no automatic failover. Only the public site and the game servers run on rented servers.',
+    },
+    {
+      de: 'Der Image-Spiegel steht im selben Haus wie die Rechner, und die x86-Rechner und die gemieteten Server legen dort noch nichts ab.',
+      en: 'The image mirror is in the same house as the machines, and the x86 machines and the rented servers do not store anything there yet.',
+    },
+    {
+      de: 'Die Last ist echt, aber überschaubar: ein Haushalt, keine hunderten gleichzeitigen Nutzer. Gebaut ist das auf Wartbarkeit und Härtung, nicht auf Lastspitzen.',
+      en: 'The load is real but modest: one household, not hundreds of concurrent users. It is built for maintainability and hardening, not for load peaks.',
+    },
+  ],
 };
 
 export default homelab;

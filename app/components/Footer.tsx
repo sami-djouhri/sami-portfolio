@@ -52,7 +52,6 @@ export function Footer({ locale }: { locale: Locale }) {
 
   const navigation: FooterLink[] = [
     { href: localePath(locale, '/projekte'), label: t(locale, 'nav.projekte') },
-    { href: localePath(locale, '/uber-mich'), label: t(locale, 'nav.uber') },
     { href: localePath(locale, '/toolbox'), label: t(locale, 'nav.toolbox') },
     // „Jetzt" (Aktueller Fokus) ist am 2026-10-15 entfallen, Entscheid
     // vom 06.10.: die Seite veraltet still. Die sechs Punkte, die dort standen,
@@ -181,9 +180,12 @@ function FooterCol({
         {links.map((link) => (
           <li key={link.href}>
             {/* Absolute Ziele verlassen die Seite und bekommen deshalb ein echtes
-                <a> mit rel/target statt des Router-Links. Interne Sonderrouten
-                (PDF des Lebenslaufs, /feed.xml) sind zwar auch `external: true`, bleiben aber
-                same-origin und laufen weiter über Link. */}
+                <a> mit rel/target statt des Router-Links. Interne Dateien
+                (`external: true`, etwa security.txt oder das PDF des Lebenslaufs)
+                bekommen ein schlichtes <a> ohne target: als Link holte der Router
+                sie seit dem statischen Export auf jeder Seite als RSC-Route vor
+                (`/.well-known/security.txt/__next._tree.txt`), und jede dieser
+                Vorabfragen endete in einer 404 (im Browser gemessen 2026-11-21). */}
             {/^https?:\/\//.test(link.href) ? (
               <a
                 href={link.href}
@@ -195,6 +197,10 @@ function FooterCol({
                 <span aria-hidden className="ml-1 text-muted-dim">
                   ↗
                 </span>
+              </a>
+            ) : link.external ? (
+              <a href={link.href} className="link-underline text-text/85 hover:text-accent">
+                {link.label}
               </a>
             ) : (
               <Link href={link.href} className="link-underline text-text/85 hover:text-accent">

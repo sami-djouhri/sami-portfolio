@@ -199,7 +199,7 @@ export const PROJECTS: Project[] = [
     // Startseite rendern sie als Featured-Karte direkt untereinander: derselbe
     // Satz zweimal, zwei Zeilen auseinander.
     description:
-      'Verteilt auf mehrere kleine Rechner und einen Virtualisierungs-Cluster. Welcher Dienst wo laufen soll, steht in einer einzigen Datei; ein Abgleich meldet mir jeden Container, der davon abweicht. Die Dienste reden über einen gemeinsamen Event-Bus miteinander, und eine Routen-Probe schlägt an, wenn eine öffentliche Domain nicht mehr antwortet. Die Container laufen ohne Root und mit read-only Dateisystem, das Netz ist in Zonen geschnitten.',
+      'Verteilt auf mehrere kleine Rechner, einen Virtualisierungs-Cluster und zwei gemietete Server. Welcher Dienst wo laufen soll, steht in einer einzigen Datei. Ein Abgleich misst alle 15 Minuten dagegen und meldet jeden Dienst, der fehlt. Meldungen laufen über einen gemeinsamen Event-Bus, und der Meldeweg wird selbst geprüft. Die Sicherungen werden jede Woche testweise zurückgespielt.',
     role: 'Aufbau, Design, Betrieb, On-Call',
     year: 'seit 2024',
     highlight: 'Jeder Dienst steht in einer versionierten Service-Map, gegen die der Ist-Zustand gemessen wird',
@@ -253,14 +253,14 @@ export const PROJECTS: Project[] = [
   {
     id: 'homelab-sentinel',
     title: 'Homelab-Sentinel',
-    tagline: 'Ein Discord-Bot als Bereitschaftsdienst fürs Homelab.',
+    tagline: 'Ein eigener Meldeweg als Bereitschaftsdienst fürs Homelab.',
     description:
-      'Ein Discord-Bot ist mein Bereitschaftsdienst fürs Homelab. Er meldet Container-Health und Alarme aus dem hauseigenen Event-Bus dorthin, wo ich ohnehin schon bin. Neue Prüfungen kommen als getrennte Module dazu. So kann ich beispielsweise Backups, VPN-Verbindungen, Updates oder fehlgeschlagene Dienste überwachen, ohne für jede neue Prüfung den restlichen Bot umzubauen.',
+      'Das Homelab meldet sich von selbst, wenn etwas zu tun ist. Alarme und Skripte laufen über einen eigenen Event-Bus. Regeln legen Dringlichkeit und Ruhezeit fest, zugestellt wird über ntfy aufs Handy. Eingriffe wie ein Container-Neustart warten als Freigabe in Tardis. Bis November 2026 war das ein Discord-Bot.',
     role: 'Konzept, Aufbau, Event-Anbindung',
     year: 'seit 2026',
-    highlight: 'Jede Prüfung ein eigenes Modul, der Kern bleibt unangetastet',
-    stack: ['Python', 'discord.py', 'Prometheus', 'MQTT'],
-    domain: 'Bots',
+    highlight: 'Jede Meldung über eine Regel, jeder Eingriff erst nach Freigabe',
+    stack: ['Python', 'MQTT', 'ntfy', 'Prometheus'],
+    domain: 'Infra',
     status: 'live',
   },
   {
@@ -519,15 +519,15 @@ export const PROJECTS: Project[] = [
     stack: ['Caddy', 'Docker', 'Mailserver', 'Debian', 'Off-Site'],
     domain: 'Infra',
     status: 'live',
-    // Öffentlicher Beweis der Edge-Zone: die extern gehostete Status-Seite.
-    href: 'https://status.djouhri.de',
+    // Kein href: die Status-Seite war bis 2026-11-21 der öffentliche Beleg der
+    // Edge-Zone und ist seitdem nicht mehr öffentlich (der Wächter alarmiert nur).
     repos: [
       {
         url: 'https://github.com/sami-djouhri/netcup-sentinel',
         label: 'Netcup-Sentinel (externer Wächter)',
         labelEn: 'Netcup Sentinel (external watcher)',
-        note: 'Externer Wächter auf einem Off-Site-Server: Uptime-Monitoring, Status-Seite, Backup-Verifikation und ein Dead-Man-Switch fürs Heimnetz.',
-        noteEn: 'External watchdog on an off-site VPS: uptime monitoring, status page, backup verification and a dead-man switch for the home lab.',
+        note: 'Externer Wächter auf einem Off-Site-Server: Uptime-Monitoring mit Alarm, Backup-Verifikation und ein Dead-Man-Switch fürs Heimnetz.',
+        noteEn: 'External watchdog on an off-site VPS: uptime monitoring with alerts, backup verification and a dead-man switch for the home lab.',
       },
     ],
   },
@@ -610,7 +610,7 @@ const PROJECTS_TEXT_EN: Record<
   homelab: {
     tagline: 'Self-run services across several hosts, in continuous operation since 2024.',
     description:
-      'The services run at my home around the clock, from mail through search and automation to AI inference, spread across several hosts. Every change originates from a single source of truth. An event spine connects the services to each other, and a route probe tells me about public domains that are failing before I notice myself. The networks are segmented, the containers hardened, the state documented. New hosts and domains arrive in a controlled way.',
+      'Spread across several small computers, a virtualization cluster and two rented servers. Which service should run where is written in a single file. A check measures against it every 15 minutes and reports every service that is missing. Alerts travel over a shared event bus, and the alert path itself is tested. The backups are restored as a test every week.',
     highlight: 'Every service is listed in a version-controlled service map, and the live state is measured against it',
     role: 'Build, design, operations, on-call',
   },
@@ -630,10 +630,10 @@ const PROJECTS_TEXT_EN: Record<
     role: 'Concept, build-out, security model',
   },
   'homelab-sentinel': {
-    tagline: 'A personal on-call for my homelab, a watcher set that grows with it.',
+    tagline: 'An own alert path as on-call duty for the homelab.',
     description:
-      'A Discord bot is my on-call duty for the homelab: it reports container health, backup status, available updates, alerts from the in-house event bus, security-audit nudges and the state of the VPN connections, right where I already am. Every new worry gets its own encapsulated building block without touching the core. So the watcher set grows exactly with what the infrastructure learns about itself.',
-    highlight: 'Modular watcher architecture, extensible block by block',
+      'The homelab reports on its own when there is something to do. Alerts and scripts go through an own event bus. Rules set urgency and a quiet period, and delivery goes through ntfy to the phone. Interventions such as a container restart wait as an approval in Tardis. Until November 2026 this was a Discord bot.',
+    highlight: 'Every message through a rule, every intervention only after approval',
     role: 'Concept, build-out, event wiring',
   },
   marktwatch: {
@@ -876,34 +876,8 @@ export const STACK: StackCategory[] = [
   },
 ];
 
-export interface Principle {
-  title: string;
-  body: string;
-}
-
-export const PRINCIPLES: Principle[] = [
-  // Dieses Prinzip trug bis 2026-08-27 dasselbe Argument wie ABOUT.bio auf der
-  // Startseite („kleiner selbst gebaut schlaegt gross gemietet“), und stand auf
-  // /uber-mich zwei Zentimeter unter einem Absatz, der es ein drittes Mal sagte.
-  // Ein Prinzip soll die BETRIEBLICHE Konsequenz nennen, nicht die These
-  // wiederholen: wer selbst baut, hat auch die Reparaturpflicht.
-  {
-    title: 'Eigene Systeme',
-    body: 'Wer selbst baut, betreibt auch selbst, nachts und im Fehlerfall. Deshalb kommt nichts herein, das ich im Zweifel nicht auseinandernehmen kann. Das begrenzt den Umfang, und genau so ist es gemeint.',
-  },
-  {
-    title: 'Sicherheit als Standard',
-    body: 'Read-only Container, gedroppte Capabilities, segmentierte Netze, kein direkter Docker-Socket. Härtung passiert in Wellen, dokumentiert pro Ausnahme.',
-  },
-  {
-    title: 'Keine Platzhalter-Daten',
-    body: 'Wenn eine Oberfläche nichts anzuzeigen hat, zeigt sie das auch so an. Ein Demo-Datensatz, der aussieht wie ein echter, kostet mich beim nächsten Fehler mehr Zeit, als er beim Bauen gespart hat.',
-  },
-  {
-    title: 'Dokumentation als Qualitätssicherung',
-    body: 'Service-Map, Runbooks, Entscheidungs-Logs. Was aufgeschrieben ist, kann ich ein halbes Jahr später nachlesen. Sonst muss ich es mir aus dem Code wieder herleiten.',
-  },
-];
+// Die vier Grundsätze (PRINCIPLES) sind am 2026-11-21 mit /uber-mich entfallen
+// (Entscheid aus dem Interview vom 09.11.).
 
 // ─── Englische Varianten der Code-Konstanten + Locale-Getter ────────────────────
 
@@ -966,25 +940,3 @@ export function getStack(locale: Locale): StackCategory[] {
   }));
 }
 
-const PRINCIPLES_EN: Principle[] = [
-  {
-    title: 'Systems of my own',
-    body: 'Whoever builds it also runs it, at night and when it breaks. So nothing goes in that I could not take apart if I had to. That limits the scope, and it is meant to.',
-  },
-  {
-    title: 'Security as default',
-    body: 'Read-only containers, dropped capabilities, segmented networks, no direct Docker socket. Hardening happens in waves, documented per exception.',
-  },
-  {
-    title: 'Honest empty states',
-    body: 'A clear empty state beats a pretty mock that lies eventually. Nothing gets invented in production UI.',
-  },
-  {
-    title: 'Documentation as quality assurance',
-    body: 'Service map, runbooks, decision logs, target picture. What is written down I can verify, and somebody else can take it over.',
-  },
-];
-
-export function getPrinciples(locale: Locale): Principle[] {
-  return locale === 'en' ? PRINCIPLES_EN : PRINCIPLES;
-}

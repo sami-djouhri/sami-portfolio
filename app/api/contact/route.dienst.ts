@@ -40,6 +40,8 @@ interface ContactPayload {
   captchaToken?: unknown;
   /** Sprache des Formulars, entscheidet die Sprache der Empfangsbestätigung. */
   locale?: unknown;
+  /** Kästchen „Lebenslauf anfordern“, nur `true` zählt. */
+  lebenslauf?: unknown;
 }
 
 export async function POST(request: Request) {
@@ -74,6 +76,9 @@ export async function POST(request: Request) {
   const email = typeof body.email === 'string' ? body.email.trim().slice(0, 320) : '';
   const subject = typeof body.subject === 'string' ? body.subject.trim().slice(0, 300) : '';
   const message = typeof body.message === 'string' ? body.message.trim().slice(0, 5000) : '';
+  // Nur ein echtes `true` markiert die Anfrage; jeder andere Wert gilt als nicht
+  // angekreuzt. Das Kästchen erscheint nur im Bewerbungsmodus (ContactForm).
+  const lebenslauf = body.lebenslauf === true;
 
   if (!name || !email || !message) {
     return NextResponse.json(
@@ -101,6 +106,7 @@ export async function POST(request: Request) {
     `E-Mail:  ${email}`,
     `Betreff: ${subject || '(ohne Betreff)'}`,
     `Zeit:    ${receivedAt}`,
+    ...(lebenslauf ? ['Lebenslauf: angefordert'] : []),
     '',
     message,
   ].join('\n');
@@ -123,11 +129,19 @@ export async function POST(request: Request) {
         subject: '',
         message: '',
         encrypted,
+        ...(lebenslauf ? { lebenslauf } : {}),
         received_at: receivedAt,
       });
     } else {
       console.error('[contact] PGP-Verschlüsselung fehlgeschlagen, Klartext-Fallback');
-      await addMessage({ name, email, subject, message, received_at: receivedAt });
+      await addMessage({
+        name,
+        email,
+        subject,
+        message,
+        ...(lebenslauf ? { lebenslauf } : {}),
+        received_at: receivedAt,
+      });
     }
     captured = true;
   } catch (err) {
@@ -145,6 +159,7 @@ export async function POST(request: Request) {
         email,
         subject,
         message,
+        lebenslauf,
         encrypted: mailPlaintext ? null : encrypted,
       });
       captured = true;

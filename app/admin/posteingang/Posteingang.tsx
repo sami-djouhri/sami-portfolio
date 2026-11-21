@@ -211,6 +211,11 @@ export default function Posteingang({ messages }: { messages: Message[] }) {
                   title={`~/posteingang/${m.id.slice(0, 8)}`}
                   right={
                     <span className="flex items-center gap-2">
+                      {m.lebenslauf && (
+                        <span className="rounded-md border border-term/40 px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-widest text-term">
+                          lebenslauf
+                        </span>
+                      )}
                       {m.encrypted && (
                         <span className="rounded-md border border-accent/30 px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-widest text-accent/80">
                           🔒 pgp

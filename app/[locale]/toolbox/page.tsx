@@ -563,15 +563,15 @@ export default async function ToolboxPage(props: { params: Promise<{ locale: str
           </p>
 
           <div
-            aria-label={en ? 'Live aggregate of the operation' : 'Live-Aggregat des Betriebs'}
+            aria-label={en ? 'Numbers from the list of works' : 'Zahlen aus der Werkliste'}
             className="mt-8 overflow-hidden rounded-lg border border-border shadow-panel"
           >
             <WindowBar
               title="stats --aggregate"
               right={
                 // Ehrlichkeit: dies ist eine Selbstauskunft aus der Werkliste,
-                // NICHT extern gemessen wie das Panel der Startseite. Deshalb
-                // ein neutraler „Momentaufnahme“-Marker statt eines grünen online-Pulses.
+                // nichts davon ist gemessen. Deshalb ein neutraler
+                // „Momentaufnahme“-Marker statt eines grünen online-Pulses.
                 <span className="inline-flex items-center gap-2 font-mono text-[0.65rem] uppercase tracking-widest text-muted-dim">
                   <span className="status-dot status-dot--pivot" aria-hidden />
                   {en ? 'snapshot' : 'Momentaufnahme'}

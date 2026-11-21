@@ -69,8 +69,8 @@ export const WERKAUSZUEGE: Record<string, Werkauszug> = {
     en: 'The watcher scans classifieds and eBay for hardware below value. False alarms were the real problem.',
   },
   'wissens-foederation': {
-    de: 'Mein Wissen liegt über viele Dienste verstreut, von Dokumenten im Archiv bis zu Büchern im Regal.',
-    en: 'My knowledge sits scattered across many services, from documents in an archive to books on a shelf.',
+    de: 'Mein Wissen liegt über viele Dienste verstreut, von Dokumenten im Archiv bis zu Büchern in der Bibliothek.',
+    en: 'My knowledge sits scattered across many services, from documents in an archive to books in a library.',
   },
   'offline-wissen': {
     de: 'Karte, Nachschlagewerk und Routenplanung braucht man genau dann, wenn die Leitung weg ist.',

@@ -33,11 +33,12 @@ export function asLocale(value: unknown): Locale {
  */
 export const EN_SLUGS: Record<string, string> = {
   projekte: 'projects',
-  'uber-mich': 'about',
   kontakt: 'contact',
   impressum: 'legal-notice',
   datenschutz: 'privacy',
 };
+// `'uber-mich': 'about'` ist am 2026-11-21 entfallen (Seite in `/kontakt`
+// aufgegangen), Weiterleitungen in `next.config.mjs`.
 // `jetzt: 'now'` und `notizen: 'notes'` sind am 2026-10-15 mit ihren Seiten
 // entfallen. Ein Eintrag ohne Route wäre hier nicht nur tot, sondern schädlich:
 // der Proxy würde `/en/notes` weiter auf die deutsche Route umschreiben, die es
